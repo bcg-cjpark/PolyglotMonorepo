@@ -37,20 +37,20 @@ ASCII 와이어프레임 (디자인 시안 전 임시):
 
 **영역 구성:**
 - 헤더: 좌측 제목("Todos"), 우측 "+ New" 버튼
-- 필터 바: RadioGroup (All/Active/Completed)
+- 필터 바: 라디오 탭 (All/Active/Completed)
 - 리스트: 각 행에 [체크박스, 제목, 설명(옵션), 마감일(옵션), Edit/Delete 버튼]
 - 빈 상태: 메시지
 
 ## 컴포넌트
-| 역할 | 컴포넌트 | 비고 |
+| 역할 | UI 종류 | 비고 |
 |---|---|---|
-| "+ New" 버튼 | `Button` | variant=`contained`, color=`primary` |
-| 필터 탭 | `RadioGroup` | variant=`underline`, options: [All, Active, Completed] |
-| 완료 체크박스 | `Checkbox` | 행당 1개, 토글 시 `/todos/{id}/toggle` 호출 |
-| Edit 버튼 | `Button` | variant=`outlined`, size=`sm` |
-| Delete 버튼 | `Button` | variant=`outlined`, color=`red`, size=`sm` |
-| 리스트 컨테이너 | native `<ul>` 또는 `<table>` | 카드 스타일 복잡하면 native div로 가능 |
-| 마감일 표시 | native `<span>` | 과거면 `text-red-500` 적용 |
+| "+ New" 버튼 | Primary 버튼 | 클릭 시 `/todos/new` 로 이동 |
+| 필터 탭 | 라디오 탭 (단일 선택) | 옵션: All / Active / Completed |
+| 완료 체크박스 | 체크박스 | 행당 1개, 토글 시 `/todos/{id}/toggle` 호출 |
+| Edit 버튼 | 작은 Secondary 버튼 | 클릭 시 `/todos/{id}/edit` 로 이동 |
+| Delete 버튼 | 작은 위험(Destructive) 버튼 | 클릭 시 `DELETE /todos/{id}` |
+| 리스트 컨테이너 | 리스트 또는 테이블 | 개별 Todo 행을 세로로 나열 |
+| 마감일 표시 | 텍스트 | 과거 날짜면 빨간색 강조 |
 
 ## 인터랙션
 1. 진입 시 `GET /todos?status={filter}` 호출 → 리스트 렌더 (기본 filter=`all`)

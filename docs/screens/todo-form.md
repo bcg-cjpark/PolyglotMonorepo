@@ -19,18 +19,18 @@ ASCII 와이어프레임:
 │                                      │
 │  Title *                             │
 │  ┌────────────────────────────────┐  │
-│  │ Finish project report          │  │  ← Input (required, allowSpaces)
+│  │ Finish project report          │  │  ← 단일행 텍스트 입력 (필수)
 │  └────────────────────────────────┘  │
 │                                      │
 │  Description                         │
 │  ┌────────────────────────────────┐  │
-│  │ Prepare slides and talking     │  │  ← textarea (native or Input multiline)
+│  │ Prepare slides and talking     │  │  ← 여러 줄 텍스트 입력
 │  │ points for Monday presentation │  │
 │  └────────────────────────────────┘  │
 │                                      │
 │  Due Date                            │
 │  ┌─────────────────┐                 │
-│  │ 2026-04-25      │                 │  ← native <input type="date">
+│  │ 2026-04-25      │                 │  ← 날짜 선택
 │  └─────────────────┘                 │
 │                                      │
 │  [ Create ]  [ Cancel ]              │  ← 수정 모드면 "Update"
@@ -47,15 +47,13 @@ ASCII 와이어프레임:
 - 액션 버튼 행: Create/Update + Cancel
 
 ## 컴포넌트
-| 역할 | 컴포넌트 | 비고 |
+| 역할 | UI 종류 | 비고 |
 |---|---|---|
-| Title 입력 | `Input` | `full`, `allowSpaces` |
-| Description 입력 | native `<textarea>` | `libs/ui` 에 textarea 전용 컴포넌트 없음 — 필요 시 ui-composer 로 추가 |
-| Due Date 입력 | native `<input type="date">` | 날짜 피커 전용 컴포넌트 없음 — 네이티브로 시작 |
-| 제출 버튼 | `Button` | `buttonType=submit`, variant=`contained`, color=`primary` |
-| 취소 버튼 | `Button` | `buttonType=button`, variant=`outlined`, color=`grey` |
-
-**참고:** textarea 와 date picker 는 현재 `libs/ui` 에 없음. 초기 구현은 네이티브로 진행하고, 나중에 `ui-composer` 로 `Textarea`, `DatePicker` 컴포넌트 추가 가능.
+| Title 입력 | 단일행 텍스트 입력 | 필수, 공백 허용 |
+| Description 입력 | 여러 줄 텍스트 입력 | 선택 |
+| Due Date 입력 | 날짜 선택 | 선택, YYYY-MM-DD |
+| 제출 버튼 | Primary 버튼 | 모드에 따라 label "Create" / "Update" |
+| 취소 버튼 | Secondary 버튼 | label "Cancel" |
 
 ## 인터랙션
 1. 진입 시 URL 에 `:id` 있으면 `GET /todos/{id}` → 폼 필드 채우기
@@ -78,9 +76,9 @@ ASCII 와이어프레임:
 ## 상태
 | 상태명 | 타입 | 초기값 | 업데이트 트리거 |
 |---|---|---|---|
-| title | `string` | `""` (or 로드값) | Input onChange |
-| description | `string` | `""` (or 로드값) | textarea onChange |
-| dueDate | `string` | `""` (or 로드값, "YYYY-MM-DD") | date input onChange |
+| title | `string` | `""` (or 로드값) | 제목 입력 변경 |
+| description | `string` | `""` (or 로드값) | 설명 입력 변경 |
+| dueDate | `string` | `""` (or 로드값, "YYYY-MM-DD") | 마감일 입력 변경 |
 | submitting | `boolean` | `false` | 제출 시작/종료 |
 | loading | `boolean` | `true` (수정 모드) / `false` (신규) | GET 시작/종료 |
 | error | `string \| null` | `null` | 요청 실패 |
