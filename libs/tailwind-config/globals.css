@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 content 소스 명시 — 이 파일이 libs/tailwind-config/ 에 있어서 기본 스캔 범위가 좁음.
+   workspace의 모든 앱/라이브러리 소스를 스캔하도록 지정. */
+@source "../../apps/**/*.{ts,tsx,html}";
+@source "../../libs/**/*.{ts,tsx}";
+
+/* `dark:` 유틸은 문서 루트의 `.dark` 클래스 기준 (next-themes / 다크모드 토글과 정합) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 앱에서 @monorepo/tokens 의 CSS를 먼저 import한 뒤 이 파일을 로드하면,
+   토큰 CSS 변수와 아래 @theme 기본값이 함께 적용됩니다. */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}

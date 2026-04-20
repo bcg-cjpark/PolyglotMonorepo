@@ -1,0 +1,15 @@
+{
+  "name": "@monorepo/tailwind-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./globals": "./globals.css",
+    "./postcss": "./postcss.config.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0"
+  }
+}
