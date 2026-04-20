@@ -1,0 +1,49 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "example-api",
+  "projectType": "application",
+  "sourceRoot": "apps/example-api",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/example-api",
+        "command": "node ../../scripts/run-gradle.mjs :app:bootRun"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "outputs": ["{projectRoot}/app/build/libs"],
+      "options": {
+        "cwd": "apps/example-api",
+        "command": "node ../../scripts/run-gradle.mjs :app:bootJar"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "cwd": "apps/example-api",
+        "command": "node ../../scripts/run-gradle.mjs test"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "cwd": "apps/example-api",
+        "command": "node ../../scripts/run-gradle.mjs ktlintCheck"
+      }
+    },
+    "generate-openapi": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/app/build/openapi.json"],
+      "options": {
+        "cwd": "apps/example-api",
+        "command": "node ../../scripts/run-gradle.mjs :app:generateOpenApiDocs"
+      }
+    }
+  },
+  "tags": ["lang:kotlin", "scope:api"]
+}
