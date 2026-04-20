@@ -1,0 +1,22 @@
+{
+  "name": "@monorepo/root",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "build": "nx run-many -t build",
+    "test": "nx run-many -t test",
+    "lint": "nx run-many -t lint",
+    "graph": "nx graph",
+    "affected": "nx affected"
+  },
+  "devDependencies": {
+    "@nx/js": "^20.0.0",
+    "@nx/react": "^20.0.0",
+    "@nx/vite": "^20.0.0",
+    "@nx/workspace": "^20.0.0",
+    "nx": "^20.0.0",
+    "openapi-typescript": "^7.4.0",
+    "typescript": "~5.5.2"
+  }
+}
