@@ -1,0 +1,7 @@
+{
+  "extends": "@monorepo/typescript-config/library",
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  "include": ["src"]
+}

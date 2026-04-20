@@ -1,0 +1,18 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "api-types",
+  "projectType": "library",
+  "sourceRoot": "libs/api-types/src",
+  "targets": {
+    "codegen": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/src/generated.ts"],
+      "dependsOn": ["example-api:generate-openapi"],
+      "options": {
+        "cwd": "libs/api-types",
+        "command": "pnpm codegen"
+      }
+    }
+  },
+  "tags": ["lang:typescript", "scope:shared"]
+}

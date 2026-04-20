@@ -1,0 +1,15 @@
+{
+  "name": "@monorepo/api-types",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "codegen": "openapi-typescript ../../apps/example-api/app/build/openapi.json -o src/generated.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.0",
+    "typescript": "~5.5.2"
+  }
+}
