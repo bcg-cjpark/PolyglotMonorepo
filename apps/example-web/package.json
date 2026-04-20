@@ -1,0 +1,48 @@
+{
+  "name": "example-web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@monorepo/api-types": "workspace:*",
+    "@monorepo/tokens": "workspace:*",
+    "@monorepo/types": "workspace:*",
+    "@monorepo/ui": "workspace:*",
+    "axios": "^1.7.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^6.23.1",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@ag-grid-community/locale": "^34.3.1",
+    "@monorepo/eslint-config": "workspace:*",
+    "@monorepo/tailwind-config": "workspace:*",
+    "@monorepo/typescript-config": "workspace:*",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@playwright/test": "^1.49.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "ag-grid-community": "^34.3.1",
+    "ag-grid-react": "^34.3.1",
+    "eslint": "^9.18.0",
+    "jsdom": "^25.0.0",
+    "sass": "^1.85.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}

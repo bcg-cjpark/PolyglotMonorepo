@@ -1,0 +1,9 @@
+/* 앱 레벨 커스텀 스타일. 토큰/Tailwind/UI 뒤에 로드되어 오버라이드 우선순위를 가짐. */
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--background-bg-default, #fff);
+  color: var(--font-color-default, #111);
+}

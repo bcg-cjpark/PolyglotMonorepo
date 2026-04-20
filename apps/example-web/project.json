@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "example-web",
+  "projectType": "application",
+  "sourceRoot": "apps/example-web/src",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/example-web",
+        "command": "pnpm e2e"
+      }
+    },
+    "e2e:install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/example-web",
+        "command": "pnpm e2e:install"
+      }
+    }
+  },
+  "tags": ["lang:typescript", "scope:web"]
+}

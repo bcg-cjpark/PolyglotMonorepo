@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "#/*": ["../../libs/ui/src/*"],
+      "@monorepo/api-types": ["../../libs/api-types/src/index.ts"],
+      "@monorepo/tokens": ["../../libs/tokens"],
+      "@monorepo/types": ["../../libs/types/src/index.ts"],
+      "@monorepo/ui": ["../../libs/ui/src/index.ts"]
+    }
+  },
+  "include": ["src", "../../libs/ui/src", "../../libs/types/src"]
+}
