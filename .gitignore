@@ -12,6 +12,7 @@ node_modules/
 dist/
 .vite/
 *.tsbuildinfo
+storybook-static/
 
 # ========================
 # Kotlin / Gradle

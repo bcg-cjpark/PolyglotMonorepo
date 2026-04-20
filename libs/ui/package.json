@@ -12,6 +12,10 @@
     },
     "./styles.scss": "./src/styles/components.scss"
   },
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
   "peerDependencies": {
     "@ag-grid-community/locale": "^34.0.0",
     "ag-grid-community": "^34.0.0",
@@ -26,12 +30,18 @@
   "devDependencies": {
     "@monorepo/eslint-config": "workspace:*",
     "@monorepo/tailwind-config": "workspace:*",
+    "@monorepo/tokens": "workspace:*",
     "@monorepo/typescript-config": "workspace:*",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/react-vite": "^10.3.5",
+    "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sass": "^1.85.0",
+    "storybook": "^10.3.5",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.7.0"
   }
 }
