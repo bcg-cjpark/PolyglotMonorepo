@@ -1,0 +1,76 @@
+# ========================
+# Nx
+# ========================
+.nx/
+.nx/cache
+.nx/workspace-data
+
+# ========================
+# Node / React
+# ========================
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# ========================
+# Kotlin / Gradle
+# ========================
+.gradle/
+build/
+out/
+bin/
+*.class
+*.jar
+*.war
+*.jqwik-database
+
+# ========================
+# Generated code
+# ========================
+libs/api-types/src/generated.ts
+
+# ========================
+# Playwright
+# ========================
+**/test-results/
+**/playwright-report/
+**/playwright/.cache/
+
+# ========================
+# Environment
+# ========================
+.env
+.env.*
+!.env.example
+local*
+
+# ========================
+# IDE
+# ========================
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+*.swp
+*.swo
+
+# ========================
+# OS
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Logs
+# ========================
+*.log
+*.gz
+
+# ========================
+# Claude / GStack
+# ========================
+.claude/settings.local.json
+.gstack/browse.json
