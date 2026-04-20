@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/nx/schemas/generators-schema.json",
+  "name": "@monorepo/generators",
+  "version": "0.0.1",
+  "generators": {
+    "api-app": {
+      "factory": "./src/api-app/generator",
+      "schema": "./src/api-app/schema.json",
+      "description": "Scaffold a new Kotlin Spring Boot multi-module API app from example-api"
+    },
+    "web-app": {
+      "factory": "./src/web-app/generator",
+      "schema": "./src/web-app/schema.json",
+      "description": "Scaffold a new React + Vite web app from example-web"
+    }
+  }
+}

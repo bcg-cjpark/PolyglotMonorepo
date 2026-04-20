@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "ApiApp",
+  "title": "Create a Kotlin Spring Boot multi-module API app",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the app (kebab-case), e.g. billing-api",
+      "$default": { "$source": "argv", "index": 0 },
+      "x-prompt": "What name would you like to use?"
+    },
+    "packageName": {
+      "type": "string",
+      "description": "Kotlin root package, e.g. com.example.billing",
+      "x-prompt": "Root Kotlin package (e.g. com.example.billing)?"
+    },
+    "port": {
+      "type": "number",
+      "description": "HTTP server port",
+      "default": 8080
+    }
+  },
+  "required": ["name", "packageName"]
+}

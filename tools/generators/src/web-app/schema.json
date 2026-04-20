@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "WebApp",
+  "title": "Create a React + Vite web app",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the app (kebab-case), e.g. billing-web",
+      "$default": { "$source": "argv", "index": 0 },
+      "x-prompt": "What name would you like to use?"
+    },
+    "port": {
+      "type": "number",
+      "description": "Vite dev server port",
+      "default": 3000
+    }
+  },
+  "required": ["name"]
+}
