@@ -28,6 +28,8 @@ grep -q 'rootProject.name = "example-api"' apps/example-api/settings.gradle.kts 
 | **프로젝트 슬러그** | `billing-app` | kebab-case, 3-40자 |
 | **Kotlin 루트 패키지** | `com.acme.billing` | 소문자 + 점, 역도메인 |
 | **프로덕트 한 줄 소개** | `송장 관리 SaaS` | README 에 들어감 |
+| **Primary 색상** (선택) | `#2563eb` | `#rrggbb` 또는 `#rgb`. 미지정 시 템플릿 기본 유지 |
+| **Secondary 색상** (선택) | `#f97316` | `#rrggbb` 또는 `#rgb`. 미지정 시 Secondary 토큰 추가 안 함 |
 
 수집 후 아래 치환 계획을 **사용자에게 보여주고 확인**:
 
@@ -45,6 +47,8 @@ grep -q 'rootProject.name = "example-api"' apps/example-api/settings.gradle.kts 
   - apps/example-api/app/src/test/...ApplicationTests.kt 의 패키지 라인 업데이트
   - libs/api-types 기존 OpenAPI 코드젠 결과 초기화
   - pnpm-workspace.yaml, nx.json 의 참조 업데이트
+  - (Primary/Secondary 입력 시) 디자인 시스템 색상 재생성:
+      node scripts/apply-theme-colors.mjs --primary=<hex> [--secondary=<hex>]
 
 진행할까요? (yes/no)
 ```
@@ -136,6 +140,25 @@ rm docs/screens/user-form.md
 상단에 "이 레포는 `PolyglotMonorepo` 템플릿에서 생성된 `<slug>` 프로젝트" 한 줄 추가.
 기존 내용은 **유지** (검증 규칙, UI 라이브러리 우선 등은 계속 적용되어야 함).
 
+### 3.7 디자인 시스템 색상 (선택)
+
+Primary 또는 Secondary 가 입력됐으면 generator 실행. 토큰 파일을 직접 편집하지 말 것.
+
+```bash
+# 둘 다 있을 때
+node scripts/apply-theme-colors.mjs --primary=<primary_hex> --secondary=<secondary_hex>
+
+# Primary 만
+node scripts/apply-theme-colors.mjs --primary=<primary_hex>
+```
+
+스크립트 동작:
+- `libs/tokens/styles/__tokens-light.css` 와 `__tokens-dark.css` 의
+  `--base-colors-primary-primary*` (및 secondary) 전 단계(050~900 + deep) 를
+  HSL 기반으로 재생성. Light/Dark 양 테마 모두 갱신.
+- Secondary 가 처음 추가되면 `libs/tokens/styles/tailwind-bridge.css` 에
+  `--color-secondary` alias 를 함께 추가.
+
 ## 4. 검증
 
 다음 명령이 에러 없이 끝나야 함:
@@ -188,7 +211,8 @@ rm .claude/commands/bootstrap.md
 ## 절대 하지 말 것
 
 - **`.claude/agents/*` 파일 내용 수정** — 이 에이전트들은 템플릿 자산. 경로 참조(`example-api` 등)만 필요 시 업데이트.
-- **`libs/ui`, `libs/tokens`, `libs/tailwind-config`, `libs/typescript-config`, `libs/eslint-config` 변경** — 공통 인프라 유지.
+- **`libs/ui`, `libs/tailwind-config`, `libs/typescript-config`, `libs/eslint-config` 변경** — 공통 인프라 유지.
+- **`libs/tokens/styles/__tokens-*.css` 를 직접 편집** — 색상 변경은 반드시 `scripts/apply-theme-colors.mjs` 로. 직접 편집하면 Light/Dark 동기화가 깨지기 쉬움.
 - **`tools/generators/` 수정** — 제너레이터도 템플릿 자산.
 - **git 상태 무시** — 기존 uncommitted 변경이 있으면 사용자에게 확인 후 진행.
 - **외부 네트워크 호출** — 이 스킬은 로컬에서만 동작.
