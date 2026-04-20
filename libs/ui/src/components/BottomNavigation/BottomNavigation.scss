@@ -1,0 +1,122 @@
+/**
+ * BottomNavigation 스타일
+ * Material UI Bottom Navigation을 참고하여 구현
+ */
+
+.base-bottom-navigation {
+  display: flex;
+  width: 100%;
+  height: 50px;
+  background-color: var(--background-bg-default);
+  border-top: 1px solid var(--background-bg-outline);
+  box-shadow: none;
+  z-index: 1000;
+
+  &--fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  &--with-labels {
+    .base-bottom-navigation__item {
+      flex-direction: column;
+      padding: 4px 8px 6px;
+      height: 50px;
+    }
+
+    .base-bottom-navigation__icon {
+      margin-bottom: 2px;
+    }
+
+    .base-bottom-navigation__label {
+      font-size: 10px;
+      line-height: 1.2;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+  }
+
+  &--icons-only {
+    .base-bottom-navigation__item {
+      flex-direction: column;
+      padding: 8px 6px;
+      height: 50px;
+    }
+
+    .base-bottom-navigation__icon {
+      margin-bottom: 0;
+    }
+
+    .base-bottom-navigation__label {
+      display: none;
+    }
+  }
+
+  &__container {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    outline: none;
+
+    &:focus-visible {
+      outline: 2px solid var(--base-colors-primary-primary800);
+      outline-offset: -2px;
+    }
+
+    &--active {
+      .base-bottom-navigation__icon {
+        color: var(--nav-on);
+      }
+
+      .base-bottom-navigation__label {
+        color: var(--nav-on);
+        font-weight: 600;
+      }
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      .base-bottom-navigation__icon {
+        color: var(--nav-off);
+      }
+
+      .base-bottom-navigation__label {
+        color: var(--nav-off);
+      }
+    }
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--nav-off);
+    flex-shrink: 0;
+  }
+
+  &__label {
+    color: var(--nav-off);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+}

@@ -1,0 +1,39 @@
+.base-popover {
+  &__panel {
+    position: absolute;
+    z-index: 50;
+    min-width: 200px;
+    background: var(--background-bg-default);
+    border: 1px solid var(--border-color-default);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+    // 위치별 기본 transform 처리
+    // 인라인 스타일로 override 가능하도록 기본값만 설정
+    &--bottom,
+    &--top {
+      transform: translateX(-50%);
+    }
+
+    &--bottom-left,
+    &--top-left {
+      transform: translateX(0);
+    }
+
+    &--bottom-right,
+    &--top-right {
+      transform: translateX(0);
+    }
+
+    &--left,
+    &--right {
+      transform: translateY(-50%);
+    }
+
+    // transition 중에는 transform을 유지해야 함
+    &.transition-enter-active,
+    &.transition-leave-active {
+      transition-property: opacity, transform;
+    }
+  }
+}

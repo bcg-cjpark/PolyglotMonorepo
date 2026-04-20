@@ -1,0 +1,144 @@
+// MobileListItem - 모바일용 리스트 아이템 (스와이프 액션 옵션)
+.mobile-list-item {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: all 0.2s ease;
+  cursor: default;
+  position: relative;
+  min-height: var(--base-size-size-48);
+  box-sizing: border-box;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  list-style-type: none;
+
+  &.mobile-list-item--swipeable {
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  &.mobile-list-item--clickable {
+    cursor: pointer;
+    user-select: none;
+
+    .mobile-list-item__swipe-surface:hover {
+      background-color: var(--background-bg-surface);
+    }
+
+    .mobile-list-item__swipe-surface:active {
+      background-color: var(--background-bg-outline);
+    }
+  }
+
+  &.mobile-list-item--disabled {
+    opacity: 0.5;
+    color: var(--font-color-default-muted);
+  }
+
+  &.mobile-list-item--divider {
+    border-bottom: 1px solid var(--background-divider);
+  }
+
+  &.mobile-list-item--selected {
+    .mobile-list-item__swipe-surface {
+      background-color: var(--background-bg-innerframe);
+    }
+  }
+
+  &__swipe-backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff5b5b;
+    z-index: 0;
+  }
+
+  &__swipe-icon {
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__swipe-surface {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--base-size-size-48);
+    padding: var(--padding-padding-10) var(--padding-padding-12);
+    background-color: var(--background-bg-default);
+    transition: transform 0.15s ease-out;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &.mobile-list-item--swipeable .mobile-list-item__swipe-surface {
+    cursor: grab;
+  }
+
+  &.mobile-list-item--swipeable .mobile-list-item__swipe-surface:active {
+    cursor: grabbing;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--padding-padding-8);
+    margin-right: var(--padding-padding-12);
+
+    .base-icon {
+      flex-shrink: 0;
+      width: var(--base-size-size-20);
+      height: var(--base-size-size-20);
+      color: var(--input-icon-default);
+    }
+
+    span {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: var(--font-size-font-14);
+    }
+  }
+
+  &__secondary-action {
+    margin-left: auto;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: var(--padding-padding-4);
+    border-radius: var(--radius-xs);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--background-bg-surface);
+    }
+
+    &:active {
+      background-color: var(--background-bg-outline);
+    }
+
+    .base-icon,
+    .icon {
+      width: var(--base-size-size-18);
+      height: var(--base-size-size-18);
+      color: var(--input-icon-default);
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__swipe-backdrop {
+      width: 72px;
+    }
+  }
+}

@@ -1,0 +1,94 @@
+// InputSelect 컴포넌트 스타일
+// 피그마의 Input/Select-SM 디자인 기반
+// 가이드: 피그마 HEX → 디자인 토큰 변환 적용
+
+.base-input-select {
+  // 셀렉트 박스에 특화된 스타일
+  position: relative;
+
+  // 숨겨진 실제 셀렉트 요소
+  .base-input-select-hidden {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: var(--z-index-dropdown);
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  // 표시용 입력 필드 (읽기 전용)
+  input {
+    cursor: pointer;
+    user-select: none;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  // 화살표 아이콘 스타일
+  .base-input-suffix {
+    .base-icon {
+      color: var(--input-icon-default);
+      transition: transform 0.2s ease;
+    }
+  }
+
+  // 비활성화 상태
+  &.base-input-disabled {
+    .base-input-suffix {
+      .base-icon {
+        color: var(--input-color-text-disable);
+      }
+    }
+  }
+
+  // 포커스 상태에서 화살표 회전 (선택사항)
+  &:focus-within {
+    .base-input-suffix {
+      .base-icon {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+// 크기별 스타일
+.base-input-select-sm {
+  input {
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: -0.35px;
+  }
+}
+
+.base-input-select-md {
+  input {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.35px;
+  }
+}
+
+// 셀렉트 옵션 스타일 (브라우저 기본 드롭다운)
+.base-input-select-hidden {
+  option {
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: -0.35px;
+    color: var(--input-color-text-static);
+    background-color: var(--input-color-surface);
+    padding: 8px 12px;
+
+    &:disabled {
+      color: var(--input-color-text-disable);
+      background-color: var(--input-color-bg-disabled);
+    }
+  }
+}

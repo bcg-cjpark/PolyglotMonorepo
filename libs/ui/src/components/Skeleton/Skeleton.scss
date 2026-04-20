@@ -1,0 +1,53 @@
+/* Skeleton 스타일 */
+.skeleton-base {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--base-colors-neutral-neutral200);
+  border-radius: var(--radius-sm);
+
+  // 다크 모드 대응
+  .dark & {
+    background-color: var(--base-colors-neutral-neutral700);
+  }
+}
+
+.skeleton-text {
+  border-radius: var(--radius-sm);
+  // 텍스트 스켈레톤은 더 작은 높이와 적절한 너비를 가짐
+  min-height: 1rem;
+  // 텍스트 라인처럼 보이도록 약간의 여백 추가
+  margin: 0.125rem 0;
+}
+
+.skeleton-circular {
+  border-radius: 50%;
+}
+
+.skeleton-rectangular {
+  border-radius: var(--radius-sm);
+  // rectangular는 약간의 둥근 모서리를 가짐
+}
+
+// 텍스트용 shimmer 효과
+.skeleton-text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--base-colors-neutral-neutral300) 0%,
+    var(--base-colors-neutral-neutral100) 50%,
+    var(--base-colors-neutral-neutral300) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 1.5s infinite;
+
+  .dark & {
+    background: linear-gradient(
+      90deg,
+      var(--base-colors-neutral-neutral600) 0%,
+      var(--base-colors-neutral-neutral400) 50%,
+      var(--base-colors-neutral-neutral600) 100%
+    );
+  }
+}

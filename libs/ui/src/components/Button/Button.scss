@@ -1,0 +1,464 @@
+// Button 컴포넌트 스타일
+
+// 기본 버튼 스타일
+.btn-primary,
+.btn-outline,
+.btn-red,
+.btn-blue,
+.btn-pill,
+.btn-light-solid,
+.btn-red-solid,
+.btn-blue-solid,
+.btn-green-solid,
+.btn-cancel-solid,
+.btn-disabled {
+  background-color: var(--button-disabled-background);
+  color: var(--button-disabled-text);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+// 색상(color) 관련 클래스
+.btn-color-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  font-weight: 600;
+}
+.btn-color-primary:hover {
+  background-color: var(--button-primary-background-hover);
+}
+.btn-color-red {
+  background-color: var(--base-colors-red-red800);
+  color: var(--font-color-white);
+  border: 1px solid var(--base-colors-red-red800);
+}
+.btn-color-red:hover {
+  background-color: var(--button-red-solid-hover);
+}
+.btn-color-blue {
+  background-color: var(--base-colors-blue-blue800-deep);
+  color: var(--font-color-white);
+  border: 1px solid var(--base-colors-blue-blue800-deep);
+}
+.btn-color-blue:hover {
+  background-color: var(--button-blue-solid-hover);
+}
+.btn-color-green {
+  background-color: var(--base-colors-green-green700);
+  color: var(--font-color-white);
+  font-weight: 600;
+}
+.btn-color-green:hover {
+  background-color: var(--base-colors-green-green700);
+}
+.btn-color-cancel {
+  background-color: var(--base-colors-purple-purple600);
+  color: var(--font-color-white);
+  font-weight: 600;
+}
+.btn-color-cancel:hover {
+  background-color: var(--base-colors-purple-purple600);
+}
+
+.btn-color-grey {
+  background-color: var(--base-colors-neutral-neutral200);
+  color: var(--base-colors-neutral-neutral550);
+  font-weight: 600;
+}
+
+.btn-color-white {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border: 1px solid var(--button-outline-border);
+}
+
+.btn-color-white:hover {
+  background-color: var(--button-outline-background-hover);
+}
+
+.btn-color-black {
+  background-color: var(--base-colors-neutral-neutral800);
+  color: var(--base-colors-neutral-neutral000);
+  border: 1px solid var(--base-colors-neutral-neutral800);
+  font-weight: 600;
+}
+
+.btn-color-black:hover {
+  background-color: var(--base-colors-neutral-neutral750);
+  border-color: var(--base-colors-neutral-neutral750);
+}
+
+.btn-variant-contained {
+  border: 1px solid transparent;
+}
+
+.btn-variant-contained.btn-disabled,
+.btn-variant-contained:disabled {
+  background-color: var(--button-disabled-background);
+  color: var(--button-disabled-text);
+  border: none;
+}
+
+.btn-variant-contained-grey {
+  border: 1px solid transparent;
+  background-color: var(--button-red-background-none);
+}
+
+.btn-variant-contained-grey.btn-color-primary {
+  color: var(--base-colors-primary-primary-deep);
+}
+.btn-variant-contained-grey.btn-color-red {
+  color: var(--button-trade-red-text-before);
+  background-color: var(--button-trade-red-background-before);
+}
+.btn-variant-contained-grey.btn-color-blue {
+  color: var(--button-trade-blue-text-before);
+  background-color: var(--button-trade-blue-background-before);
+}
+.btn-variant-contained-grey.btn-color-green {
+  color: var(--base-colors-green-green700);
+}
+.btn-variant-contained-grey.btn-color-cancel {
+  color: var(--base-colors-purple-purple600);
+}
+.btn-variant-contained-grey.btn-color-grey {
+  color: var(--base-colors-neutral-neutral550);
+}
+.btn-variant-contained-grey.btn-color-white {
+  color: var(--base-colors-neutral-neutral750);
+}
+.btn-variant-contained-grey.btn-color-black {
+  color: var(--base-colors-neutral-neutral800);
+}
+
+// Contained Grey hover 상태
+.btn-variant-contained-grey:hover:not(.btn-disabled):not(:disabled) {
+  background-color: var(--button-trade-blue-hover-before);
+}
+
+// Contained Grey disabled 상태
+.btn-variant-contained-grey.btn-disabled,
+.btn-variant-contained-grey:disabled {
+  background-color: var(--button-disabled-background);
+  color: var(--button-disabled-text);
+  opacity: 0.6;
+}
+
+// Light variant: 파스텔톤 배경 + 테두리
+.btn-variant-light {
+  border-width: 1px;
+  border-style: solid;
+}
+.btn-variant-light.btn-color-primary {
+  border-color: var(--base-colors-primary-primary800);
+  color: var(--base-colors-primary-primary-deep);
+  background-color: var(--base-colors-primary-primary100);
+}
+.btn-variant-light.btn-color-red {
+  border-color: var(--base-colors-red-red800);
+  color: var(--base-colors-red-red800);
+  background-color: var(--base-colors-red-red050);
+}
+.btn-variant-light.btn-color-blue {
+  border-color: var(--base-colors-blue-blue800-deep);
+  color: var(--base-colors-blue-blue800-deep);
+  background-color: var(--base-colors-blue-blue050);
+}
+.btn-variant-light.btn-color-green {
+  border-color: var(--base-colors-green-green700);
+  color: var(--base-colors-green-green700);
+  background-color: var(--base-colors-green-green050);
+}
+.btn-variant-light.btn-color-cancel {
+  border-color: var(--base-colors-purple-purple600);
+  color: var(--base-colors-purple-purple600);
+  background-color: var(--base-colors-purple-purple050);
+}
+.btn-variant-light.btn-color-grey {
+  border-color: var(--base-colors-neutral-neutral550);
+  color: var(--base-colors-neutral-neutral550);
+  background-color: var(--base-colors-neutral-neutral100);
+}
+.btn-variant-light.btn-color-white {
+  border-color: var(--base-colors-neutral-neutral300);
+  color: var(--base-colors-neutral-neutral750);
+  background-color: var(--button-outline-background);
+}
+.btn-variant-light.btn-color-black {
+  border-color: var(--base-colors-neutral-neutral800);
+  color: var(--base-colors-neutral-neutral800);
+  background-color: var(--base-colors-neutral-neutral100);
+}
+.btn-variant-light.btn-color-primary:hover {
+  background-color: var(--button-light-solid-background-hover);
+}
+/* .btn-variant-light.btn-color-red:hover {
+  background-color: var(--button-red-background-hover);
+} */
+/* .btn-variant-light.btn-color-blue:hover {
+  background-color: var(--button-blue-outline-big-background-hover);
+} */
+.btn-variant-light.btn-color-green:hover {
+  background-color: var(--button-green-background-hover, var(--base-colors-green-green100));
+}
+.btn-variant-light.btn-color-cancel:hover {
+  background-color: var(--button-cancel-background-hover, var(--base-colors-purple-purple100));
+}
+.btn-variant-light.btn-color-black:hover {
+  background-color: var(--base-colors-neutral-neutral200);
+}
+
+// light variant + disabled 상태
+.btn-variant-light.btn-disabled,
+.btn-variant-light:disabled {
+  background-color: var(--button-disabled-background);
+  border-color: var(--button-disabled-background);
+  color: var(--button-disabled-text);
+}
+
+// Outlined variant: 테두리만 있고 배경색 없음
+.btn-variant-outlined {
+  border-width: 1px;
+  border-style: solid;
+  background-color: transparent;
+}
+.btn-variant-outlined.btn-color-primary {
+  border-color: var(--base-colors-primary-primary800);
+  color: var(--base-colors-primary-primary-deep);
+}
+.btn-variant-outlined.btn-color-red {
+  border-color: var(--base-colors-red-red800);
+  color: var(--base-colors-red-red800);
+}
+.btn-variant-outlined.btn-color-blue {
+  border-color: var(--base-colors-blue-blue800-deep);
+  color: var(--base-colors-blue-blue800-deep);
+}
+.btn-variant-outlined.btn-color-green {
+  border-color: var(--base-colors-green-green700);
+  color: var(--base-colors-green-green700);
+}
+.btn-variant-outlined.btn-color-cancel {
+  border-color: var(--base-colors-purple-purple600);
+  color: var(--base-colors-purple-purple600);
+}
+.btn-variant-outlined.btn-color-grey {
+  border-color: var(--base-colors-neutral-neutral550);
+  color: var(--base-colors-neutral-neutral550);
+}
+.btn-variant-outlined.btn-color-white {
+  border-color: var(--base-colors-neutral-neutral300);
+  color: var(--base-colors-neutral-neutral750);
+}
+.btn-variant-outlined.btn-color-black {
+  border-color: var(--background-divider-muted);
+  color: var(--base-colors-neutral-neutral800);
+}
+.btn-variant-outlined.btn-color-primary:hover {
+  background-color: var(--base-colors-primary-primary050);
+}
+.btn-variant-outlined.btn-color-red:hover {
+  background-color: var(--base-colors-red-red050);
+}
+.btn-variant-outlined.btn-color-blue:hover {
+  background-color: var(--base-colors-blue-blue050);
+}
+.btn-variant-outlined.btn-color-green:hover {
+  background-color: var(--base-colors-green-green050);
+}
+.btn-variant-outlined.btn-color-cancel:hover {
+  background-color: var(--base-colors-purple-purple050);
+}
+.btn-variant-outlined.btn-color-grey:hover {
+  background-color: var(--base-colors-neutral-neutral100);
+}
+.btn-variant-outlined.btn-color-white:hover {
+  background-color: var(--base-colors-neutral-neutral050);
+}
+.btn-variant-outlined.btn-color-black:hover {
+  background-color: var(--base-colors-neutral-neutral100);
+}
+
+.btn-variant-outlined.btn-color-yellow {
+  border-color: #ffc300;
+  color: #ffc300;
+  background-color: transparent;
+}
+
+.btn-variant-outlined.btn-color-yellow:hover:not(.btn-disabled):not(:disabled) {
+  background-color: rgba(255, 195, 0, 0.3);
+}
+
+// outlined variant + disabled 상태
+.btn-variant-outlined.btn-disabled,
+.btn-variant-outlined:disabled {
+  background-color: var(--button-disabled-background);
+  border: none;
+  color: var(--button-disabled-text);
+}
+
+.btn-variant-outline {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--button-outline-border);
+  color: var(--button-outline-text);
+  background-color: var(--button-outline-background);
+}
+.btn-variant-outline:hover:not(.btn-disabled):not(:disabled) {
+  background-color: var(--button-outline-background-hover);
+}
+.btn-variant-outline.btn-disabled,
+.btn-variant-outline:disabled {
+  background-color: var(--button-disabled-background);
+  border: none;
+  color: var(--button-disabled-text);
+}
+
+.btn-variant-chip.btn-disabled,
+.btn-variant-chip:disabled {
+  background-color: var(--button-disabled-background);
+  border: none;
+  color: var(--button-disabled-text);
+}
+
+// 크기별 스타일
+.btn-size-lg {
+  height: 48px;
+  padding: 12px 16px;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -0.35px;
+  border-radius: var(--radius-md);
+}
+.btn-size-md {
+  height: 40px;
+  padding: 6px 20px;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0;
+  border-radius: var(--radius-sm);
+}
+.btn-size-sm {
+  height: 36px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 16px;
+  letter-spacing: -0.35px;
+  border-radius: var(--radius-sm);
+}
+.btn-size-mini {
+  height: 20px;
+  padding: 2px 8px;
+  font-size: var(--base-size-size-12); /* 12px */
+  line-height: 16px;
+  letter-spacing: 0;
+  border-radius: var(--radius-xs);
+  font-weight: 500;
+}
+
+// label 텍스트 스타일
+.btn-label {
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.btn-size-lg .btn-label {
+  font-size: 16px;
+  line-height: 20px;
+}
+.btn-size-md .btn-label {
+  font-size: 14px;
+  line-height: 18px;
+}
+.btn-size-sm .btn-label {
+  font-size: 13px;
+  line-height: 16px;
+}
+.btn-size-mini .btn-label {
+  font-size: var(--base-size-size-12); /* 12px */
+  line-height: 16px;
+  font-weight: 500;
+}
+
+// subLabel이 있을 경우 mainLabel 텍스트 스타일
+.btn-size-large .btn-main-label {
+  font-size: 14px;
+  line-height: 18px;
+}
+.btn-size-medium .btn-main-label {
+  font-size: 12px;
+  line-height: 16px;
+}
+.btn-size-small .btn-main-label {
+  font-size: 10px;
+  line-height: 14px;
+}
+
+// subLabel(서브텍스트) 스타일 - label보다 2px 크게, 세미볼드(600)
+.btn-sub-label {
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.btn-size-lg .btn-sub-text {
+  font-size: 16px;
+  line-height: 20px;
+}
+.btn-size-md .btn-sub-text {
+  font-size: 14px;
+  line-height: 18px;
+}
+.btn-size-sm .btn-sub-text {
+  font-size: 12px;
+  line-height: 16px;
+}
+.btn-size-mini .btn-sub-text {
+  font-size: 10px;
+  line-height: 14px;
+}
+
+// pill 스타일 (border-radius override)
+.btn-pill {
+  border-radius: var(--radius-pill);
+}
+
+// 비활성화 상태 스타일 (파일 마지막)
+.btn-disabled,
+button:disabled,
+a[role='button'][aria-disabled='true'] {
+  background-color: var(--button-disabled-background);
+  color: var(--button-disabled-text);
+  border-color: var(--button-disabled-background);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// 로딩 스피너
+.button-spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: currentColor transparent transparent transparent;
+  animation: button-spin 0.6s linear infinite;
+}
+
+@keyframes button-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

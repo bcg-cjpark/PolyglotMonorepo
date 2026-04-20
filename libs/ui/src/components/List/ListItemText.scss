@@ -1,0 +1,289 @@
+// ListItemText 컴포넌트 스타일
+.list-item-text {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0; // 텍스트 오버플로우 방지
+  flex: 1; // 남은 공간 차지
+
+  // 기본 텍스트 스타일
+  &__primary {
+    color: var(--font-color-default);
+    font-size: var(--font-size-font-16);
+    font-weight: var(--font-weights-pretendard-gov-1);
+    line-height: var(--font-line-heights-3);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; // 기본값을 normal로 변경
+
+    // 여러 줄 텍스트 지원
+    &--multiline {
+      white-space: normal;
+      line-height: var(--font-line-heights-4);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    // 줄바꿈 방지
+    &--no-wrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%; // 부모 컨테이너 너비 제한
+    }
+  }
+
+  &__secondary {
+    color: var(--font-color-default-muted);
+    font-size: var(--font-size-font-14);
+    font-weight: var(--font-weights-pretendard-gov-2);
+    line-height: var(--font-line-heights-5);
+    margin: 4px 0 0 0;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; // 기본값을 normal로 변경
+
+    // 여러 줄 텍스트 지원
+    &--multiline {
+      white-space: normal;
+      line-height: var(--font-line-heights-6);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    // 줄바꿈 방지
+    &--no-wrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%; // 부모 컨테이너 너비 제한
+    }
+  }
+
+  // 오른쪽 끝 텍스트 스타일
+  &__right-primary {
+    color: var(--font-color-default);
+    font-size: var(--font-size-font-14);
+    font-weight: var(--font-weights-pretendard-gov-2);
+    line-height: var(--font-line-heights-5);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; // 기본값을 normal로 변경
+    text-align: right;
+
+    // 여러 줄 텍스트 지원
+    &--multiline {
+      white-space: normal;
+      line-height: var(--font-line-heights-6);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    // 줄바꿈 방지
+    &--no-wrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%; // 부모 컨테이너 너비 제한
+    }
+  }
+
+  &__right-secondary {
+    color: var(--font-color-default-muted);
+    font-size: var(--font-size-font-12);
+    font-weight: var(--font-weights-pretendard-gov-3);
+    line-height: var(--font-line-heights-7);
+    margin: 2px 0 0 0;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; // 기본값을 normal로 변경
+    text-align: right;
+
+    // 여러 줄 텍스트 지원
+    &--multiline {
+      white-space: normal;
+      line-height: var(--font-line-heights-8);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    // 줄바꿈 방지
+    &--no-wrap {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%; // 부모 컨테이너 너비 제한
+    }
+  }
+
+  // 들여쓰기 (아바타가 있을 때)
+  &--inset {
+    margin-left: var(--padding-padding-12);
+  }
+
+  // 오른쪽 텍스트가 있는 경우 레이아웃 조정
+  &--with-right {
+    flex-direction: row; // 가로 레이아웃으로 변경
+    justify-content: space-between;
+    align-items: flex-start;
+
+    // 왼쪽 텍스트 컨테이너
+    .list-item-text__left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column; // 왼쪽 텍스트들을 세로로 쌓기
+      align-items: flex-start; // 왼쪽 정렬
+    }
+
+    // 오른쪽 텍스트 컨테이너
+    .list-item-text__right {
+      flex-shrink: 0;
+      margin-left: var(--padding-padding-16);
+      max-width: 120px; // 오른쪽 텍스트 최대 너비 제한
+      text-align: right;
+      display: flex;
+      flex-direction: column; // 오른쪽 텍스트들을 세로로 쌓기
+      align-items: flex-end; // 오른쪽 정렬
+    }
+  }
+
+  // 왼쪽 텍스트 영역
+  &__left {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    align-items: flex-start; // 왼쪽 정렬
+
+    // 슬롯 콘텐츠가 한 줄에 들어가도록 설정
+    > *:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      flex-shrink: 0;
+    }
+  }
+
+  // 오른쪽 텍스트 영역
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; // 오른쪽 정렬
+    min-width: 0;
+
+    // 슬롯 콘텐츠가 한 줄에 들어가도록 설정
+    > *:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      flex-shrink: 0;
+    }
+  }
+
+  // 여러 줄 텍스트 모드
+  &--multiline {
+    .list-item-text__primary {
+      line-height: var(--font-line-heights-4);
+    }
+
+    .list-item-text__secondary {
+      line-height: var(--font-line-heights-6);
+    }
+
+    .list-item-text__right-primary {
+      line-height: var(--font-line-heights-6);
+    }
+
+    .list-item-text__right-secondary {
+      line-height: var(--font-line-heights-8);
+    }
+  }
+
+  // 줄바꿈 방지 모드
+  &--no-wrap {
+    .list-item-text__primary,
+    .list-item-text__secondary,
+    .list-item-text__right-primary,
+    .list-item-text__right-secondary {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  // 호버 효과 (클릭 가능한 리스트 아이템에서)
+  .list-item--clickable & {
+    .list-item-text__primary,
+    .list-item-text__secondary,
+    .list-item-text__right-primary,
+    .list-item-text__right-secondary {
+      transition: color 0.2s ease;
+    }
+  }
+
+  // 비활성화 상태
+  .list-item--disabled & {
+    .list-item-text__primary,
+    .list-item-text__secondary,
+    .list-item-text__right-primary,
+    .list-item-text__right-secondary {
+      color: var(--font-color-default-muted);
+    }
+  }
+
+  // 반응형 디자인
+  @media (max-width: 768px) {
+    &__primary {
+      font-size: var(--font-size-font-14);
+      line-height: var(--font-line-heights-5);
+    }
+
+    &__secondary {
+      font-size: var(--font-size-font-12);
+      line-height: var(--font-line-heights-7);
+    }
+
+    &__right-primary {
+      font-size: var(--font-size-font-12);
+      line-height: var(--font-line-heights-7);
+    }
+
+    &__right-secondary {
+      font-size: var(--font-size-font-10);
+      line-height: var(--font-line-heights-8);
+    }
+
+    // 모바일에서 들여쓰기 조정
+    &--inset {
+      margin-left: var(--padding-padding-8);
+    }
+
+    // 모바일에서 오른쪽 텍스트 여백 조정
+    &--with-right {
+      .list-item-text__right {
+        margin-left: var(--padding-padding-8);
+        max-width: 80px; // 모바일에서는 더 작게
+      }
+    }
+  }
+}

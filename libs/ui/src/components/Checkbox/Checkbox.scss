@@ -1,0 +1,131 @@
+// Checkbox 컴포넌트 스타일
+// 피그마의 Input/Checkbox 디자인 기반 (node-id: 29-405)
+// 가이드: 피그마 HEX → 디자인 토큰 변환 적용
+
+.base-checkbox {
+  // 기본 체크박스 컨테이너
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+
+  // 비활성화 상태
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  // 포커스 상태
+  &:focus-visible {
+    outline: 2px solid var(--checkbox-color-border-focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+// 체크박스 박스 스타일
+.base-checkbox-box {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  border: 1.5px solid;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // 기본 상태 (체크 안됨)
+  &.unchecked {
+    background-color: var(--checkbox-color-surface);
+    border-color: var(--checkbox-color-border-static);
+  }
+
+  // 체크된 상태
+  &.checked {
+    background-color: var(--checkbox-color-background-checked);
+    border-color: var(--checkbox-color-border-checked);
+  }
+
+  // 부분 선택 상태 (indeterminate)
+  &.indeterminate {
+    background-color: var(--checkbox-color-background-checked);
+    border-color: var(--checkbox-color-border-checked);
+  }
+
+  // 비활성화 + 체크 안됨
+  &.disabled-unchecked {
+    background-color: var(--checkbox-color-surface-disabled);
+    border-color: var(--checkbox-color-border-disabled);
+  }
+
+  // 비활성화 + 체크됨
+  &.disabled-checked {
+    background-color: var(--checkbox-color-background-disabled);
+    border-color: var(--checkbox-color-border-disabled);
+  }
+}
+
+// 체크 아이콘 스타일
+.base-checkbox-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--checkbox-color-icon);
+
+  &.indeterminate {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// 라벨 스타일
+.base-checkbox-label {
+  margin-left: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--checkbox-color-text);
+
+  .disabled & {
+    color: var(--checkbox-color-text-disabled);
+  }
+}
+
+// 호버 효과
+.base-checkbox:not(.disabled):hover {
+  .base-checkbox-box.unchecked {
+    border-color: var(--checkbox-color-border-hover);
+    background-color: var(--checkbox-color-surface-hover);
+  }
+}
+
+// 키보드 접근성
+.base-checkbox {
+  &:focus-visible {
+    .base-checkbox-box {
+      box-shadow: 0 0 0 2px var(--checkbox-color-border-focus);
+    }
+  }
+}
+
+// 애니메이션
+.base-checkbox-box {
+  .base-checkbox-icon {
+    transition: transform 0.15s ease;
+  }
+
+  &.checked .base-checkbox-icon,
+  &.indeterminate .base-checkbox-icon {
+    animation: checkmark-appear 0.15s ease;
+  }
+}
+
+@keyframes checkmark-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

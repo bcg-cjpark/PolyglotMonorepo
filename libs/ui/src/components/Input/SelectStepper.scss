@@ -1,0 +1,21 @@
+// SelectStepper 컴포넌트 스타일
+// 셀렉트 스테퍼 컴포넌트
+
+.base-select-stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+
+  // 버튼과 셀렉트 박스 간격 조정
+  > * {
+    flex-shrink: 0;
+  }
+
+  // 셀렉트 박스는 유연하게 확장
+  > div:has(.base-input-select) {
+    flex: 1;
+    min-width: 0;
+  }
+}
+

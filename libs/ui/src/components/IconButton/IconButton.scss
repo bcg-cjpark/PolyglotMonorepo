@@ -1,0 +1,108 @@
+// IconButton 컴포넌트 스타일
+// Material UI IconButton 스타일을 참고하여 작성
+
+// 버튼 크기별 스타일
+.icon-button-size-lg {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+}
+
+.icon-button-size-md {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+}
+
+.icon-button-size-sm {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+}
+
+// 커스텀 padding이 있을 때는 크기 조정 (라벨이 있을 때와 동일하게 처리)
+.icon-button-with-custom-padding {
+  width: auto;
+  min-width: 0;
+  height: auto;
+}
+
+// 라벨이 있을 때는 크기 조정 (커스텀 padding이 없는 경우에만 기본 padding 적용)
+.icon-button-with-label:not(.icon-button-with-custom-padding).icon-button-size-lg {
+  width: auto;
+  padding: 0 12px;
+}
+
+.icon-button-with-label:not(.icon-button-with-custom-padding).icon-button-size-md {
+  width: auto;
+  padding: 0 10px;
+}
+
+.icon-button-with-label:not(.icon-button-with-custom-padding).icon-button-size-sm {
+  width: auto;
+  padding: 0 8px;
+}
+
+// 라벨 스타일
+.icon-button-label {
+  white-space: nowrap;
+  pointer-events: none;
+  font-weight: 500;
+}
+
+.icon-button-label-lg {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.icon-button-label-md {
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.icon-button-label-sm {
+  font-size: 10px;
+  line-height: 12px;
+}
+
+// 기본 스타일 (Icon과 동일하게 currentColor 사용)
+.icon-button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+// 버튼 모양
+.icon-button-shape-circle {
+  border-radius: 9999px;
+}
+
+.icon-button-shape-square {
+  border-radius: 4px;
+}
+
+// 기본 배경이 없는 경우 hover 시 살짝 배경 표시
+.icon-button-no-bg:hover:not(.icon-button-disabled):not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+// 커스텀 배경색이 있는 경우 hover 시 약간 어둡게
+.icon-button-has-bg:hover:not(.icon-button-disabled):not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.icon-button:focus,
+.icon-button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+// 비활성화 상태
+.icon-button-disabled,
+button:disabled {
+  color: var(--button-disabled-text);
+  background-color: transparent;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}

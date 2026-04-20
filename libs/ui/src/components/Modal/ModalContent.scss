@@ -1,0 +1,82 @@
+.modal-content {
+  flex: 1;
+  padding: var(--padding-padding-36);
+  overflow-y: auto;
+  background-color: var(--popup-background);
+}
+
+.modal-content--compact {
+  padding: var(--padding-padding-8);
+}
+
+.modal-content--none {
+  padding: var(--padding-padding-z);
+}
+
+.alert-icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.alert-icon-container.alert-success {
+  background-color: var(--base-colors-green-green050);
+  color: var(--font-color-green);
+}
+
+.alert-icon-container.alert-info {
+  background-color: var(--base-colors-green-blue050);
+  color: var(--font-color-blue);
+}
+
+.alert-icon-container.alert-warning {
+  background-color: var(--base-colors-primary-primary050);
+  color: var(--base-colors-primary-primary-deep);
+}
+
+.alert-icon-container.alert-error {
+  background-color: var(--base-colors-red-red050);
+  color: var(--base-colors-red-red800);
+}
+
+.modal-description {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: var(--font-color-default-muted);
+  line-height: 1.5;
+}
+
+.modal-default-content {
+  color: var(--popup-text);
+  line-height: 1.6;
+}
+
+.modal-default-content h1,
+.modal-default-content h2,
+.modal-default-content h3,
+.modal-default-content h4,
+.modal-default-content h5,
+.modal-default-content h6 {
+  margin: 0 0 0.75rem 0;
+  color: var(--popup-text);
+}
+
+.modal-default-content p {
+  margin: 0 0 0.75rem 0;
+}
+
+.modal-default-content p:last-child {
+  margin-bottom: 0;
+}
+
+.modal-default-content ul,
+.modal-default-content ol {
+  margin: 0 0 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.modal-default-content li {
+  margin-bottom: 0.25rem;
+}

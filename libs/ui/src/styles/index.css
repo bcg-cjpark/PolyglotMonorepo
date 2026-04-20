@@ -1,0 +1,13 @@
+/* Theme 패키지의 CSS 변수 import */
+@import '../../../theme/dist/styles/__tokens-light.css';
+@import '../../../theme/dist/styles/__tokens-dark.css';
+
+/* Tailwind CSS import */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}

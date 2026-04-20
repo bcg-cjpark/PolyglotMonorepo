@@ -1,0 +1,53 @@
+/*
+  Alert 전용 SCSS (Tailwind로 제어 불가한 부분이 생길 경우 확장)
+  현재는 기본 전환 애니메이션과 텍스트 슬라이드 애니메이션 포함
+*/
+
+.base-alert-enter-active,
+.base-alert-leave-active {
+  transition: opacity 150ms ease;
+}
+
+.base-alert-enter-from,
+.base-alert-leave-to {
+  opacity: 0;
+}
+
+// 텍스트 슬라이드 애니메이션
+.base-alert-slide {
+  display: inline-block;
+  animation: slideTextContinuous 8s ease-in-out infinite;
+  animation-delay: 0.5s;
+  padding-right: 20px;
+
+  &--rotate {
+    animation: slideTextRotate 12s ease-in-out infinite;
+    animation-delay: 0.5s;
+  }
+}
+
+// rotate: false - 끝까지 나오면 멈추고, 글자 끝을 가운데까지 가져오지 않음
+@keyframes slideTextContinuous {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  80% {
+    transform: translateX(calc(-40% + 80px));
+  }
+  100% {
+    transform: translateX(calc(-40% + 80px));
+  }
+}
+
+// rotate: true - 왼쪽으로 흐르다가 다 읽히면 바로 새로운 텍스트가 오른쪽에서 나와서 연속 흐름
+@keyframes slideTextRotate {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

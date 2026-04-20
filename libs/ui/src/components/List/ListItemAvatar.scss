@@ -1,0 +1,247 @@
+// ListItemAvatar 컴포넌트 스타일
+.list-item-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  transition: all 0.2s ease;
+
+  // 크기별 스타일
+  &--sm {
+    width: var(--base-size-size-40);
+    height: var(--base-size-size-40);
+  }
+
+  &--md {
+    width: 44px;
+    height: 44px;
+  }
+
+  &--lg {
+    width: var(--base-size-size-48);
+    height: var(--base-size-size-48);
+  }
+
+  // 스타일 변형
+  &--circular {
+    border-radius: 50%;
+  }
+
+  &--rounded {
+    border-radius: 10px;
+  }
+
+  &--square {
+    border-radius: var(--radius-xs);
+  }
+
+  // 색상 테마 - 더 높은 우선순위로 적용
+  &.list-item-avatar--primary {
+    background-color: var(--base-colors-primary-primary200) !important;
+    border-color: var(--base-colors-primary-primary300) !important;
+
+    .list-item-avatar__icon,
+    .list-item-avatar__fallback {
+      background-color: var(--base-colors-primary-primary200) !important;
+    }
+
+    .list-item-avatar__icon-content,
+    .list-item-avatar__fallback-icon {
+      color: var(--base-colors-primary-primary800) !important;
+    }
+
+    .list-item-avatar__fallback-text {
+      color: var(--base-colors-primary-primary800) !important;
+    }
+  }
+
+  &.list-item-avatar--red {
+    background-color: var(--base-colors-red-red100) !important;
+    border-color: var(--base-colors-red-red200) !important;
+
+    .list-item-avatar__icon,
+    .list-item-avatar__fallback {
+      background-color: var(--base-colors-red-red100) !important;
+    }
+
+    .list-item-avatar__icon-content,
+    .list-item-avatar__fallback-icon {
+      color: var(--base-colors-red-red800) !important;
+    }
+
+    .list-item-avatar__fallback-text {
+      color: var(--base-colors-red-red800) !important;
+    }
+  }
+
+  &.list-item-avatar--blue {
+    background-color: var(--base-colors-blue-blue100) !important;
+    border-color: var(--base-colors-blue-blue200) !important;
+
+    .list-item-avatar__icon,
+    .list-item-avatar__fallback {
+      background-color: var(--base-colors-blue-blue100) !important;
+    }
+
+    .list-item-avatar__icon-content,
+    .list-item-avatar__fallback-icon {
+      color: var(--base-colors-blue-blue800) !important;
+    }
+
+    .list-item-avatar__fallback-text {
+      color: var(--base-colors-blue-blue800) !important;
+    }
+  }
+
+  &.list-item-avatar--green {
+    background-color: var(--base-colors-green-green100) !important;
+    border-color: var(--base-colors-green-green200) !important;
+
+    .list-item-avatar__icon,
+    .list-item-avatar__fallback {
+      background-color: var(--base-colors-green-green100) !important;
+    }
+
+    .list-item-avatar__icon-content,
+    .list-item-avatar__fallback-icon {
+      color: var(--base-colors-green-green800) !important;
+    }
+
+    .list-item-avatar__fallback-text {
+      color: var(--base-colors-green-green800) !important;
+    }
+  }
+
+  &.list-item-avatar--purple {
+    background-color: var(--base-colors-purple-purple100) !important;
+    border-color: var(--base-colors-purple-purple200) !important;
+
+    .list-item-avatar__icon,
+    .list-item-avatar__fallback {
+      background-color: var(--base-colors-purple-purple100) !important;
+    }
+
+    .list-item-avatar__icon-content,
+    .list-item-avatar__fallback-icon {
+      color: var(--base-colors-purple-purple800) !important;
+    }
+
+    .list-item-avatar__fallback-text {
+      color: var(--base-colors-purple-purple800) !important;
+    }
+  }
+
+  // 커스텀 색상
+  &.list-item-avatar--custom {
+    background-color: var(--custom-background-color, var(--background-bg-innerframe)) !important;
+    border-color: var(--custom-background-color, var(--background-divider)) !important;
+
+    .list-item-avatar__icon,
+    .list-item-avatar__fallback {
+      background-color: var(--custom-background-color, var(--background-bg-innerframe)) !important;
+    }
+
+    .list-item-avatar__icon-content,
+    .list-item-avatar__fallback-icon {
+      color: var(--custom-icon-color, var(--input-icon-default)) !important;
+    }
+
+    .list-item-avatar__fallback-text {
+      color: var(--custom-icon-color, var(--font-color-default-muted)) !important;
+    }
+  }
+
+  // 에러 상태
+  &--error {
+    background-color: var(--background-bg-innerframe);
+    border-color: var(--input-color-border-error);
+  }
+
+  // 직접 지정된 아이콘
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+  }
+
+  &__icon-content {
+    color: var(--input-icon-default);
+    width: 60%;
+    height: 60%;
+  }
+
+  // 이미지 스타일
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  // 폴백 스타일
+  &__fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+  }
+
+  // 폴백 아이콘
+  &__fallback-icon {
+    color: var(--input-icon-default);
+    width: 60%;
+    height: 60%;
+  }
+
+  // 폴백 텍스트
+  &__fallback-text {
+    color: var(--font-color-default-muted);
+    font-size: var(--font-size-font-12);
+    font-weight: var(--font-weights-pretendard-gov-1);
+    text-align: center;
+    line-height: 1;
+    user-select: none;
+  }
+
+  // 호버 효과
+  &:hover {
+    border-color: var(--input-color-border-focus);
+    box-shadow: var(--shadow-box);
+  }
+
+  // 포커스 효과
+  &:focus {
+    outline: 2px solid var(--base-colors-primary-primary800);
+    outline-offset: 2px;
+  }
+
+  // 반응형 디자인
+  @media (max-width: 768px) {
+    &--sm {
+      width: var(--base-size-size-36);
+      height: var(--base-size-size-36);
+    }
+
+    &--md {
+      width: 44px;
+      height: 44px;
+    }
+
+    &--lg {
+      width: var(--base-size-size-44);
+      height: var(--base-size-size-44);
+    }
+
+    &__fallback-text {
+      font-size: var(--font-size-font-10);
+    }
+  }
+}

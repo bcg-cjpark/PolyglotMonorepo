@@ -1,0 +1,30 @@
+/* Variant별 스타일 */
+.toast-info {
+  background-color: var(--trade-correct-background);
+  border: 1px solid var(--trade-correct-border);
+  color: var(--font-color-green);
+}
+
+.toast-info-purple {
+  background-color: var(--trade-cancel-background);
+  border: 1px solid var(--trade-cancel-border);
+  color: var(--trade-cancel-text);
+}
+
+.toast-info-blue {
+  background-color: var(--trade-short-background);
+  border: 1px solid var(--trade-short-border);
+  color: var(--font-color-blue);
+}
+
+.toast-warning {
+  background-color: var(--button-light-solid-background);
+  border: 1px solid var(--button-light-solid-border);
+  color: var(--button-light-solid-text);
+}
+
+.toast-error {
+  background-color: var(--trade-long-background);
+  border: 1px solid var(--trade-long-border);
+  color: var(--trade-long-text);
+}

@@ -1,0 +1,41 @@
+/**
+ * List 컴포넌트 스타일
+ */
+
+// List 컴포넌트 스타일
+.base-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--background-bg-default);
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+
+  // 서브헤더
+  &__subheader {
+    padding: var(--padding-padding-12) var(--padding-padding-16);
+    background-color: var(--background-bg-surface);
+    font-size: var(--font-size-font-14);
+    font-weight: var(--font-weights-pretendard-gov-1);
+    color: var(--font-color-default-muted);
+    line-height: var(--font-line-heights-5);
+    border-bottom: 1px solid var(--background-divider);
+  }
+
+  // 리스트 아이템들
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--list-gap, 0px);
+  }
+
+  // 반응형 디자인
+  @media (max-width: 768px) {
+    border-radius: var(--radius-sm);
+
+    &__subheader {
+      padding: var(--padding-padding-8) var(--padding-padding-12);
+      font-size: var(--font-size-font-12);
+    }
+  }
+}

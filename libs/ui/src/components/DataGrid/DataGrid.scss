@@ -1,0 +1,232 @@
+/* 고정 컬럼 구분선 제거 스타일
+ * 기본 구분선을 사용하려면 아래 @include removePinnedDivider(); 줄을 주석 처리하세요.
+ */
+@mixin removePinnedDivider() {
+  --ag-pinned-border-width: 0px;
+  --ag-pinned-border: 0px;
+
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container,
+  .ag-pinned-right-header,
+  .ag-pinned-right-cols-container {
+    border: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+  }
+
+  .ag-pinned-right-header::before,
+  .ag-pinned-right-cols-container::before,
+  .ag-pinned-right-header::after,
+  .ag-pinned-right-cols-container::after {
+    display: none !important;
+  }
+
+  .ag-cell-last-left-pinned,
+  .ag-header-cell-last-left-pinned,
+  .ag-cell-first-right-pinned,
+  .ag-header-cell-first-right-pinned {
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+
+  .ag-cell-last-left-pinned::after,
+  .ag-header-cell-last-left-pinned::after,
+  .ag-cell-first-right-pinned::before,
+  .ag-header-cell-first-right-pinned::before,
+  .ag-cell-first-right-pinned::after,
+  .ag-header-cell-first-right-pinned::after {
+    display: none !important;
+  }
+}
+
+/* AG Grid 전역: 앱에서 Pretendard GOV를 쓰면 첫 글꼴로 적용됨. 없으면 시스템 폰트로 대체 */
+.ag-root-wrapper {
+  font-family:
+    'Pretendard GOV',
+    -apple-system,
+    blinkmacsystemfont,
+    system-ui,
+    roboto,
+    'Helvetica Neue',
+    'Segoe UI',
+    'Apple SD Gothic Neo',
+    'Noto Sans KR',
+    'Malgun Gothic',
+    sans-serif;
+  @include removePinnedDivider();
+}
+
+.grid-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.grid-placeholder {
+  box-sizing: border-box;
+}
+
+/* 가로 스크롤바 숨김 옵션 */
+.grid-container--hide-horizontal-scrollbar .ag-body-horizontal-scroll {
+  display: none !important;
+}
+
+.grid-container--hide-horizontal-scrollbar .ag-body-horizontal-scroll-viewport {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.grid-container--hide-horizontal-scrollbar .ag-body-horizontal-scroll-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* 세로 스크롤바 숨김 옵션 */
+.grid-container--hide-vertical-scrollbar .ag-body-vertical-scroll-viewport,
+.grid-container--hide-vertical-scrollbar .ag-body-viewport {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.grid-container--hide-vertical-scrollbar .ag-body-vertical-scroll-viewport::-webkit-scrollbar,
+.grid-container--hide-vertical-scrollbar .ag-body-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.grid-container .ag-root-wrapper {
+  height: 100% !important;
+}
+
+.grid-container .ag-layout-normal {
+  height: 100% !important;
+}
+
+.grid-container .ag-viewport {
+  min-height: 200px !important;
+}
+
+.grid-container .ag-center-cols-viewport {
+  min-height: 200px !important;
+}
+
+/* 고정 컬럼 우측 그라데이션 */
+.grid-container--pinned-column-gradient .ag-root-wrapper {
+  .ag-pinned-left-header::after,
+  .ag-pinned-left-cols-container::after {
+    display: block !important;
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 100% !important;
+    right: auto !important;
+    width: 13px !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+    background: linear-gradient(
+      to right,
+      rgba(115, 115, 115, 0.2) 0%,
+      rgba(217, 217, 217, 0) 100%
+    ) !important;
+  }
+
+  .ag-pinned-left-header,
+  .ag-pinned-left-cols-container {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  .ag-pinned-left-cols-viewport,
+  [class*='ag-pinned-left'][class*='viewport'] {
+    overflow: visible !important;
+  }
+
+  .ag-horizontal-left-spacer {
+    background: transparent !important;
+  }
+}
+
+.ag-header-cell-label,
+.ag-header-cell-text,
+.ag-header-cell {
+  font-size: 12px !important;
+  font-family: 'Pretendard GOV', sans-serif !important;
+}
+
+.ag-cell,
+.ag-cell-value {
+  font-size: 13px !important;
+  font-family: 'Pretendard GOV', sans-serif !important;
+}
+
+.ag-paging-panel {
+  font-size: 12px !important;
+  font-family: 'Pretendard GOV', sans-serif !important;
+}
+
+.ag-overlay-no-rows-wrapper {
+  font-size: 13px !important;
+  font-family: 'Pretendard GOV', sans-serif !important;
+}
+
+.ag-header-cell.text-right .ag-header-cell-label,
+.ag-header-cell.text-right .ag-header-cell-text {
+  justify-content: flex-end !important;
+  text-align: right !important;
+}
+
+.ag-header-cell.text-center .ag-header-cell-label,
+.ag-header-cell.text-center .ag-header-cell-text {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.ag-header-cell.text-left .ag-header-cell-label,
+.ag-header-cell.text-left .ag-header-cell-text {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.grid-container--tight-letter-spacing .ag-cell,
+.grid-container--tight-letter-spacing .ag-cell-value,
+.grid-container--tight-letter-spacing .ag-group-value {
+  letter-spacing: -0.35px !important;
+}
+
+.grid-container--tight-letter-spacing .ag-header-cell,
+.grid-container--tight-letter-spacing .ag-header-cell-label,
+.grid-container--tight-letter-spacing .ag-header-cell-text {
+  letter-spacing: 0 !important;
+}
+
+.header-scroll-button {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: rgba(217, 217, 217, 0.5);
+  transition: background-color 0.2s;
+}
+
+.header-scroll-button:hover {
+  background-color: rgba(217, 217, 217, 0.7);
+}
+
+.header-scroll-button:active {
+  background-color: rgba(217, 217, 217, 0.9);
+}
+
+.header-scroll-button--left {
+  margin-left: -10px;
+}
+
+.header-scroll-button--right {
+  margin-left: -10px;
+}

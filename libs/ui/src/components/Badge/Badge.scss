@@ -1,0 +1,196 @@
+// Badge 컴포넌트 스타일
+
+// 배지 래퍼
+.base-badge-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+// 기본 배지 스타일
+.base-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 2px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.35px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  box-sizing: border-box;
+  user-select: none;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+// Variant 스타일
+.base-badge--dot {
+  min-width: 8px !important;
+  width: 8px !important;
+  height: 8px !important;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  border: none !important;
+}
+
+// square variant: 네모 형태, 텍스트 배지 스타일 유지
+.base-badge--square {
+  border-radius: 4px;
+  padding: 2px 4px !important;
+  min-width: auto !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+// Overlap 스타일
+.base-badge--overlap {
+  position: absolute;
+  z-index: 1;
+}
+
+.base-badge--no-overlap {
+  position: absolute;
+  z-index: 1;
+}
+
+// 위치별 스타일
+.base-badge--top-left {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.base-badge--top-right {
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.base-badge--middle-left {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.base-badge--middle-right {
+  top: 50%;
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.base-badge--bottom-left {
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+}
+
+.base-badge--bottom-right {
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+}
+
+// no-overlap일 때 추가 오프셋 적용
+.base-badge--no-overlap.base-badge--top-left {
+  transform: translate(-100%, -100%);
+}
+
+.base-badge--no-overlap.base-badge--top-right {
+  transform: translate(100%, -100%);
+}
+
+.base-badge--no-overlap.base-badge--middle-left {
+  transform: translate(-100%, -50%);
+}
+
+.base-badge--no-overlap.base-badge--middle-right {
+  transform: translate(100%, -50%);
+}
+
+.base-badge--no-overlap.base-badge--bottom-left {
+  transform: translate(-100%, 100%);
+}
+
+.base-badge--no-overlap.base-badge--bottom-right {
+  transform: translate(100%, 100%);
+}
+
+// square 변형 전용: no-overlap일 때 우측 4px 간격 추가
+.base-badge--square.base-badge--no-overlap.base-badge--middle-right {
+  transform: translate(calc(100% + 4px), -50%);
+}
+
+// 색상 스타일 (Material UI 스타일)
+// 색상 토큰 (square 전용 기본 배경/글자색)
+.base-badge--grey {
+  background-color: var(--table-chip-background);
+  color: var(--font-color-default-muted);
+  border-color: var(--table-chip-background);
+}
+.base-badge--red {
+  background-color: var(--trade-long-background);
+  color: var(--trade-long-text);
+  border-color: var(--trade-long-background);
+}
+.base-badge--green {
+  background-color: var(--chips-status-done-bg);
+  color: var(--chips-status-done-text);
+  border-color: var(--chips-status-done-bg);
+}
+.base-badge--blue {
+  background-color: var(--trade-short-background);
+  color: var(--trade-short-text);
+  border-color: var(--trade-short-background);
+}
+.base-badge--yellow {
+  background-color: var(--chips-status-pending-bg);
+  color: var(--chips-status-pending-text);
+  border-color: var(--chips-status-pending-bg);
+}
+.base-badge--purple {
+  background-color: var(--trade-cancel-background);
+  color: var(--trade-cancel-text);
+  border-color: var(--trade-cancel-background);
+}
+
+// square 이외의 variant는 색 반전: 배경은 텍스트색, 글자는 흰색
+.base-badge--standard,
+.base-badge--dot {
+  &.base-badge--grey {
+    background-color: var(--font-color-default-muted);
+    color: var(--font-color-white);
+    border-color: var(--font-color-default-muted);
+  }
+  &.base-badge--red {
+    background-color: var(--trade-long-text);
+    color: var(--font-color-white);
+    border-color: var(--trade-long-text);
+  }
+  &.base-badge--green {
+    background-color: var(--chips-status-done-text);
+    color: var(--font-color-white);
+    border-color: var(--chips-status-done-text);
+  }
+  &.base-badge--blue {
+    background-color: var(--trade-short-text);
+    color: var(--font-color-white);
+    border-color: var(--trade-short-text);
+  }
+  &.base-badge--yellow {
+    background-color: var(--chips-status-pending-text);
+    color: var(--font-color-white);
+    border-color: var(--chips-status-pending-text);
+  }
+  &.base-badge--purple {
+    background-color: var(--trade-cancel-text);
+    color: var(--font-color-white);
+    border-color: var(--trade-cancel-text);
+  }
+}

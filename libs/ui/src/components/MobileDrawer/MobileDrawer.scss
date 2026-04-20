@@ -1,0 +1,41 @@
+.base-mobile-drawer-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+}
+
+.base-mobile-drawer__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.base-mobile-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: var(--background-bg-innerframe, #f5f7f9);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  will-change: transform;
+  animation: drawerSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.base-mobile-drawer__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
