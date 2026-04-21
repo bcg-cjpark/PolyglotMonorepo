@@ -9,8 +9,9 @@
  *   in `libs/tokens/styles/__tokens-light.css` AND `__tokens-dark.css`.
  * - --secondary (optional) hex → same, for `--base-colors-secondary-secondary*`.
  *   Secondary block is inserted right after the primary block if it does not
- *   yet exist. Also adds `--color-secondary` alias to
- *   `libs/tokens/styles/tailwind-bridge.css`.
+ *   yet exist. The `--color-secondary` Tailwind alias lives in
+ *   `libs/tailwind-config/globals.css` as a static definition, so the script
+ *   does not need to inject it.
  *
  * Tonal scale is generated from the input hex using HSL interpolation. The
  * input hex is anchored at `<name>800` (brand color). Lighter steps
@@ -29,7 +30,6 @@ const repoRoot = path.resolve(__dirname, '..');
 
 const LIGHT_PATH = path.join(repoRoot, 'libs/tokens/styles/__tokens-light.css');
 const DARK_PATH = path.join(repoRoot, 'libs/tokens/styles/__tokens-dark.css');
-const BRIDGE_PATH = path.join(repoRoot, 'libs/tokens/styles/tailwind-bridge.css');
 
 const LEVELS = ['050', '100', '200', '300', '400', '500', '600', '700', '800', '900', 'deep'];
 
@@ -274,19 +274,6 @@ function applySemanticOverrides(lightContent, darkContent) {
   return { lightContent, darkContent };
 }
 
-function ensureTailwindSecondaryAlias() {
-  let bridge = fs.readFileSync(BRIDGE_PATH, 'utf8');
-  if (/--color-secondary:/.test(bridge)) return false;
-  const aliasLine = '  --color-secondary: var(--base-colors-secondary-secondary500);';
-  const re = /(--color-primary:\s*var\([^)]+\);\s*\n)/;
-  if (!re.test(bridge)) {
-    throw new Error('Could not find --color-primary alias in tailwind-bridge.css');
-  }
-  bridge = bridge.replace(re, `$1${aliasLine}\n`);
-  fs.writeFileSync(BRIDGE_PATH, bridge);
-  return true;
-}
-
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.primary && !args.secondary) {
@@ -330,17 +317,12 @@ function main() {
 
   fs.writeFileSync(LIGHT_PATH, lightContent);
   fs.writeFileSync(DARK_PATH, darkContent);
-  let bridgeAdded = false;
-  if (args.secondary) {
-    bridgeAdded = ensureTailwindSecondaryAlias();
-  }
 
   console.log('Theme colors applied:');
   for (const c of changes) console.log('  ' + c);
   console.log('Files updated:');
   console.log('  ' + path.relative(repoRoot, LIGHT_PATH));
   console.log('  ' + path.relative(repoRoot, DARK_PATH));
-  if (bridgeAdded) console.log('  ' + path.relative(repoRoot, BRIDGE_PATH) + ' (--color-secondary alias added)');
 }
 
 main();
