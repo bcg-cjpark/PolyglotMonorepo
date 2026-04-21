@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping("/api/memos")
+@RequestMapping("/memos")
 class MemoController(
     private val memoService: MemoService,
 ) {
