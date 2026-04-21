@@ -3,6 +3,7 @@ import UserListPage from "./pages/UserListPage";
 import UserFormPage from "./pages/UserFormPage";
 import TodoListPage from "./pages/TodoListPage";
 import TodoFormPage from "./pages/TodoFormPage";
+import MemoListPage from "./pages/MemoListPage";
 
 function App() {
   return (
@@ -14,6 +15,9 @@ function App() {
         <Link to="/todos" className="text-sm font-medium hover:underline">
           Todos
         </Link>
+        <Link to="/memos" className="text-sm font-medium hover:underline">
+          Memos
+        </Link>
       </nav>
       <Routes>
         <Route path="/" element={<Navigate to="/users" replace />} />
@@ -22,6 +26,7 @@ function App() {
         <Route path="/todos" element={<TodoListPage />} />
         <Route path="/todos/new" element={<TodoFormPage />} />
         <Route path="/todos/:id/edit" element={<TodoFormPage />} />
+        <Route path="/memos" element={<MemoListPage />} />
       </Routes>
     </div>
   );
