@@ -8,7 +8,7 @@ const meta: Meta<typeof Disclosure> = {
   argTypes: {
     color: {
       control: 'select',
-      options: ['red', 'blue', 'gray', 'purple'],
+      options: ['red', 'blue', 'neutral', 'purple', 'primary'],
     },
     defaultOpen: { control: 'boolean' },
     custom: { control: 'boolean' },
@@ -24,7 +24,7 @@ const meta: Meta<typeof Disclosure> = {
     buttonText: '자세히 보기',
     panelContent:
       '여기는 아코디언 패널 본문입니다. 임의의 설명 텍스트를 배치할 수 있습니다.',
-    color: 'gray',
+    color: 'neutral',
     defaultOpen: false,
     custom: false,
     showArrow: true,
@@ -58,6 +58,14 @@ export const Red: Story = {
 
 export const Purple: Story = {
   args: { color: 'purple', buttonText: '보라 헤더' },
+};
+
+export const Neutral: Story = {
+  args: { color: 'neutral', buttonText: '중립(뉴트럴) 헤더' },
+};
+
+export const Primary: Story = {
+  args: { color: 'primary', buttonText: '프라이머리 헤더' },
 };
 
 export const CustomRender: Story = {

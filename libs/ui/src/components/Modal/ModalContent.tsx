@@ -19,9 +19,9 @@ export interface ModalContentProps {
 
 const ALERT_ICONS: Record<AlertVariant, IconName> = {
   success: 'check-circle',
-  info: 'settings',
-  warning: 'star',
-  error: 'trash',
+  info: 'info',
+  warning: 'warning',
+  error: 'close',
 };
 
 export const ModalContent = memo(function ModalContent({

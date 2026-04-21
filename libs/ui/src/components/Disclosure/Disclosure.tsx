@@ -15,8 +15,8 @@ export interface DisclosureProps {
   panelContent?: string;
   /** 커스텀 스타일 사용 여부 */
   custom?: boolean;
-  /** 버튼 색상 테마 */
-  color?: 'red' | 'blue' | 'gray' | 'purple';
+  /** 버튼 색상 테마 (디자인 토큰 팔레트 기반) */
+  color?: 'red' | 'blue' | 'neutral' | 'purple' | 'primary';
   /** 커스텀 모드에서 화살표 표시 여부 */
   showArrow?: boolean;
   /** 커스텀 모드에서 화살표 오른쪽 위치 (px) */
@@ -27,22 +27,34 @@ export interface DisclosureProps {
   renderPanel?: React.ReactNode;
 }
 
+// 디자인 토큰 브릿지(tailwind-bridge.css)의 `--color-<scale>-<scale><shade>` 규칙에
+// 맞춘 유틸리티 사용. data-theme 전환 시 토큰 값이 자동으로 바뀌므로
+// light/dark 양쪽에서 올바른 색이 잡힌다.
 const COLOR_CLASSES = {
   red: {
-    button: 'bg-red-100 text-red-900 hover:bg-red-200 focus-visible:ring-red-500',
-    icon: 'text-red-500',
+    button:
+      'bg-red-red100 text-red-red900 hover:bg-red-red200 focus-visible:ring-red-red500',
+    icon: 'text-red-red500',
   },
   blue: {
-    button: 'bg-blue-100 text-blue-900 hover:bg-blue-200 focus-visible:ring-blue-500',
-    icon: 'text-blue-500',
+    button:
+      'bg-blue-blue100 text-blue-blue800 hover:bg-blue-blue200 focus-visible:ring-blue-blue500',
+    icon: 'text-blue-blue500',
   },
-  gray: {
-    button: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500',
-    icon: 'text-gray-500',
+  neutral: {
+    button:
+      'bg-neutral-neutral100 text-neutral-neutral700 hover:bg-neutral-neutral200 focus-visible:ring-neutral-neutral500',
+    icon: 'text-neutral-neutral500',
   },
   purple: {
-    button: 'bg-purple-100 text-purple-900 hover:bg-purple-200 focus-visible:ring-purple-500',
-    icon: 'text-purple-500',
+    button:
+      'bg-purple-purple100 text-purple-purple800 hover:bg-purple-purple200 focus-visible:ring-purple-purple500',
+    icon: 'text-purple-purple500',
+  },
+  primary: {
+    button:
+      'bg-primary-primary100 text-primary-primary-deep hover:bg-primary-primary200 focus-visible:ring-primary-primary500',
+    icon: 'text-primary-primary500',
   },
 };
 
@@ -51,7 +63,7 @@ export const Disclosure = memo(function Disclosure({
   buttonText = '',
   panelContent = '',
   custom = false,
-  color = 'gray',
+  color = 'neutral',
   showArrow = true,
   arrowPosition = 16,
   renderButton,
@@ -97,7 +109,7 @@ export const Disclosure = memo(function Disclosure({
                 <Icon name="arrow-up" className={`h-5 w-5 ${!open ? 'hidden' : 'block'}`} />
               </HUIDisclosureButton>
 
-              <HUIDisclosurePanel as="div" className="w-full px-4 pb-2 pt-4 text-sm text-gray-500">
+              <HUIDisclosurePanel as="div" className="w-full px-4 pb-2 pt-4 text-sm text-default-muted">
                 {panelContent}
               </HUIDisclosurePanel>
             </>
