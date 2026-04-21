@@ -1,6 +1,10 @@
 // InputStepper 컴포넌트 스타일
 // 피그마의 Input/Stepper와 Input/Stepper-lined 디자인 기반
 // 가이드: 피그마 HEX → 디자인 토큰 변환 적용
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
 
 .base-input-stepper {
   // 스테퍼 입력에 특화된 스타일
@@ -213,3 +217,5 @@
     }
   }
 }
+
+} // @layer components 닫기

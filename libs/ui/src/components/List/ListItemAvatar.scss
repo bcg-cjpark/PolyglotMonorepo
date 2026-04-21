@@ -1,4 +1,9 @@
 // ListItemAvatar 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
+
 .list-item-avatar {
   display: flex;
   align-items: center;
@@ -245,3 +250,5 @@
     }
   }
 }
+
+} // @layer components 닫기

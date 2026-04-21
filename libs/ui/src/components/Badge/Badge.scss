@@ -1,4 +1,8 @@
 // Badge 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
 
 // 배지 래퍼
 .base-badge-wrapper {
@@ -194,3 +198,5 @@
     border-color: var(--trade-cancel-text);
   }
 }
+
+} // @layer components 닫기

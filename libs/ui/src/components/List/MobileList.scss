@@ -1,6 +1,11 @@
 /**
  * MobileList - 모바일용 리스트 컨테이너 스타일
  */
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
+
 .base-mobile-list {
   display: flex;
   flex-direction: column;
@@ -25,3 +30,5 @@
     gap: var(--list-gap, 0px);
   }
 }
+
+} // @layer components 닫기

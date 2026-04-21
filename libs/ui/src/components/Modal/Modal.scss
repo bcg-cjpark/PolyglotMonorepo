@@ -8,6 +8,11 @@
 $modal-base-z-index: var(--z-index-modal);
 $modal-z-index-step: 10;
 
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈. (SCSS 변수는 출력에 기여하지 않아 밖에 유지)
+
+@layer components {
+
 // Headless UI Dialog 래퍼
 .modal-dialog {
   position: relative;
@@ -150,3 +155,5 @@ $modal-z-index-step: 10;
 .modal-container:focus {
   outline: none;
 }
+
+} // @layer components 닫기

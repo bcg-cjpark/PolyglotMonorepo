@@ -42,6 +42,11 @@
   }
 }
 
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈. (@mixin 은 출력에 기여하지 않아 밖에 유지)
+
+@layer components {
+
 /* AG Grid 전역: 앱에서 Pretendard GOV를 쓰면 첫 글꼴로 적용됨. 없으면 시스템 폰트로 대체 */
 .ag-root-wrapper {
   font-family:
@@ -244,3 +249,5 @@
 .header-scroll-button--right {
   margin-left: -10px;
 }
+
+} // @layer components 닫기

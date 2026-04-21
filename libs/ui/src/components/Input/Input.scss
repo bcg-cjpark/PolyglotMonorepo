@@ -1,3 +1,9 @@
+// Input 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
+
 /* Input type=number일 경우 우측 스핀버튼 제거 */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
@@ -15,3 +21,5 @@ input[type='number'] {
 .ime-disabled {
   ime-mode: disabled;
 }
+
+} // @layer components 닫기

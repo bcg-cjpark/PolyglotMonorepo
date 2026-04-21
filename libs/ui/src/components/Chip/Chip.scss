@@ -2,6 +2,10 @@
 // 피그마 디자인 토큰을 기반으로 한 칩 스타일 정의
 // 가이드: 피그마 HEX → 디자인 토큰 변환 적용
 // 접근성: 포커스 표시기, 키보드 네비게이션, 상태별 스타일 지원
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
 
 // 기본 칩 스타일
 .base-chip {
@@ -95,3 +99,5 @@
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
   }
 }
+
+} // @layer components 닫기

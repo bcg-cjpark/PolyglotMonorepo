@@ -2,6 +2,10 @@
  * BottomNavigation 스타일
  * Material UI Bottom Navigation을 참고하여 구현
  */
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
 
 .base-bottom-navigation {
   display: flex;
@@ -120,3 +124,5 @@
     flex-shrink: 0;
   }
 }
+
+} // @layer components 닫기

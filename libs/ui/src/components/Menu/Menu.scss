@@ -1,3 +1,9 @@
+// Menu 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
+
 .base-menu {
   &__items {
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
@@ -24,3 +30,5 @@
     color: var(--font-color-default);
   }
 }
+
+} // @layer components 닫기

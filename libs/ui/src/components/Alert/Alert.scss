@@ -2,6 +2,10 @@
   Alert 전용 SCSS (Tailwind로 제어 불가한 부분이 생길 경우 확장)
   현재는 기본 전환 애니메이션과 텍스트 슬라이드 애니메이션 포함
 */
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
 
 .base-alert-enter-active,
 .base-alert-leave-active {
@@ -51,3 +55,5 @@
     transform: translateX(-100%);
   }
 }
+
+} // @layer components 닫기

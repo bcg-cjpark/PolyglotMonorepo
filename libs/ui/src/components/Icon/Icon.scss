@@ -19,6 +19,11 @@
   }
 }
 
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈. (@mixin 은 출력에 기여하지 않아 밖에 유지)
+
+@layer components {
+
 .icon-xs {
   @include icon-box(0.75rem);
 }
@@ -74,3 +79,5 @@
     fill: none;
   }
 }
+
+} // @layer components 닫기
