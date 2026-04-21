@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+/* 디자인 토큰 로드 (CSS 변수 :root 선언).
+   Tailwind v4 는 `@theme` 블록을 entry CSS graph 안에서만 인식하므로
+   tokens 도 이 파일을 통해 끌어와야 함. JS 쪽에서 별도로
+   `import '@monorepo/tokens/styles.css'` 하면 @theme 가 누락됨. */
+@import '../tokens/styles/tokens-light.css';
+@import '../tokens/styles/tokens-dark.css';
+
 /* Tailwind v4 content 소스 명시 — 이 파일이 libs/tailwind-config/ 에 있어서 기본 스캔 범위가 좁음.
    workspace의 모든 앱/라이브러리 소스를 스캔하도록 지정. */
 @source "../../apps/**/*.{ts,tsx,html}";
@@ -8,9 +15,131 @@
 /* `dark:` 유틸은 문서 루트의 `.dark` 클래스 기준 (next-themes / 다크모드 토글과 정합) */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 앱에서 @monorepo/tokens 의 CSS를 먼저 import한 뒤 이 파일을 로드하면,
-   토큰 CSS 변수와 아래 @theme 기본값이 함께 적용됩니다. */
-@theme {
+/**
+ * Tailwind v4 @theme — 디자인 토큰(CSS 변수)을 유틸리티 계층에 노출.
+ *
+ * @tailwindcss/vite + pnpm workspace + Storybook 조합에서 `@import '...tailwind-bridge.css'`
+ * 로 끌어온 `@theme` 블록이 pipeline 에서 누락되는 버그가 관측되어,
+ * 원래 libs/tokens/styles/tailwind-bridge.css 에 있던 내용을 이 entry CSS 로 이전.
+ * (tokens 패키지는 base 변수 정의만 소유; Tailwind 매핑은 tailwind-config 가 소유.)
+ *
+ * 매핑 추가 시 규칙:
+ *  - 색상: `--color-<name>: var(--<원본>);` → `text-<name>`, `bg-<name>`, `border-<name>` 가능
+ *  - 반경: `--radius-<name>` → `rounded-<name>`
+ *  - @theme inline 으로 선언해 참조 형태를 보존해야 라이트/다크 토글 시 cascade 가 동작.
+ */
+@theme inline {
+  /* ── Font ── */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Semantic aliases ── */
+  --color-primary: var(--base-colors-primary-primary500);
+  --color-secondary: var(--base-colors-secondary-secondary500);
+  --color-primary-foreground: var(--font-color-white);
+  --color-background: var(--background-bg-default);
+  --color-foreground: var(--font-color-default);
+  --color-muted: var(--font-color-default-muted);
+  --color-border: var(--background-divider);
+
+  /* ── Input ── (Input.tsx 가 사용) */
+  --color-input-text-static: var(--input-color-text-static);
+  --color-input-text-disable: var(--input-color-text-disable);
+  --color-input-text-placeholder: var(--input-color-text-placeholder);
+  --color-input-text-error: var(--input-color-text-error);
+  --color-input-color-surface: var(--input-color-surface);
+  --color-input-bg-disabled: var(--input-color-bg-disabled);
+  --color-input-border-static: var(--input-color-border-static);
+  --color-input-border-focus: var(--input-color-border-focus);
+  --color-input-border-error: var(--input-color-border-error);
+  --color-input-border-disabled: var(--input-color-border-disabled);
+
+  /* ── Background / Font general ── */
+  --color-default: var(--font-color-default);
+  --color-default-muted: var(--font-color-default-muted);
+  --color-default-muted-dark: var(--font-color-default-muted-dark);
+  --color-bg-bg-default: var(--background-bg-default);
+  --color-bg-bg-outline: var(--background-bg-outline);
+
+  /* ── Neutral scale ── */
+  --color-neutral-neutral000: var(--base-colors-neutral-neutral000);
+  --color-neutral-neutral050: var(--base-colors-neutral-neutral050);
+  --color-neutral-neutral100: var(--base-colors-neutral-neutral100);
+  --color-neutral-neutral150: var(--base-colors-neutral-neutral150);
+  --color-neutral-neutral200: var(--base-colors-neutral-neutral200);
+  --color-neutral-neutral250: var(--base-colors-neutral-neutral250);
+  --color-neutral-neutral300: var(--base-colors-neutral-neutral300);
+  --color-neutral-neutral400: var(--base-colors-neutral-neutral400);
+  --color-neutral-neutral500: var(--base-colors-neutral-neutral500);
+  --color-neutral-neutral550: var(--base-colors-neutral-neutral550);
+  --color-neutral-neutral600: var(--base-colors-neutral-neutral600);
+  --color-neutral-neutral700: var(--base-colors-neutral-neutral700);
+  --color-neutral-neutral750: var(--base-colors-neutral-neutral750);
+  --color-neutral-neutral800: var(--base-colors-neutral-neutral800);
+
+  /* ── Primary scale ── */
+  --color-primary-primary050: var(--base-colors-primary-primary050);
+  --color-primary-primary100: var(--base-colors-primary-primary100);
+  --color-primary-primary200: var(--base-colors-primary-primary200);
+  --color-primary-primary300: var(--base-colors-primary-primary300);
+  --color-primary-primary400: var(--base-colors-primary-primary400);
+  --color-primary-primary500: var(--base-colors-primary-primary500);
+  --color-primary-primary600: var(--base-colors-primary-primary600);
+  --color-primary-primary700: var(--base-colors-primary-primary700);
+  --color-primary-primary800: var(--base-colors-primary-primary800);
+  --color-primary-primary900: var(--base-colors-primary-primary900);
+  --color-primary-primary-deep: var(--base-colors-primary-primary-deep);
+
+  /* ── Red scale ── */
+  --color-red-red050: var(--base-colors-red-red050);
+  --color-red-red100: var(--base-colors-red-red100);
+  --color-red-red200: var(--base-colors-red-red200);
+  --color-red-red300: var(--base-colors-red-red300);
+  --color-red-red400: var(--base-colors-red-red400);
+  --color-red-red500: var(--base-colors-red-red500);
+  --color-red-red600: var(--base-colors-red-red600);
+  --color-red-red700: var(--base-colors-red-red700);
+  --color-red-red800: var(--base-colors-red-red800);
+  --color-red-red900: var(--base-colors-red-red900);
+
+  /* ── Green scale ── */
+  --color-green-green050: var(--base-colors-green-green050);
+  --color-green-green100: var(--base-colors-green-green100);
+  --color-green-green200: var(--base-colors-green-green200);
+  --color-green-green300: var(--base-colors-green-green300);
+  --color-green-green400: var(--base-colors-green-green400);
+  --color-green-green500: var(--base-colors-green-green500);
+  --color-green-green600: var(--base-colors-green-green600);
+  --color-green-green700: var(--base-colors-green-green700);
+  --color-green-green800: var(--base-colors-green-green800);
+
+  /* ── Blue scale ── */
+  --color-blue-blue050: var(--base-colors-blue-blue050);
+  --color-blue-blue100: var(--base-colors-blue-blue100);
+  --color-blue-blue200: var(--base-colors-blue-blue200);
+  --color-blue-blue300: var(--base-colors-blue-blue300);
+  --color-blue-blue400: var(--base-colors-blue-blue400);
+  --color-blue-blue500: var(--base-colors-blue-blue500);
+  --color-blue-blue600: var(--base-colors-blue-blue600);
+  --color-blue-blue700: var(--base-colors-blue-blue700);
+  --color-blue-blue800: var(--base-colors-blue-blue800);
+  --color-blue-blue800-deep: var(--base-colors-blue-blue800-deep);
+
+  /* ── Purple scale ── */
+  --color-purple-purple050: var(--base-colors-purple-purple050);
+  --color-purple-purple100: var(--base-colors-purple-purple100);
+  --color-purple-purple200: var(--base-colors-purple-purple200);
+  --color-purple-purple300: var(--base-colors-purple-purple300);
+  --color-purple-purple400: var(--base-colors-purple-purple400);
+  --color-purple-purple500: var(--base-colors-purple-purple500);
+  --color-purple-purple600: var(--base-colors-purple-purple600);
+  --color-purple-purple700: var(--base-colors-purple-purple700);
+  --color-purple-purple800: var(--base-colors-purple-purple800);
+
+  /* ── Radius ── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 }

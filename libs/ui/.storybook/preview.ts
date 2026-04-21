@@ -1,6 +1,8 @@
 import type { Preview } from '@storybook/react-vite';
 
-import '@monorepo/tokens/styles.css';
+// tailwind-config/globals.css 가 이미 @monorepo/tokens 를 @import 로 끌어오므로
+// 여기서 tokens 를 별도로 import 하면 Tailwind v4 가 @theme inline 블록을 두 번째 graph 로 인식해 utility 가 누락됨.
+// globals 한 줄만 두어 단일 CSS graph 를 유지.
 import '@monorepo/tailwind-config/globals';
 import '../src/styles/components.scss';
 
