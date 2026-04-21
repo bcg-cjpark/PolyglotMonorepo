@@ -36,7 +36,7 @@ git diff --stat HEAD
 ### 2. 검수 범위 (UI팀 소관만)
 허용 경로:
 - `libs/ui/**`
-- `libs/tailwind-config/globals.css` (`@theme inline` 매핑 추가 시). `libs/tokens/styles/tailwind-bridge.css` 는 DEPRECATED — 직접 편집 금지
+- `libs/tailwind-config/globals.css` (`@theme inline` 매핑 추가 시)
 - `libs/tokens/styles/__tokens-*.css` (단, `scripts/apply-theme-colors.mjs` 로 생성된 결과만. 직접 편집 흔적이면 FAIL)
 
 다른 경로(`apps/**`, `docs/**` 등) 섞이면 FAIL, 메인에 분리 요청.

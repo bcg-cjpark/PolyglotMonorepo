@@ -77,7 +77,6 @@ Claude Code 는 **sub-agent nesting 을 지원하지 않는다** — 서브에�
 | `libs/ui/**` | UI팀 |
 | `libs/tokens/styles/__tokens-*.css` | UI팀 (`scripts/apply-theme-colors.mjs` 경유 필수, 의도는 디자인팀) |
 | `libs/tailwind-config/globals.css` (Tailwind `@theme inline` 매핑) | UI팀 |
-| `libs/tokens/styles/tailwind-bridge.css` | **DEPRECATED** — `@theme` 매핑은 `globals.css` 로 이전. `apply-theme-colors.mjs` secondary alias 주입 경로 때문에 stub 유지. 직접 편집 금지 |
 | `apps/example-web/src/**` | 프론트 개발팀 |
 | `apps/example-web/tests/e2e/**` | 프론트 테스트팀 |
 | `apps/example-web/tests/integration/**` | 통합테스트팀 |

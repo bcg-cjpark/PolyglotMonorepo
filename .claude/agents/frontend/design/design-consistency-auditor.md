@@ -137,6 +137,6 @@ grep -hnE "var\(--[a-zA-Z0-9\-]+" <파일들>
 ## 레퍼런스
 
 - 토큰 정의: `libs/tokens/styles/__tokens-light.css`, `__tokens-dark.css`
-- Tailwind 매핑: `libs/tailwind-config/globals.css` 의 `@theme inline` 블록 (`libs/tokens/styles/tailwind-bridge.css` 는 DEPRECATED, `apply-theme-colors.mjs` secondary 주입 경로만 잔존)
+- Tailwind 매핑: `libs/tailwind-config/globals.css` 의 `@theme inline` 블록
 - libs/ui 컴포넌트 목록: `libs/ui/src/components/index.ts`
 - 구현 규약: `.claude/agents/frontend/ui/ui-composer.md`

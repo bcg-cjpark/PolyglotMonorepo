@@ -174,11 +174,8 @@ node scripts/apply-theme-colors.mjs --primary=#4f46e5 --secondary=#f59e0b
 - `libs/tokens/styles/__tokens-light.css` 와 `__tokens-dark.css` 의
   `--base-colors-primary-primary*` (및 secondary) 전 단계(050~900 + deep) 를
   HSL 기반으로 재생성. Light/Dark 양 테마 모두 갱신.
-- Secondary 가 처음 추가되면 `--color-secondary` alias 가 함께 주입됨.
-  (현재는 스크립트가 DEPRECATED 된 `libs/tokens/styles/tailwind-bridge.css`
-  를 타겟으로 쓰고 있어 `--secondary=` 인자 전달 시 stub 마커 탐색 실패로
-  크래시할 수 있음. 후속 라운드에서 `libs/tailwind-config/globals.css` 의
-  `@theme inline` 블록을 타겟으로 전환 예정.)
+- `--color-secondary` Tailwind alias 는 `libs/tailwind-config/globals.css` 에
+  static 으로 이미 정의되어 있어 스크립트가 별도로 주입하지 않음.
 
 ## 4. 검증
 
