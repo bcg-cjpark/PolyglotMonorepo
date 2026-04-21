@@ -27,9 +27,9 @@ export interface DisclosureProps {
   renderPanel?: React.ReactNode;
 }
 
-// 디자인 토큰 브릿지(tailwind-bridge.css)의 `--color-<scale>-<scale><shade>` 규칙에
-// 맞춘 유틸리티 사용. data-theme 전환 시 토큰 값이 자동으로 바뀌므로
-// light/dark 양쪽에서 올바른 색이 잡힌다.
+// 디자인 토큰 (libs/tailwind-config/globals.css 의 @theme inline) 의
+// `--color-<scale>-<scale><shade>` 규칙에 맞춘 유틸리티 사용.
+// data-theme 전환 시 토큰 값이 자동으로 바뀌므로 light/dark 양쪽에서 올바른 색이 잡힌다.
 const COLOR_CLASSES = {
   red: {
     button:

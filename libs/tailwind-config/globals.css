@@ -90,6 +90,19 @@
   --color-primary-primary900: var(--base-colors-primary-primary900);
   --color-primary-primary-deep: var(--base-colors-primary-primary-deep);
 
+  /* ── Secondary scale ── */
+  --color-secondary-secondary050: var(--base-colors-secondary-secondary050);
+  --color-secondary-secondary100: var(--base-colors-secondary-secondary100);
+  --color-secondary-secondary200: var(--base-colors-secondary-secondary200);
+  --color-secondary-secondary300: var(--base-colors-secondary-secondary300);
+  --color-secondary-secondary400: var(--base-colors-secondary-secondary400);
+  --color-secondary-secondary500: var(--base-colors-secondary-secondary500);
+  --color-secondary-secondary600: var(--base-colors-secondary-secondary600);
+  --color-secondary-secondary700: var(--base-colors-secondary-secondary700);
+  --color-secondary-secondary800: var(--base-colors-secondary-secondary800);
+  --color-secondary-secondary900: var(--base-colors-secondary-secondary900);
+  --color-secondary-secondary-deep: var(--base-colors-secondary-secondary-deep);
+
   /* ── Red scale ── */
   --color-red-red050: var(--base-colors-red-red050);
   --color-red-red100: var(--base-colors-red-red100);
