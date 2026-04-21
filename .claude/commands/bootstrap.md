@@ -28,8 +28,20 @@ grep -q 'rootProject.name = "example-api"' apps/example-api/settings.gradle.kts 
 | **프로젝트 슬러그** | `billing-app` | kebab-case, 3-40자 |
 | **Kotlin 루트 패키지** | `com.acme.billing` | 소문자 + 점, 역도메인 |
 | **프로덕트 한 줄 소개** | `송장 관리 SaaS` | README 에 들어감 |
-| **Primary 색상** (선택) | `#2563eb` | `#rrggbb` 또는 `#rgb`. 미지정 시 템플릿 기본 유지 |
-| **Secondary 색상** (선택) | `#f97316` | `#rrggbb` 또는 `#rgb`. 미지정 시 Secondary 토큰 추가 안 함 |
+| **색상 커스터마이즈 여부** | `yes` / `no` | `no` 면 템플릿 기본 팔레트(아래) 사용, `yes` 면 Primary/Secondary HEX 추가 수집 |
+| **Primary 색상** (yes 일 때) | `#2563eb` | `#rrggbb` 또는 `#rgb` |
+| **Secondary 색상** (yes 일 때) | `#f97316` | `#rrggbb` 또는 `#rgb` |
+
+### 템플릿 기본 팔레트 (BOOTSTRAP_DEFAULTS)
+
+사용자가 색상 커스터마이즈 `no` 를 선택하거나 답을 비우면 **아래 HEX 를 그대로 `scripts/apply-theme-colors.mjs` 에 전달**한다. 근거는 `docs/design-notes/global-palette.md` 의 `BOOTSTRAP_DEFAULTS` 섹션 (디자인팀이 결정).
+
+| 역할 | HEX |
+|---|---|
+| Primary   | `#4f46e5` (indigo-600) |
+| Secondary | `#f59e0b` (amber-500) |
+
+> **주의**: 이 HEX 가 바뀔 때는 `docs/design-notes/global-palette.md` 의 `BOOTSTRAP_DEFAULTS` 표와 **동기화**. 디자인팀이 노트를 갱신하면 이 스킬도 함께 업데이트.
 
 수집 후 아래 치환 계획을 **사용자에게 보여주고 확인**:
 
@@ -47,8 +59,9 @@ grep -q 'rootProject.name = "example-api"' apps/example-api/settings.gradle.kts 
   - apps/example-api/app/src/test/...ApplicationTests.kt 의 패키지 라인 업데이트
   - libs/api-types 기존 OpenAPI 코드젠 결과 초기화
   - pnpm-workspace.yaml, nx.json 의 참조 업데이트
-  - (Primary/Secondary 입력 시) 디자인 시스템 색상 재생성:
-      node scripts/apply-theme-colors.mjs --primary=<hex> [--secondary=<hex>]
+  - 디자인 시스템 색상 재생성 (항상 실행):
+      node scripts/apply-theme-colors.mjs --primary=<primary> --secondary=<secondary>
+      ↑ 커스터마이즈 미선택 시 BOOTSTRAP_DEFAULTS (#4f46e5 / #f59e0b) 사용
 
 진행할까요? (yes/no)
 ```
@@ -140,17 +153,22 @@ rm docs/screens/user-form.md
 상단에 "이 레포는 `PolyglotMonorepo` 템플릿에서 생성된 `<slug>` 프로젝트" 한 줄 추가.
 기존 내용은 **유지** (검증 규칙, UI 라이브러리 우선 등은 계속 적용되어야 함).
 
-### 3.7 디자인 시스템 색상 (선택)
+### 3.7 디자인 시스템 색상 (항상 실행)
 
-Primary 또는 Secondary 가 입력됐으면 generator 실행. 토큰 파일을 직접 편집하지 말 것.
+토큰 파일을 직접 편집하지 말 것. 반드시 generator 경유.
 
+**사용자가 커스터마이즈 `yes` 선택한 경우** — 입력받은 HEX 사용:
 ```bash
-# 둘 다 있을 때
 node scripts/apply-theme-colors.mjs --primary=<primary_hex> --secondary=<secondary_hex>
-
-# Primary 만
-node scripts/apply-theme-colors.mjs --primary=<primary_hex>
 ```
+
+**사용자가 커스터마이즈 `no` 선택한 경우** — 템플릿 기본 팔레트(BOOTSTRAP_DEFAULTS) 사용:
+```bash
+node scripts/apply-theme-colors.mjs --primary=#4f46e5 --secondary=#f59e0b
+```
+
+> 기본값 근거는 `docs/design-notes/global-palette.md` 의 `BOOTSTRAP_DEFAULTS` 표 참조.
+> 두 경우 모두 Secondary 를 항상 세팅한다 (템플릿 레포에는 Secondary 가 아직 없으므로 최초 bootstrap 시 새로 추가되는 경로).
 
 스크립트 동작:
 - `libs/tokens/styles/__tokens-light.css` 와 `__tokens-dark.css` 의
