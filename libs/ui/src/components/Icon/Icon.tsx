@@ -68,7 +68,12 @@ export const Icon = memo(function Icon({
     return (
       <span
         className={classes.join(' ')}
-        style={{ ...styles, display: 'inline-block', background: '#e5e7eb', borderRadius: '50%' }}
+        style={{
+          ...styles,
+          display: 'inline-block',
+          background: 'var(--base-colors-neutral-neutral200)',
+          borderRadius: '50%',
+        }}
         aria-hidden="true"
       />
     );

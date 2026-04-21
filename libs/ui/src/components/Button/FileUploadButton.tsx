@@ -63,10 +63,10 @@ export const FileUploadButton = memo(function FileUploadButton({
 
   const staticClasses = [
     'relative w-full flex items-center rounded-sm border transition-colors duration-150',
-    'bg-[#f3f4f6]',
+    'bg-neutral-neutral100',
     'border-bg-bg-outline',
     'text-input-text-static',
-    disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-bg-surface',
+    disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-bg-bg-default',
   ].join(' ');
 
   const dynamicStyle: React.CSSProperties = disabled
@@ -141,7 +141,7 @@ export const FileUploadButton = memo(function FileUploadButton({
             key={`${file.name}-${index}`}
             className="flex w-full items-center justify-between rounded-sm border border-gray-200 bg-gray-50 px-4 py-[11px]"
           >
-            <span className="text-blue truncate text-sm underline underline-offset-1">
+            <span className="text-blue-blue800-deep truncate text-sm underline underline-offset-1">
               {file.name}
             </span>
             <button

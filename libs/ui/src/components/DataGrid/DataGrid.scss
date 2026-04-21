@@ -125,10 +125,12 @@
     height: 100% !important;
     pointer-events: none !important;
     z-index: 1 !important;
+    // pinned 칼럼 우측 그라데이션: neutral500 (#737373 부근) → neutral300 투명.
+    // 토큰 + color-mix 로 테마 대응 + 20% 알파 유지.
     background: linear-gradient(
       to right,
-      rgba(115, 115, 115, 0.2) 0%,
-      rgba(217, 217, 217, 0) 100%
+      color-mix(in srgb, var(--base-colors-neutral-neutral500) 20%, transparent) 0%,
+      color-mix(in srgb, var(--base-colors-neutral-neutral300) 0%, transparent) 100%
     ) !important;
   }
 
@@ -211,16 +213,28 @@
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  background-color: rgba(217, 217, 217, 0.5);
+  background-color: color-mix(
+    in srgb,
+    var(--base-colors-neutral-neutral300) 50%,
+    transparent
+  );
   transition: background-color 0.2s;
 }
 
 .header-scroll-button:hover {
-  background-color: rgba(217, 217, 217, 0.7);
+  background-color: color-mix(
+    in srgb,
+    var(--base-colors-neutral-neutral300) 70%,
+    transparent
+  );
 }
 
 .header-scroll-button:active {
-  background-color: rgba(217, 217, 217, 0.9);
+  background-color: color-mix(
+    in srgb,
+    var(--base-colors-neutral-neutral300) 90%,
+    transparent
+  );
 }
 
 .header-scroll-button--left {

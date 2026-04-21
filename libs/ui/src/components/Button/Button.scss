@@ -419,8 +419,9 @@
 }
 
 // 비활성화 상태 스타일 (파일 마지막)
+// 전역 `button:disabled` leak 방지: .btn 에만 스코프.
 .btn-disabled,
-button:disabled,
+button.btn:disabled,
 a[role='button'][aria-disabled='true'] {
   background-color: var(--button-disabled-background);
   color: var(--button-disabled-text);

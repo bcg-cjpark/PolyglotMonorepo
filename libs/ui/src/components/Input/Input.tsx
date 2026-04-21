@@ -363,7 +363,7 @@ export const Input = memo(
         {/* 에러 메시지 */}
         {error && errorMessage && (
           <div
-            className={`text-input-border-error mt-1 text-[12px] font-medium ${errorMessageOverflow ? 'whitespace-nowrap' : ''}`}
+            className={`text-input-text-error mt-1 text-[12px] font-medium ${errorMessageOverflow ? 'whitespace-nowrap' : ''}`}
           >
             {errorMessage}
           </div>

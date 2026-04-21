@@ -103,11 +103,11 @@
 
   &__legend-label {
     flex: 1;
-    color: var(--text-default);
+    color: var(--font-color-default);
   }
 
   &__legend-value {
     font-weight: 500;
-    color: var(--text-strong);
+    color: var(--font-color-default);
   }
 }

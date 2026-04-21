@@ -54,12 +54,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ff5b5b;
+    background-color: var(--base-colors-red-red700);
     z-index: 0;
   }
 
   &__swipe-icon {
-    color: #fff;
+    color: var(--font-color-white);
     flex-shrink: 0;
   }
 

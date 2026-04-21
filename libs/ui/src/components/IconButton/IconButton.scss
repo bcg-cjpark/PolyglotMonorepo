@@ -99,7 +99,7 @@
 
 // 비활성화 상태
 .icon-button-disabled,
-button:disabled {
+.icon-button:disabled {
   color: var(--button-disabled-text);
   background-color: transparent;
   opacity: 0.6;

@@ -54,11 +54,19 @@ const ROUNDED_CLASSES: Record<string, string> = {
   'rounded-full': 'rounded-full',
 };
 
-function getDefaultTextColor(bg: string) {
-  if (bg.includes('--trade-short-bg') || bg.includes('#e8f0fa')) return 'var(--trade-short-text)';
-  if (bg.includes('--trade-cancel-bg') || bg.includes('#f9f3ff')) return 'var(--trade-cancel-text)';
-  if (bg.includes('--table-chip-bg') || bg.includes('#eaecee')) return 'var(--font-color-footer)';
-  return 'var(--font-color-primary)';
+// variant 별 기본 텍스트 색상. backgroundColor 가 HEX 로 들어와도 테마마다 HEX
+// 값이 달라 문자열 매칭이 깨지므로, variant 를 출처로 삼아 결정.
+const CHIP_VARIANT_TEXT_COLORS: Record<ChipVariant, string> = {
+  grey: 'var(--font-color-default)',
+  red: 'var(--base-colors-red-red800)',
+  green: 'var(--base-colors-green-green700)',
+  blue: 'var(--trade-short-text)',
+  yellow: 'var(--base-colors-primary-primary-deep)',
+  purple: 'var(--trade-cancel-text)',
+};
+
+function getDefaultTextColor(variant: ChipVariant) {
+  return CHIP_VARIANT_TEXT_COLORS[variant] ?? 'var(--font-color-primary)';
 }
 
 export const Chip = memo(function Chip({
@@ -98,7 +106,7 @@ export const Chip = memo(function Chip({
     if (textColor) {
       s.color = textColor;
     } else if (backgroundColor) {
-      s.color = getDefaultTextColor(backgroundColor);
+      s.color = getDefaultTextColor(variant);
     }
     if (borderColor) {
       s.borderColor = borderColor;
@@ -106,7 +114,7 @@ export const Chip = memo(function Chip({
       s.borderStyle = 'solid';
     }
     return s;
-  }, [backgroundColor, textColor, borderColor]);
+  }, [backgroundColor, textColor, borderColor, variant]);
 
   return (
     <span className={classes} style={hasCustomColor ? customStyles : undefined} aria-label={label}>

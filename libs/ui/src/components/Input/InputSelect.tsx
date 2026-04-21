@@ -106,7 +106,7 @@ export const InputSelect = memo(function InputSelect({
       variant === 'header'
         ? 'bg-transparent'
         : color === 'black'
-          ? 'bg-[var(--input-color-surface-dark)] !text-[#F1F3F5] !border-[var(--input-color-border-dark)]'
+          ? 'bg-[var(--input-color-surface-dark)] !text-neutral-neutral050 !border-[var(--input-color-border-dark)]'
           : color === 'gray'
             ? 'bg-[var(--chart-chart-bg-on)]'
             : 'bg-[var(--input-color-surface)]';
@@ -200,12 +200,12 @@ export const InputSelect = memo(function InputSelect({
                             : variant === 'compact'
                               ? 'relative cursor-default select-none py-2 pl-3 pr-3 text-[10px] font-medium leading-[16px] tracking-[-0.35px]'
                               : 'relative cursor-default select-none py-2 pl-3 pr-3 text-[13px] leading-[16px] tracking-[-0.35px]',
-                          color === 'black' ? '!text-[#F1F3F5]' : '',
+                          color === 'black' ? '!text-neutral-neutral050' : '',
                           option.disabled
                             ? 'text-input-text-disable cursor-not-allowed opacity-50'
                             : focus
                               ? color === 'black'
-                                ? 'text-input-text-static bg-[#131313]'
+                                ? 'text-input-text-static bg-neutral-neutral800'
                                 : 'text-input-text-static bg-[var(--background-bg-surface-muted)]'
                               : 'text-input-text-static',
                           selected && !option.disabled ? 'font-medium' : '',

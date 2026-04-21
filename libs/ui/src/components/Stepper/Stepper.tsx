@@ -55,7 +55,7 @@ export const Stepper = memo(function Stepper({
             {/* 스텝 아이콘 */}
             <div
               className={`flex size-10 shrink-0 items-center justify-center rounded-full p-2 ${
-                index <= current ? 'bg-bg-primary' : 'bg-bg-bg-surface'
+                index <= current ? 'bg-primary-primary500' : 'bg-bg-bg-default'
               }`}
             >
               {index <= current ? (
