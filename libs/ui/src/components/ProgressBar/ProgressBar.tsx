@@ -36,18 +36,18 @@ export interface ProgressBarProps {
 
 const STRENGTH_COLORS = [
   'bg-red-red800',
-  'bg-[#FF9500]',
+  'bg-red-red500',
   'bg-primary-primary800',
-  'bg-[#7ED428]',
+  'bg-green-green500',
   'bg-green-green800',
 ];
 
 const STRENGTH_LABEL_COLORS = [
-  'text-red',
-  'text-[#FF9500]',
-  'text-primary',
-  'text-[#7ED428]',
-  'text-green',
+  'text-red-red800',
+  'text-red-red500',
+  'text-primary-primary800',
+  'text-green-green500',
+  'text-green-green800',
 ];
 
 const STRENGTH_LABELS = ['매우 약함', '약함', '보통', '강함', '매우 강함'];
@@ -56,11 +56,11 @@ const DEFAULT_SEGMENT_COLORS = [
   'bg-blue-blue800-deep',
   'bg-primary-primary800',
   'bg-green-green800',
-  'bg-[#FF9500]',
+  'bg-red-red500',
   'bg-red-red800',
-  'bg-[#7ED428]',
+  'bg-green-green500',
   'bg-purple-purple800',
-  'bg-yellow-yellow800',
+  'bg-primary-primary500',
 ];
 
 function getSegmentBorderRadius(index: number, total: number): string {
