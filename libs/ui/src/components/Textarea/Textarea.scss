@@ -1,0 +1,15 @@
+// Textarea 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
+  // 세로 방향으로만 리사이즈 허용 (사용자가 본문 길이에 맞춰 늘릴 수 있음).
+  // Tailwind 의 resize-y 유틸과 동일하지만 root 클래스에 직접 매핑해 두면
+  // 별도 유틸 클래스 배선 없이도 동작을 보장.
+  .textarea-root {
+    resize: vertical;
+    // 기본 line-height (20px) × rows(4) = 80px 최소 높이.
+    // rows 속성이 기본값이므로 사용자 브라우저 기본 계산과 충돌하지 않도록
+    // min-height 를 명시하지 않음. (rows prop 이 높이 기준)
+  }
+}

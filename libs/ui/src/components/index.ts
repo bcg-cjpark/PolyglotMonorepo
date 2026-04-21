@@ -141,3 +141,6 @@ export type { PINProps } from './PIN';
 
 export { DataGrid } from './DataGrid';
 export type { DataGridHandle, DataGridProps, SortState } from './DataGrid';
+
+export { Textarea } from './Textarea';
+export type { TextareaProps, TextareaRef } from './Textarea';
