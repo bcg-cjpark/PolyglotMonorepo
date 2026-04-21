@@ -1,58 +1,113 @@
+# PolyglotMonorepo — 에이전트 팀 규약
+
+## 총원 구조 (메인 에이전트 = 프로젝트 전체 팀장)
+
+메인 에이전트가 프로젝트 전체 팀장 역할로 아래 6개 서브팀을 **직접 호출**해 파이프라인을 돌린다.
+Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 에이전트는 Task 도구를 가지지 않고, 모든 위임은 메인이 수행.
+
+1. **기획팀** — `.claude/agents/planning/`
+2. **프론트엔드** — `.claude/agents/frontend/`
+   - 디자인팀 (`frontend/design/`)
+   - UI팀 (`frontend/ui/`) — `libs/ui` 소유
+   - 프론트 개발팀 (`frontend/web/`)
+   - 프론트 테스트팀 (`frontend/test/`)
+3. **백엔드 개발팀** — `.claude/agents/backend/`
+4. **통합테스트팀** — `.claude/agents/integration/`
+
+각 팀의 구성/역할/호출 시점은 [`.claude/agents/README.md`](./.claude/agents/README.md) 참조.
+
+## 표준 파이프라인
+
+```
+[1] 기획 통합       doc-consolidator → stitch-brief-writer → planning-lead (커밋)
+[2] (사용자 수동)   Stitch 로 화면정의서 생성 → docs/screens/*.md 로 투입
+[3] 디자인 노트     design-trend-scout → design-lead (커밋)          ← 선택
+[4] 백엔드 ∥ UI    backend-developer → backend-lead (커밋)
+                   ui-composer → ui-storybook-curator → ui-library-tester → ui-lead (커밋)
+[5] 프론트 화면     frontend-developer → design-consistency-auditor → frontend-lead (커밋)
+[6] 화면 e2e        frontend-e2e-tester → frontend-test-lead (커밋)
+[7] 통합 e2e        integration-e2e-runner → integration-lead (커밋)
+[8] 실패 루프       lead FAIL → 해당 팀원 재호출 (≤ 3회)
+[9] 사후 감사       spec-auditor → planning-lead (커밋)
+```
+
 ## UI 라이브러리 우선 규칙
 
-**새 UI가 필요하면 ad-hoc 컴포넌트를 만들지 말고 `@monorepo/ui` 를 먼저 활용할 것.**
+**새 UI가 필요하면 ad-hoc 컴포넌트를 만들지 말고 `@monorepo/ui` 를 먼저 활용.**
 
-바이브 코딩 시 매번 다른 스타일의 컴포넌트가 튀어나오면 일관성이 깨짐. 따라서:
+1. `frontend-developer` 가 `libs/ui/src/components/` 를 탐색해 필요 primitive 가 있는지 확인.
+2. 없으면 "UI팀 신규 primitive 요청" 을 리포트로 반환.
+3. 메인이 `ui-composer → ui-storybook-curator → ui-library-tester → ui-lead` 순 호출.
+4. UI팀 커밋 완료 후 `frontend-developer` 재호출해서 primitive 교체.
 
-1. **먼저 `libs/ui/src/components/` 탐색** — 이미 있는 컴포넌트(Button, Input, Card, Modal 등 28+)로 요구사항이 충족 가능한가?
-2. **없으면 `ui-lead` 에이전트에 위임** (`.claude/agents/ui/ui-lead.md`). ui-lead 가 내부에서 `ui-composer` 를 호출해 `libs/ui` 에 새 primitive 를 추가한 뒤, `ui-design-reviewer` + `ui-verifier` 로 일관성/동작 검증까지 완료한다.
-3. **앱 코드 내부에 인라인 컴포넌트를 만들지 말 것** (예: `apps/example-web/src/components/MyButton.tsx` 같은 것 금지). 재사용 가능한 것은 전부 `libs/ui` 에.
+**앱 코드 내부에 범용 primitive 금지** — `apps/example-web/src/components/` 에는 해당 페이지에서만 쓰이는 **합성 컴포넌트** (예: `UserListRow`) 만 허용. 그 내부 구성도 `@monorepo/ui` primitive 기반.
 
-**예외:** 해당 페이지에서만 쓰이는 **합성 컴포넌트**(예: `UserListRow` 같은 페이지 로컬 구성)는 `apps/*/src/components/` 에 둘 수 있음. 단, 그것도 내부 구성은 `@monorepo/ui` 의 primitive 로.
+## 파일 편집 소유권
 
-**직접 호출 금지:** `ui-composer`, `ui-verifier`, `ui-design-reviewer` 는 `ui-lead` 가 내부에서만 호출. 메인/developer 가 이 세 가지를 직접 호출하지 말 것 (단일 진입점 원칙). 사용자가 명시적으로 "composer만 돌려" 같이 지시한 경우만 예외.
-
-## 작업 검증 규칙
-
-**어떤 작업이든 완료 보고 전에 반드시 관련된 빌드/실행/UX 검증을 돌려볼 것.**
-"동작할 것이다"로 끝내지 말고 실제로 돌려본 결과를 근거로 보고.
-
-### 계층별 검증 수단
-
-| 변경 계층 | 필수 검증 |
+| 경로 | 편집 가능 팀 |
 |---|---|
-| Kotlin (`apps/example-api/`) | `pnpm nx run example-api:lint` (구조 변경 시 `:build` 또는 `:serve` 도 실기동) |
-| Gradle 설정 | 최소 `:lint` 실행으로 문법/의존성 확인 |
-| React 컴포넌트/페이지/라우트/서비스 (`apps/example-web/src/`, `libs/ui/src/`) | `build` + **`ui-lead` 에이전트 호출** (ui-lead 내부에서 design-reviewer + Playwright verifier 돌림) |
-| CSS/토큰/Tailwind 설정 | dev 서버에서 transform 확인 **+** UX 변화 있으면 `ui-lead` 호출 |
-| `libs/tokens/styles/__tokens-*.css` 색상 변경 | 반드시 `node scripts/apply-theme-colors.mjs --primary=<hex> [--secondary=<hex>]` 경유. 직접 편집 금지 (Light/Dark 동기화 깨짐). |
+| `docs/prd/**`, `docs/screens/**`, `docs/stitch-brief/**`, `docs/audit/**` | 기획팀 |
+| `docs/design-notes/**` | 디자인팀 |
+| `libs/ui/**` | UI팀 |
+| `libs/tokens/styles/__tokens-*.css` | UI팀 (`scripts/apply-theme-colors.mjs` 경유 필수, 의도 결정은 디자인팀) |
+| `libs/tokens/styles/tailwind-bridge.css` | UI팀 |
+| `apps/example-web/src/**` | 프론트 개발팀 |
+| `apps/example-web/tests/e2e/**` | 프론트 테스트팀 |
+| `apps/example-web/tests/integration/**` | 통합테스트팀 |
+| `apps/example-api/**` | 백엔드팀 |
+| `libs/ui/tests/**` | UI팀 (ui-library-tester) |
+| `.claude/**`, `CLAUDE.md`, 루트 설정 | 메인(프로젝트 전체 팀장) |
 
-### UX/디자인 검증 시 Task 도구로 `ui-lead` 호출 필수
+## 작업 검증 규칙 (팀별)
 
-React 쪽 변경 후 **브라우저에서 실제로 동작하는지** + **디자인 시스템 일관성** 은
-HTTP/빌드 검증만으로는 알 수 없음. `ui-lead` 에이전트(`.claude/agents/ui/ui-lead.md`)가
-내부에서:
-- `ui-design-reviewer` — 하드코딩 색/간격/라이브러리 일탈 감사
-- `ui-verifier` — Playwright 로 실제 키보드/마우스 이벤트 검증
-- 위반 있으면 `ui-composer` / `developer` 로 수정 요청 후 재검토 (최대 3회)
+| 변경 계층 | 책임 팀 | 필수 검증 |
+|---|---|---|
+| Kotlin, Gradle, Flyway | 백엔드팀 | `pnpm nx run example-api:lint` + `:build`, Flyway 버전 충돌 없음 (V1 불변) |
+| `libs/ui/**` | UI팀 | `pnpm nx run example-web:build` + `pnpm --filter @monorepo/ui build-storybook` + `ui-library-tester` 통과 |
+| `libs/tokens/**` 색상 | UI팀 (의도는 디자인팀) | `scripts/apply-theme-colors.mjs` 경유 필수 |
+| `apps/example-web/src/**` React | 프론트 개발팀 | `pnpm nx run example-web:lint` + `:build` |
+| 디자인 일관성 | 디자인팀 | `design-consistency-auditor` Critical 0 |
+| 화면 단위 e2e | 프론트 테스트팀 | `pnpm nx run example-web:e2e` 전체 통과 |
+| 통합 e2e | 통합테스트팀 | 실 API + DB 기동 + `tests/integration/**` 통과 |
+| `docs/prd`, `docs/screens`, `docs/stitch-brief`, `docs/audit` | 기획팀 | 필수 섹션 / 링크 무결성 / 금지어(TODO/FIXME) 0 |
+| `docs/design-notes/**` | 디자인팀 | 레퍼런스 출처 명시, 바이너리 이미지 미포함 |
 
-까지 모두 돌려서 PASS/FAIL 리포트를 반환.
+## 커밋 규약
 
-**호출 예시:**
-> React UserFormPage 수정 끝. Task 도구로 ui-lead 에이전트 호출해서
-> "Name/Email 입력 타이핑, Create 버튼 제출, 생성된 유저가 리스트에 나타나는지
-> 검증 + 디자인 일관성 감사" 요청.
+- **팀장만** `git commit` 실행. main 직접 (기능 브랜치/PR 없음).
+- 메시지는 한국어 Conventional Commits:
+  - `docs(plan)`, `docs(design)`, `docs(audit)`
+  - `feat(ui)`, `feat(web)`, `feat(api)`
+  - `test(web)`, `test(integration)`, `test(ui)`
+  - `fix(...)`, `refactor(...)`, `chore(...)`
+- 한 팀의 작업 = 한 커밋. 기능 단위로 분할.
+- 팀장 PASS 전에는 커밋 금지.
+- 팀장이 없는 메타 작업 (`.claude/**`, `CLAUDE.md`, 루트 설정 변경) 은 메인이 직접 커밋.
+- Co-Authored-By trailer 항상 포함.
 
-**`ui-lead` 를 건너뛰어도 되는 경우:**
-- 백엔드만 수정 (Kotlin, SQL)
-- 문서/주석만 변경
-- `.claude/`, CI 등 설정 파일만 수정
+## 실패 루프 규약
 
-### 원칙
+- 팀장 FAIL 리턴 → 메인이 해당 팀원 재호출 (lead 지적사항 전달).
+- 재검수 FAIL → 재호출 반복. **최대 3회**.
+- 초과 시 사용자 보고 + 중단.
+
+## 원칙
 
 - `build` 성공 ≠ `dev` 성공 ≠ **UX 성공**. 세 레이어 중 변경 범위에 해당하는 것 모두 검증.
-- 검증 단계가 길어서 생략해야 하면 **명시적으로 보고**. 말없이 넘기지 말 것.
-- 이전 위반 사례: (1) build만 보고 dev 에러 방치, (2) HTTP 200만 보고 "버튼 클릭/입력 동작" 미검증, (3) 스펙에 "native 사용" 명시로 `ui-composer` 호출을 건너뛰고 바로 native 로 감 (스펙은 UI 종류만, 라이브러리는 구현 단계 결정).
+- 검증 단계 생략 시 **명시적으로 보고**. 말없이 넘기지 말 것.
+- 이전 위반 사례:
+  1. build 만 보고 dev 에러 방치
+  2. HTTP 200 만 보고 "버튼 클릭/입력 동작" 미검증
+  3. 스펙에 "native 사용" 명시라고 `ui-composer` 호출을 건너뛰고 바로 native (스펙은 UI 종류만, 라이브러리는 구현 단계 결정)
+  4. Tailwind `@layer` cascade 모른 채 unlayered SCSS 로 작성 → base preflight 에 덮어써짐
+
+## 금지사항
+
+- 팀장이 Edit/Write/Task 사용.
+- 팀원이 다른 에이전트 호출 (Task nesting).
+- 메인이 팀장 검수 없이 커밋.
+- Flyway `V1__init.sql` 수정. 새 버전은 `V<N+1>` 로.
+- 앱 코드 내부에 범용 UI primitive 생성.
 
 ## Skill routing
 

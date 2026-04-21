@@ -1,5 +1,10 @@
 # screens/ — 화면정의서 포맷 가이드
 
+이 디렉터리의 파일은 **기획팀** 소유이지만, 실 내용은 **사용자가 외부 Stitch
+(또는 대체 UX 디자인 툴) 를 수동 실행**해서 결과를 이곳에 투입하는 흐름.
+`stitch-brief-writer` 가 Stitch 투입용 브리프(`docs/stitch-brief/*.md`) 를
+먼저 준비해 준다.
+
 ## 파일 네이밍
 
 - `<page-slug>.md` (예: `user-list.md`, `user-form.md`, `billing-detail.md`)

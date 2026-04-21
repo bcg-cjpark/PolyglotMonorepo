@@ -1,5 +1,9 @@
 # prd/ — 기획서 포맷 가이드
 
+이 디렉터리의 파일은 **기획팀** (`.claude/agents/planning/`) 이 소유한다.
+`doc-consolidator` 에이전트가 산재 문서를 병합해 단일 `<feature>.md` 로 생성/갱신.
+사용자 수동 편집과 충돌 방지 위해 메인이 명시 호출했을 때만 에이전트가 편집.
+
 ## 파일 네이밍
 
 - `<feature-slug>.md` (예: `user-management.md`, `billing.md`, `auth.md`)
