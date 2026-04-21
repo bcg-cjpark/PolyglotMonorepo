@@ -60,6 +60,7 @@ export const ComboBox = memo(function ComboBox({
   onBlur,
 }: ComboBoxProps) {
   const [query, setQuery] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
 
   const clampValue = useCallback(
     (v: number) => {
@@ -77,12 +78,12 @@ export const ComboBox = memo(function ComboBox({
   }, [value]);
 
   const filteredOptions = useMemo(() => {
-    if (!options.length || !query) return options;
+    if (!options.length || !query || isComposing) return options;
     const lower = query.toLowerCase();
     return options.filter(
       (o) => o.label.toLowerCase().includes(lower) || o.value.toLowerCase().includes(lower)
     );
-  }, [options, query]);
+  }, [options, query, isComposing]);
 
   const handleSelect = useCallback(
     (optValue: string | null) => {
@@ -101,10 +102,31 @@ export const ComboBox = memo(function ComboBox({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const v = e.target.value;
       setQuery(v);
+      if (isComposing) return;
       if (!allowFreeInput) return;
       if (v === '') {
         onChange?.(undefined);
         setQuery('');
+        return;
+      }
+      const num = parseFloat(v);
+      if (!Number.isNaN(num)) onChange?.(clampValue(num));
+    },
+    [allowFreeInput, onChange, clampValue, isComposing]
+  );
+
+  const handleCompositionStart = useCallback(() => {
+    setIsComposing(true);
+  }, []);
+
+  const handleCompositionEnd = useCallback(
+    (e: React.CompositionEvent<HTMLInputElement>) => {
+      setIsComposing(false);
+      const v = (e.target as HTMLInputElement).value;
+      setQuery(v);
+      if (!allowFreeInput) return;
+      if (v === '') {
+        onChange?.(undefined);
         return;
       }
       const num = parseFloat(v);
@@ -176,6 +198,8 @@ export const ComboBox = memo(function ComboBox({
                 displayValue={() => query || displayValue}
                 placeholder={placeholder}
                 onChange={handleInputChange}
+                onCompositionStart={handleCompositionStart}
+                onCompositionEnd={handleCompositionEnd}
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
               />
