@@ -3,17 +3,29 @@
  */
 
 :root[data-theme="dark"] {
-  --base-colors-primary-primary800: #ffc800;
-  --base-colors-primary-primary700: #e1bc02;
-  --base-colors-primary-primary600: #c2a305;
-  --base-colors-primary-primary500: #a48a07;
-  --base-colors-primary-primary400: #86710a;
-  --base-colors-primary-primary300: #67580c;
-  --base-colors-primary-primary200: #493f0f;
-  --base-colors-primary-primary100: #2b2611;
-  --base-colors-primary-primary050: #2b2611;
-  --base-colors-primary-primary-deep: #ffda60;
-  --base-colors-primary-primary900: #ffb301;
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary600: #3328e1;
+  --base-colors-primary-primary500: #251cc5;
+  --base-colors-primary-primary400: #1e17a1;
+  --base-colors-primary-primary300: #211c72;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary800: #f59e0b;
+  --base-colors-secondary-secondary700: #cf8508;
+  --base-colors-secondary-secondary600: #f5a214;
+  --base-colors-secondary-secondary500: #d88b09;
+  --base-colors-secondary-secondary400: #b07107;
+  --base-colors-secondary-secondary300: #7e5610;
+  --base-colors-secondary-secondary200: #553c11;
+  --base-colors-secondary-secondary100: #38290f;
+  --base-colors-secondary-secondary050: #2f230f;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+  --base-colors-secondary-secondary900: #dd8e09;
+
   --base-colors-neutral-neutral800: #ffffff;
   --base-colors-neutral-neutral700: #ecedee;
   --base-colors-neutral-neutral600: #dadbdd;
@@ -128,7 +140,7 @@
   --button-outline-border: var(--base-colors-neutral-neutral200);
   --button-outline-background-hover: var(--base-colors-neutral-neutral100);
   --button-primary-background: var(--base-colors-primary-primary800);
-  --button-primary-text: var(--base-colors-neutral-neutral000);
+  --button-primary-text: #ffffff;
   --button-primary-border: var(--base-colors-primary-primary800);
   --button-primary-background-deep: var(--base-colors-primary-primary-deep);
   --button-primary-background-hover: var(--base-colors-primary-primary900);

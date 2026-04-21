@@ -3,17 +3,29 @@
  */
 
 :root[data-theme="light"] {
-  --base-colors-primary-primary800: #ffc300;
-  --base-colors-primary-primary700: #ffd91d;
-  --base-colors-primary-primary600: #ffe357;
-  --base-colors-primary-primary500: #ffe875;
-  --base-colors-primary-primary400: #ffed92;
-  --base-colors-primary-primary300: #fff2af;
-  --base-colors-primary-primary200: #fff6cc;
-  --base-colors-primary-primary100: #fff9df;
-  --base-colors-primary-primary050: #fffbe8;
-  --base-colors-primary-primary-deep: #de8100;
-  --base-colors-primary-primary900: #ffb301;
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary600: #3b31e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary800: #f59e0b;
+  --base-colors-secondary-secondary700: #dd8e09;
+  --base-colors-secondary-secondary600: #f6a51e;
+  --base-colors-secondary-secondary500: #f7b545;
+  --base-colors-secondary-secondary400: #f9c56c;
+  --base-colors-secondary-secondary300: #fbd493;
+  --base-colors-secondary-secondary200: #fce2b6;
+  --base-colors-secondary-secondary100: #fcefd9;
+  --base-colors-secondary-secondary050: #fef7ec;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+  --base-colors-secondary-secondary900: #dd8e09;
+
   --base-colors-neutral-neutral800: #131313;
   --base-colors-neutral-neutral700: #333740;
   --base-colors-neutral-neutral600: #5a5c5e;
@@ -73,7 +85,7 @@
   --button-disabled-color: #ffffff;
   --button-outline-background-hover: #f7f7f7;
   --button-red-background-hover: #ffe5e6;
-  --button-light-solid-background-hover: #fff4c3;
+  --button-light-solid-background-hover: var(--base-colors-primary-primary050);
   --button-trade-red-hover-before: #e4e8ec;
   --button-trade-red-border-before: #e4e8ec;
   --button-trade-blue-hover-before: #e4e8ec;
@@ -365,7 +377,7 @@
   --button-outline-text: var(--base-colors-neutral-neutral750);
   --button-outline-border: var(--base-colors-neutral-neutral550);
   --button-primary-background: var(--base-colors-primary-primary800);
-  --button-primary-text: var(--base-colors-neutral-neutral800);
+  --button-primary-text: #ffffff;
   --button-primary-border: var(--base-colors-primary-primary800);
   --button-primary-background-deep: var(--base-colors-primary-primary-deep);
   --button-primary-background-hover: var(--base-colors-primary-primary900);

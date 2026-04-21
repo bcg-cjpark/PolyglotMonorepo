@@ -16,6 +16,7 @@
 
   /* ── Semantic aliases ── */
   --color-primary: var(--base-colors-primary-primary500);
+  --color-secondary: var(--base-colors-secondary-secondary500);
   --color-primary-foreground: var(--font-color-white);
   --color-background: var(--background-bg-default);
   --color-foreground: var(--font-color-default);

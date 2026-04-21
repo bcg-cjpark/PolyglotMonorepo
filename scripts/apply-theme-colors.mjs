@@ -185,6 +185,56 @@ function insertSecondaryAfterPrimary(content, block) {
   return content.replace(re, `$1\n${block}\n$2`);
 }
 
+/**
+ * Apply policy-level semantic token overrides that depend on the *palette
+ * being a brand color* rather than on any specific hex.
+ *
+ * Why this exists:
+ *   The base tonal scale (050..900) is palette-neutral, but some semantic
+ *   tokens encode contrast *policy* that was implicitly tuned for the legacy
+ *   bright yellow primary (#ffc300, L~0.79). Swapping to a dark primary
+ *   (e.g. indigo #4f46e5, L~0.12) breaks the tacit assumption that a
+ *   "neutral800" label on top of primary800 will remain legible.
+ *
+ *   We therefore hard-bind the following semantics every time the primary
+ *   changes, so the palette swap cannot regress WCAG AA contrast:
+ *
+ *     - --button-primary-text: always white in both light and dark themes.
+ *       Primary buttons are brand-colored fills; text sits on top of
+ *       primary800. White is guaranteed legible across the normal range of
+ *       brand colors (L < 0.55). If a future brand chooses a very light
+ *       primary (L > 0.7) this rule would invert — that case is intentionally
+ *       left as a follow-up; we do NOT branch here to keep the script simple.
+ *
+ *     - --button-light-solid-background-hover (light theme only): reference
+ *       the primary050 tone of the current palette instead of a hard-coded
+ *       pale color literal. The dark theme already uses a var() reference so
+ *       it is left untouched.
+ *
+ * Note: this function is idempotent — re-running on already-overridden files
+ * is a no-op beyond writing the same bytes.
+ */
+function applySemanticOverrides(lightContent, darkContent) {
+  // --button-primary-text → #ffffff (both themes)
+  lightContent = lightContent.replace(
+    /(--button-primary-text:\s*)[^;]+(;)/,
+    `$1#ffffff$2`
+  );
+  darkContent = darkContent.replace(
+    /(--button-primary-text:\s*)[^;]+(;)/,
+    `$1#ffffff$2`
+  );
+
+  // --button-light-solid-background-hover → primary050 reference (light only).
+  // Dark theme is already a var() reference; leave it alone.
+  lightContent = lightContent.replace(
+    /(--button-light-solid-background-hover:\s*)[^;]+(;)/,
+    `$1var(--base-colors-primary-primary050)$2`
+  );
+
+  return { lightContent, darkContent };
+}
+
 function ensureTailwindSecondaryAlias() {
   let bridge = fs.readFileSync(BRIDGE_PATH, 'utf8');
   if (/--color-secondary:/.test(bridge)) return false;
@@ -215,7 +265,10 @@ function main() {
     const darkScale = generateScale(hex, 'dark');
     lightContent = replaceBlock(lightContent, 'primary', lightScale);
     darkContent = replaceBlock(darkContent, 'primary', darkScale);
+    // Re-bind contrast-sensitive semantic tokens to match the new palette.
+    ({ lightContent, darkContent } = applySemanticOverrides(lightContent, darkContent));
     changes.push(`primary  → ${hex}`);
+    changes.push('semantic → --button-primary-text=#ffffff, --button-light-solid-background-hover=primary050 (light)');
   }
 
   if (args.secondary) {
