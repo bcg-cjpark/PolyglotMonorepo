@@ -20,7 +20,8 @@
  *
  * @tailwindcss/vite + pnpm workspace + Storybook 조합에서 `@import '...tailwind-bridge.css'`
  * 로 끌어온 `@theme` 블록이 pipeline 에서 누락되는 버그가 관측되어,
- * 원래 libs/tokens/styles/tailwind-bridge.css 에 있던 내용을 이 entry CSS 로 이전.
+ * 원래 libs/tokens/styles/tailwind-bridge.css 에 있던 내용을 이 entry CSS 로 이전했음.
+ * 현재 bridge 파일은 더 이상 존재하지 않음 (stub 삭제 커밋: `2a8e64e`).
  * (tokens 패키지는 base 변수 정의만 소유; Tailwind 매핑은 tailwind-config 가 소유.)
  *
  * 매핑 추가 시 규칙:
