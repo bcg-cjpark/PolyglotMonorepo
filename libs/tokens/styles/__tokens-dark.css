@@ -356,4 +356,8 @@
   --z-index-max: 9999;
 
   --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+  --alert-success-icon-color: var(--base-colors-green-green700);
+  --alert-info-icon-color: var(--base-colors-blue-blue800-deep);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+  --alert-error-icon-color: var(--base-colors-red-red900);
 }

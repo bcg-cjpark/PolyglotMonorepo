@@ -29,22 +29,22 @@
 
 .alert-icon-container.alert-success {
   background-color: var(--base-colors-green-green050);
-  color: var(--font-color-green);
+  color: var(--alert-success-icon-color);
 }
 
 .alert-icon-container.alert-info {
   background-color: var(--base-colors-blue-blue050);
-  color: var(--font-color-blue);
+  color: var(--alert-info-icon-color);
 }
 
 .alert-icon-container.alert-warning {
-  background-color: var(--base-colors-primary-primary050);
-  color: var(--base-colors-primary-primary-deep);
+  background-color: var(--base-colors-secondary-secondary100);
+  color: var(--alert-warning-icon-color);
 }
 
 .alert-icon-container.alert-error {
   background-color: var(--base-colors-red-red050);
-  color: var(--base-colors-red-red800);
+  color: var(--alert-error-icon-color);
 }
 
 .modal-description {

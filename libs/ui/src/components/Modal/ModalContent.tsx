@@ -33,14 +33,10 @@ export const ModalContent = memo(function ModalContent({
 }: ModalContentProps) {
   return (
     <main className={`modal-content modal-content--${contentPadding}`}>
-      {/* 알림 아이콘 */}
+      {/* 알림 아이콘 — 색은 SCSS `.alert-icon-container.alert-<v>` 의 `color:` 를 currentColor 상속 */}
       {showAlertIcon && alertVariant && (
         <div className={`alert-icon-container alert-${alertVariant}`}>
-          <Icon
-            name={ALERT_ICONS[alertVariant]}
-            size="lg"
-            color={`var(--alert-${alertVariant}-icon-color)`}
-          />
+          <Icon name={ALERT_ICONS[alertVariant]} size="lg" />
         </div>
       )}
 

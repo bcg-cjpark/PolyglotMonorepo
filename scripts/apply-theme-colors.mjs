@@ -186,6 +186,66 @@ function insertSecondaryAfterPrimary(content, block) {
 }
 
 /**
+ * Declarative spec of all semantic token overrides applied on every primary
+ * palette change. Maps theme → { tokenName → value }.
+ *
+ * Each entry is handled by `replaceOrInsertToken()`:
+ *   - If the token already exists in the theme block, its value is replaced.
+ *   - Otherwise, the token is inserted right before the closing `}` of the
+ *     `:root[data-theme="<theme>"]` block.
+ *
+ * This makes the spec idempotent: re-running the script on already-overridden
+ * files is a no-op, and adding new semantic tokens here is the only edit
+ * point (no need to touch `__tokens-*.css` manually).
+ */
+const SEMANTIC_OVERRIDES = {
+  light: {
+    // Primary-fill button text: always white (see contrast rationale below).
+    '--button-primary-text': '#ffffff',
+    // Light hover surface derived from current palette primary050.
+    '--button-light-solid-background-hover': 'var(--base-colors-primary-primary050)',
+    // Alert icon colors (design-notes/global-palette.md → Alert Semantic Tokens).
+    '--alert-success-icon-color': 'var(--base-colors-green-green800)',
+    '--alert-info-icon-color': 'var(--base-colors-blue-blue800-deep)',
+    '--alert-warning-icon-color': 'var(--base-colors-secondary-secondary-deep)',
+    '--alert-error-icon-color': 'var(--base-colors-red-red900)',
+  },
+  dark: {
+    '--button-primary-text': '#ffffff',
+    // Dark theme already has a var() reference for light-solid-hover; leave it.
+    '--alert-success-icon-color': 'var(--base-colors-green-green700)',
+    '--alert-info-icon-color': 'var(--base-colors-blue-blue800-deep)',
+    '--alert-warning-icon-color': 'var(--base-colors-secondary-secondary-deep)',
+    '--alert-error-icon-color': 'var(--base-colors-red-red900)',
+  },
+};
+
+/**
+ * Replace `<tokenName>: <anything>;` in the theme block, or insert the token
+ * just before the theme block's closing `}` if it does not exist yet.
+ *
+ * `theme` is used only to locate the correct `:root[data-theme="..."]` block
+ * when inserting — replace is global (theme file has a single :root block).
+ */
+function replaceOrInsertToken(content, tokenName, value, theme) {
+  const escaped = tokenName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const replaceRe = new RegExp(`(${escaped}:\\s*)[^;]+(;)`);
+  if (replaceRe.test(content)) {
+    return content.replace(replaceRe, `$1${value}$2`);
+  }
+  // Insert before the closing `}` of the `:root[data-theme="<theme>"]` block.
+  const blockRe = new RegExp(
+    `(:root\\[data-theme="${theme}"\\][^{]*\\{[\\s\\S]*?)(\\n\\})`
+  );
+  if (!blockRe.test(content)) {
+    throw new Error(
+      `Could not locate :root[data-theme="${theme}"] block to insert ${tokenName}.`
+    );
+  }
+  return content.replace(blockRe, `$1\n  ${tokenName}: ${value};$2`);
+}
+
+/**
  * Apply policy-level semantic token overrides that depend on the *palette
  * being a brand color* rather than on any specific hex.
  *
@@ -196,42 +256,21 @@ function insertSecondaryAfterPrimary(content, block) {
  *   (e.g. indigo #4f46e5, L~0.12) breaks the tacit assumption that a
  *   "neutral800" label on top of primary800 will remain legible.
  *
- *   We therefore hard-bind the following semantics every time the primary
- *   changes, so the palette swap cannot regress WCAG AA contrast:
+ *   We therefore hard-bind policy semantics (button text color, hover
+ *   surfaces, alert icon anchors) every time the primary/secondary changes,
+ *   so the palette swap cannot regress WCAG AA contrast.
  *
- *     - --button-primary-text: always white in both light and dark themes.
- *       Primary buttons are brand-colored fills; text sits on top of
- *       primary800. White is guaranteed legible across the normal range of
- *       brand colors (L < 0.55). If a future brand chooses a very light
- *       primary (L > 0.7) this rule would invert — that case is intentionally
- *       left as a follow-up; we do NOT branch here to keep the script simple.
- *
- *     - --button-light-solid-background-hover (light theme only): reference
- *       the primary050 tone of the current palette instead of a hard-coded
- *       pale color literal. The dark theme already uses a var() reference so
- *       it is left untouched.
- *
- * Note: this function is idempotent — re-running on already-overridden files
- * is a no-op beyond writing the same bytes.
+ *   See `SEMANTIC_OVERRIDES` above for the declarative spec. New semantic
+ *   tokens should be added there — `replaceOrInsertToken()` handles both
+ *   existing (replace) and new (insert) entries idempotently.
  */
 function applySemanticOverrides(lightContent, darkContent) {
-  // --button-primary-text → #ffffff (both themes)
-  lightContent = lightContent.replace(
-    /(--button-primary-text:\s*)[^;]+(;)/,
-    `$1#ffffff$2`
-  );
-  darkContent = darkContent.replace(
-    /(--button-primary-text:\s*)[^;]+(;)/,
-    `$1#ffffff$2`
-  );
-
-  // --button-light-solid-background-hover → primary050 reference (light only).
-  // Dark theme is already a var() reference; leave it alone.
-  lightContent = lightContent.replace(
-    /(--button-light-solid-background-hover:\s*)[^;]+(;)/,
-    `$1var(--base-colors-primary-primary050)$2`
-  );
-
+  for (const [name, value] of Object.entries(SEMANTIC_OVERRIDES.light)) {
+    lightContent = replaceOrInsertToken(lightContent, name, value, 'light');
+  }
+  for (const [name, value] of Object.entries(SEMANTIC_OVERRIDES.dark)) {
+    darkContent = replaceOrInsertToken(darkContent, name, value, 'dark');
+  }
   return { lightContent, darkContent };
 }
 
@@ -268,7 +307,11 @@ function main() {
     // Re-bind contrast-sensitive semantic tokens to match the new palette.
     ({ lightContent, darkContent } = applySemanticOverrides(lightContent, darkContent));
     changes.push(`primary  → ${hex}`);
-    changes.push('semantic → --button-primary-text=#ffffff, --button-light-solid-background-hover=primary050 (light)');
+    const semanticNames = new Set([
+      ...Object.keys(SEMANTIC_OVERRIDES.light),
+      ...Object.keys(SEMANTIC_OVERRIDES.dark),
+    ]);
+    changes.push(`semantic → ${semanticNames.size} tokens (${[...semanticNames].join(', ')})`);
   }
 
   if (args.secondary) {
