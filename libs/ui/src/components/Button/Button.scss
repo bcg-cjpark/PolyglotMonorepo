@@ -1,4 +1,8 @@
 // Button 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 button { background: transparent }
+// 규칙으로 덮어쓰는 것을 막기 위해 전체를 @layer components 로 감쌈.
+
+@layer components {
 
 // 기본 버튼 스타일
 .btn-primary,
@@ -452,3 +456,5 @@ a[role='button'][aria-disabled='true'] {
   align-items: center;
   justify-content: center;
 }
+
+} // @layer components
