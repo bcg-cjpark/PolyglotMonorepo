@@ -120,7 +120,7 @@ grep -hnE "var\(--[a-zA-Z0-9\-]+" <파일들>
 ### 수정 위임 대상
 - libs/ui 관련 → UI팀 (`ui-composer`)
 - 페이지/서비스 → 프론트 개발팀 (`frontend-developer`)
-- 토큰 누락 → UI팀 (tailwind-bridge.css 또는 `scripts/apply-theme-colors.mjs`)
+- 토큰 누락 → UI팀 (`libs/tailwind-config/globals.css` 의 `@theme inline` 블록 또는 `scripts/apply-theme-colors.mjs`)
 - Variant 오용 라벨 → 프론트 개발팀
 
 ### PASS 항목
@@ -137,6 +137,6 @@ grep -hnE "var\(--[a-zA-Z0-9\-]+" <파일들>
 ## 레퍼런스
 
 - 토큰 정의: `libs/tokens/styles/__tokens-light.css`, `__tokens-dark.css`
-- Tailwind 매핑: `libs/tokens/styles/tailwind-bridge.css`
+- Tailwind 매핑: `libs/tailwind-config/globals.css` 의 `@theme inline` 블록 (`libs/tokens/styles/tailwind-bridge.css` 는 DEPRECATED, `apply-theme-colors.mjs` secondary 주입 경로만 잔존)
 - libs/ui 컴포넌트 목록: `libs/ui/src/components/index.ts`
 - 구현 규약: `.claude/agents/frontend/ui/ui-composer.md`

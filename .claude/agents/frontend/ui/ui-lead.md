@@ -36,7 +36,7 @@ git diff --stat HEAD
 ### 2. 검수 범위 (UI팀 소관만)
 허용 경로:
 - `libs/ui/**`
-- `libs/tokens/styles/tailwind-bridge.css` (utility 매핑 추가 시)
+- `libs/tailwind-config/globals.css` (`@theme inline` 매핑 추가 시). `libs/tokens/styles/tailwind-bridge.css` 는 DEPRECATED — 직접 편집 금지
 - `libs/tokens/styles/__tokens-*.css` (단, `scripts/apply-theme-colors.mjs` 로 생성된 결과만. 직접 편집 흔적이면 FAIL)
 
 다른 경로(`apps/**`, `docs/**` 등) 섞이면 FAIL, 메인에 분리 요청.
@@ -86,7 +86,7 @@ feat(ui): <요약>
 - <primitive> 추가/수정
 - Storybook story 추가
 - libs/ui 테스트 추가 (N건)
-- tailwind-bridge 매핑 추가 (필요 시)
+- `tailwind-config/globals.css` `@theme inline` 매핑 추가 (필요 시)
 ```
 
 여러 타입 섞일 때:
@@ -95,7 +95,7 @@ feat(ui): <요약>
 
 ### 8. 커밋 실행 (PASS 일 때만)
 ```bash
-git add libs/ui libs/tokens/styles/tailwind-bridge.css
+git add libs/ui libs/tailwind-config/globals.css
 git commit -m "$(cat <<'EOF'
 feat(ui): <요약>
 
