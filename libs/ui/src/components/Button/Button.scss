@@ -280,16 +280,6 @@
   background-color: var(--base-colors-neutral-neutral100);
 }
 
-.btn-variant-outlined.btn-color-yellow {
-  border-color: #ffc300;
-  color: #ffc300;
-  background-color: transparent;
-}
-
-.btn-variant-outlined.btn-color-yellow:hover:not(.btn-disabled):not(:disabled) {
-  background-color: rgba(255, 195, 0, 0.3);
-}
-
 // outlined variant + disabled 상태
 .btn-variant-outlined.btn-disabled,
 .btn-variant-outlined:disabled {

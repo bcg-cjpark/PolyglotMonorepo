@@ -10,8 +10,7 @@ export type ButtonColor =
   | 'cancel'
   | 'grey'
   | 'white'
-  | 'black'
-  | 'yellow';
+  | 'black';
 
 export type ButtonVariant =
   | 'contained'
@@ -69,7 +68,6 @@ const PREDEFINED_COLORS: readonly ButtonColor[] = [
   'grey',
   'white',
   'black',
-  'yellow',
 ];
 
 function getIconSize(size: string) {

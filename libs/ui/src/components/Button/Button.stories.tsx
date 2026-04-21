@@ -12,7 +12,7 @@ const meta: Meta<typeof Button> = {
     },
     color: {
       control: 'select',
-      options: ['primary', 'red', 'blue', 'green', 'cancel', 'grey', 'white', 'black', 'yellow'],
+      options: ['primary', 'red', 'blue', 'green', 'cancel', 'grey', 'white', 'black'],
     },
     size: {
       control: 'select',
