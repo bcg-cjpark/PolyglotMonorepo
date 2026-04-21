@@ -199,9 +199,16 @@ export const Input = memo(
     );
 
     const handleInput = useCallback(
-      (e: React.FormEvent<HTMLInputElement>) => {
-        if (isComposingRef.current) return;
-        const raw = (e.target as HTMLInputElement).value;
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value;
+        if (isComposingRef.current) {
+          // IME 조합 중엔 controlled input 이 DOM 과 싱크 유지되도록 raw 를
+          // internal state 에 반영. 필터/포매터/부모 onChange 는 compositionend
+          // 에서 최종 확정. 여기서 early return 해버리면 DOM value ≠ React
+          // state 가 되어 이후 입력이 막힘.
+          setInternalValue(raw);
+          return;
+        }
         const processed = processValue(raw);
         setInternalValue(processed);
         onChange?.(processed);
@@ -302,7 +309,7 @@ export const Input = memo(
                 }
                 lang={variant === 'password' || variant === 'password-strength' ? 'en' : undefined}
                 className={inputClasses}
-                onInput={handleInput}
+                onChange={handleInput}
                 onKeyDown={handleKeyDown}
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={handleCompositionEnd}
