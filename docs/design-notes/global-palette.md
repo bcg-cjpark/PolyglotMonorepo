@@ -128,7 +128,7 @@ Modal / Toast / Alert 계열에서 쓰는 상태 표시 색상. 배경(`--alert-
 **근거**:
 1. Primary(indigo) 는 "신뢰·집중·기본 CTA" — 사용자를 **멈춰 세우는 경고** 시맨틱과 정면 충돌.
 2. Secondary(amber) 는 이미 팔레트 의도에 "환기·주목·프로모·알림" 으로 정의돼 있어 warning 과 완전 일치.
-3. `tailwind-bridge.css` 에 secondary scale alias 가 아직 없지만 base token 값은 존재(`--base-colors-secondary-secondary100/-deep`) → 직접 참조 가능, 브릿지 추가는 후속 감사(네이밍 교정 제안 3번) 에서 일괄 처리.
+3. secondary scale 의 base token 값이 존재(`--base-colors-secondary-secondary100/-deep`) → 직접 참조 가능. Tailwind `@theme inline` alias 노출은 후속 감사(네이밍 교정 제안 3번) 에서 일괄 처리.
 
 **반대 의견 검토 (B: 배경 primary 유지, 아이콘만 amber)**: 이 조합은 "색 혼합 경고" 를 만들어 오히려 혼란. A 의 일관성이 우월.
 **반대 의견 검토 (C: warning variant 제거)**: Modal/Toast UX 에서 warning 은 흔한 4단(success/info/warning/error) 중 하나라 제거 비현실적.
@@ -147,7 +147,7 @@ Modal / Toast / Alert 계열에서 쓰는 상태 표시 색상. 배경(`--alert-
 | 200 | ~85                 | ~20                 | divider·soft border, chip bg |
 | 300 | ~78                 | ~28                 | border default, progress track |
 | 400 | ~70                 | ~36                 | secondary icon, tertiary text |
-| 500 | ~62 (중간)          | ~44 (중간)          | 중성 surface (tailwind-bridge 의 `--color-primary` alias 기본) |
+| 500 | ~62 (중간)          | ~44 (중간)          | 중성 surface (`libs/tailwind-config/globals.css` 의 `@theme inline` `--color-primary` alias 기본) |
 | 600 | ~54                 | ~52                 | 보조 액션 fill, chart accent |
 | 700 | ~anchor-5           | ~anchor-8           | hover 전 기본 icon·text on light bg |
 | **800** | **입력 HEX 그대로** | **입력 HEX 그대로** | **primary CTA fill, focus ring** |
@@ -160,7 +160,7 @@ Modal / Toast / Alert 계열에서 쓰는 상태 표시 색상. 배경(`--alert-
 2. **Text on colored fill** 은 `--font-color-white` (or 후술 `--font-color-inverse`) 사용 — scale 에서 직접 뽑지 말 것.
 3. **Text on neutral bg** 에서 brand 색 텍스트가 필요하면 `deep` 사용 (WCAG AA 통과 목적).
 4. **Soft surface** (hover·selected bg) 에는 `050`/`100` 만 사용 — `200+` 은 UI 밀도가 과해짐.
-5. **500** 을 `--color-primary` alias 기본으로 쓰고 있는 것(`tailwind-bridge.css:18`)은 의도적: 채도 중간 지점이 다크/라이트 어느 쪽에서도 무너지지 않음.
+5. **500** 을 `--color-primary` alias 기본으로 쓰고 있는 것(`libs/tailwind-config/globals.css` 의 `@theme inline`)은 의도적: 채도 중간 지점이 다크/라이트 어느 쪽에서도 무너지지 않음.
 
 ---
 
@@ -211,11 +211,11 @@ ui-library-tester 가 플래그한 이슈 및 현 토큰 스캔 결과 기반. *
 ### 3. 컴포넌트 도메인 토큰 Tailwind 브릿지 감사 (우선순위: 중)
 
 **현상**: `--button-*`, `--input-*`, `--popup-*` 등 컴포넌트 도메인 토큰이 `__tokens-light.css` 에 60+ 개 정의되어 있으나,
-`tailwind-bridge.css:12` 의 `@theme inline` 에 노출된 것은 `--input-*` 10개 뿐. `button-*` 는 하나도 노출 안 됨.
+`libs/tailwind-config/globals.css` 의 `@theme inline` 에 노출된 것은 `--input-*` 10개 뿐. `button-*` 는 하나도 노출 안 됨.
 
 **결과**: Button primitive 는 SCSS 에서 직접 `var(--button-*)` 참조 → Tailwind `@apply` 로 쓸 수 없음 → 새 합성 컴포넌트에서 재사용 시 SCSS 새로 만들어야 함.
 
-**제안**: ui-composer 에게 **"`tailwind-bridge.css` 미노출 컴포넌트 토큰 목록 주기 감사"** 작업 요청. 새 primitive 추가 시 `--color-<domain>-<variant>` alias 를 함께 추가하는 체크리스트 정의.
+**제안**: ui-composer 에게 **"`libs/tailwind-config/globals.css` 의 `@theme inline` 미노출 컴포넌트 토큰 목록 주기 감사"** 작업 요청. 새 primitive 추가 시 `--color-<domain>-<variant>` alias 를 함께 추가하는 체크리스트 정의.
 
 ### 4. `--base-colors-common-*` 의 의도 불명 (우선순위: 낮음)
 
@@ -230,7 +230,7 @@ ui-library-tester 가 플래그한 이슈 및 현 토큰 스캔 결과 기반. *
 - **하드코딩 `#hex` 금지** — SCSS/TSX 어디서도 brand 색 리터럴 금지. Tailwind `@apply` 로 `bg-primary-primary800` / `text-on-solid` 같은 토큰 유틸만 사용.
 - **Light/Dark 양쪽 대응 필수** — 단일 테마에서만 렌더 확인 후 커밋 금지. 최소한 Storybook `data-theme` 토글로 양쪽 시각 확인.
 - **`libs/tokens/styles/__tokens-*.css` 직접 편집 금지** — `/* Do not edit directly */` 헤더. Primary/Secondary 변경은 반드시 `scripts/apply-theme-colors.mjs` 경유.
-- **새 semantic 토큰 추가 시 동시 업데이트** — `__tokens-light.css` + `__tokens-dark.css` + `tailwind-bridge.css` (필요 시 `--color-*` alias 추가). 3 파일 중 하나라도 누락되면 ui-library-tester FAIL.
+- **새 semantic 토큰 추가 시 동시 업데이트** — `__tokens-light.css` + `__tokens-dark.css` 양쪽 토큰 파일, 그리고 Tailwind 유틸로 쓰려면 `libs/tailwind-config/globals.css` 의 `@theme inline` 에 `--color-*` alias 도 함께 추가. 누락되면 ui-library-tester FAIL.
 - **Scale 단계 점프 금지** — `300 → 700` 같은 큰 점프는 대비 붕괴 위험. 인접 단계(`300 → 400`)로 전환.
 - **Primary 과다 사용 금지** — 한 화면에 Primary fill CTA 는 1개 원칙. 2개 이상 필요하면 Secondary 로 위계 분리.
 
@@ -250,12 +250,12 @@ ui-library-tester 가 플래그한 이슈 및 현 토큰 스캔 결과 기반. *
 
 1. **`feat(ui): 템플릿 기본 팔레트 재설정 (indigo + amber)`**
    - `node scripts/apply-theme-colors.mjs --primary=#4f46e5 --secondary=#f59e0b`
-   - `tailwind-bridge.css` 가 `--color-secondary` alias 자동 추가되는지 확인.
+   - `libs/tailwind-config/globals.css` 의 `@theme inline` 에 `--color-secondary-*` alias 가 static 정의돼 있는지 확인 (스크립트는 토큰 파일만 갱신, alias 노출은 globals.css 소유).
 2. **`refactor(ui): --font-color-white → --font-color-on-solid 리네임`**
    - deprecated alias 한 릴리스 유지.
 3. **`docs(ui): font-color semantic 토큰 사용 가이드`**
    - `libs/ui/README.md` 또는 `libs/tokens/README.md` 에 표 추가.
-4. **`chore(ui): tailwind-bridge 미노출 컴포넌트 토큰 감사 루틴`** (별도 티켓화)
+4. **`chore(ui): globals.css @theme inline 미노출 컴포넌트 토큰 감사 루틴`** (별도 티켓화)
 5. **`feat(ui): alert semantic 토큰 추가 + warning 배경 secondary 이관`** (이번 라운드 즉시 처리)
    - `__tokens-{light,dark}.css` 양쪽에 `--alert-success-icon-color` / `--alert-info-icon-color` / `--alert-warning-icon-color` / `--alert-error-icon-color` 4개 추가 (위 "Variant → 토큰 매핑" 표 참조).
    - `ModalContent.scss:41` 의 `.alert-warning` 배경을 `--base-colors-primary-primary050` → `--base-colors-secondary-secondary100` 교체, `color:` 는 신규 `--alert-warning-icon-color` 로 정렬.
