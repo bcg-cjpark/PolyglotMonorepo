@@ -225,6 +225,30 @@ export const AlertError: Story = {
   },
 };
 
+/** variant=alert — info. 정보성 안내. */
+export const AlertInfo: Story = {
+  args: {
+    title: '안내',
+    variant: 'alert',
+    alertVariant: 'info',
+    description: '이 작업은 5분 정도 소요됩니다. 잠시만 기다려 주세요.',
+    showCancelButton: false,
+    confirmText: '확인',
+  },
+};
+
+/** variant=alert — warning. 주의 환기. */
+export const AlertWarning: Story = {
+  args: {
+    title: '주의',
+    variant: 'alert',
+    alertVariant: 'warning',
+    description: '이 변경은 되돌릴 수 없습니다. 계속하시겠습니까?',
+    confirmText: '계속',
+    cancelText: '취소',
+  },
+};
+
 /** 푸터 없음 — 순수 정보 표시. */
 export const NoFooter: Story = {
   args: {
