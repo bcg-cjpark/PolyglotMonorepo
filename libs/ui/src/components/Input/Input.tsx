@@ -288,7 +288,7 @@ export const Input = memo(
           {prepend && <div className="flex-shrink-0">{prepend}</div>}
 
           {/* 입력 컨테이너 */}
-          <div className={`${containerClasses}${full ? 'flex-1' : ''}`}>
+          <div className={`${containerClasses}${full ? ' flex-1' : ''}`}>
             {/* 내부 좌측 prepend-inner */}
             {prependInner && <div className={prependInnerClasses}>{prependInner}</div>}
 
