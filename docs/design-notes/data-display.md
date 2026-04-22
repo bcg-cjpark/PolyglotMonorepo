@@ -72,6 +72,50 @@
 - `Chip` / `Badge` — 행 내 상태·태그 표현.
 - `Button` / `IconButton` / `Checkbox` — 행 내 액션. `Table` 의 `render` 콜백, `ListItem` 의 children / `secondaryAction` 자리에 주입.
 
+### 2.1 Table row hover 의도 (2026-04-23 추가)
+
+#### 의도
+
+`Table` 의 **본문 행 hover** 는 "사용자가 어떤 행 위에 있는지 알려주는 강조" 이다.
+따라서 hover 배경은 **헤더 배경과 명확히 구분**되어야 하고, 동시에 본문 기본 배경과도 구분되어야 한다.
+
+#### 현상 (배경)
+
+`design-consistency-auditor` Warning (3b) 실측:
+
+- `libs/ui/src/components/Table/Table.scss` 기준, 헤더 `.ui-table__head` 배경과 본문 행 hover `.ui-table__body .ui-table__row:hover` 배경이 **동일하게 `var(--background-bg-surface)` 를 사용**.
+- 결과: 본문 행 위에 마우스를 올리면 그 행이 **"헤더가 한 줄 복제돼 내려온 듯"** 보여 시각 혼동 유발.
+
+#### 결정
+
+hover 전용 토큰을 새로 만들기보다, **기존 토큰 재사용 또는 반투명 오버레이** 로 의도만 고정한다. 우선순위:
+
+1. **기존 semantic 토큰 재사용 우선** — UI팀이 `libs/tokens/styles/__tokens-light.css` / `__tokens-dark.css` 를 먼저 스캔해 "헤더와 다른, 본문 위의 미묘한 강조" 에 해당하는 토큰이 있는지 확인. 후보:
+   - `--background-divider` — 본문 행 경계에 이미 쓰이므로 의도 일치.
+   - `primary050` / `neutral050` / `neutral100` 등 scale 저단계 — `global-palette.md` 11단계 Scale 가이드의 "subtle hover bg, 선택된 행 bg" 용도에 해당.
+2. **위 후보로 해결 안 되거나, hover 의 "주변 색 기반 약한 오버레이" 의도를 더 충실히 담고 싶다면** `color-mix()` 사용:
+   ```
+   background-color: color-mix(in srgb, var(--font-color-default) 4%, transparent);
+   ```
+   - 장점: Light/Dark 어느 쪽에서도 "현재 전경색의 4% 오버레이" 가 자동으로 조정되어 헤더 배경과 반드시 달라진다. 토큰 신설 불필요.
+   - 비율(4%) 은 시작점 제안 — UI팀이 실측 후 3~6% 사이에서 튜닝 재량.
+3. **UI팀이 hover 전용 semantic 토큰을 신설** 하는 선택지도 열려 있음. 예: `--background-bg-hover` / `--table-row-hover-bg`. 이 경우:
+   - `libs/tokens/styles/__tokens-light.css` / `__tokens-dark.css` 양쪽 동시 추가.
+   - **반드시 `scripts/apply-theme-colors.mjs` 경유** (CLAUDE.md 규칙: 토큰 파일 직접 편집 금지).
+   - Tailwind 로 노출하려면 `libs/tailwind-config/globals.css` 의 `@theme inline` alias 도 함께 추가.
+
+#### 비금기 조건
+
+- **헤더 배경(`--background-bg-surface`) 과 동일값 금지** — 3b 의 직접 원인.
+- **Light/Dark 양쪽에서 자동 대응** — 단일 테마에서만 확인 후 확정 금지.
+- **hover 강조 세기** — 너무 진하면 "선택됨" 상태와 혼동, 너무 옅으면 인지 불가. `800+` 같은 brand 색 fill 금지, `050`~`100` 레벨 또는 4~6% 오버레이 범위.
+
+#### UI팀 실행 요청
+
+- `libs/ui/src/components/Table/Table.scss` 의 `.ui-table__body .ui-table__row:hover` 배경을 **헤더 배경과 다른 미묘한 색** 으로 교체. 구현 방법(기존 토큰 재사용 / `color-mix` / 신규 토큰 신설)은 위 3가지 원칙 내에서 UI팀 재량.
+- 교체 확정 후 본 문서의 **2.1 절을 다시 업데이트** — 어떤 토큰/식을 선택했는지 한 줄로 기록 (후속 감사 추적용).
+- 토큰을 신설한 경우 `apply-theme-colors.mjs` 경유 필수, 양 테마 동시 정의, Tailwind alias 도 함께.
+
 ---
 
 ## 3. 선택 매트릭스 (핵심)
@@ -176,7 +220,7 @@ ui-composer → ui-storybook-curator → ui-library-tester → ui-lead
 
 - `Table` primitive 의 구현 상세 (내부 DOM 구조, CSS 변수 매핑, 테마 훅 방식) — UI팀 소관. 이 문서는 스펙과 경계만 규정.
 - 합성 카드의 구체 레이아웃 디테일 (메모/투두/유저 각 카드의 시각 규격) — 해당 피처 design-notes 에서 다룸.
-- 페이지 레벨 로딩/에러/빈 상태 시각 규격 — `global-empty-error-loading.md` (미작성, 별건).
+- 페이지 레벨 로딩/에러/빈 상태 시각 규격 — [`global-states.md`](./global-states.md) 별건 노트 참조.
 - 실제 시각 회귀 검증 — `design-consistency-auditor` / `ui-library-tester` 몫.
 
 ---
@@ -184,3 +228,4 @@ ui-composer → ui-storybook-curator → ui-library-tester → ui-lead
 ## 9. 변경 이력
 
 - 2026-04-22: DataGrid (ag-grid-community 래퍼) 제거, Table primitive 로 대체. 대량/정렬/필터 요구가 생기면 재도입 검토.
+- 2026-04-23: §2.1 "Table row hover 의도" 소섹션 추가. `design-consistency-auditor` Warning (3b) — "본문 행 hover 배경이 헤더 배경과 동일" 대응. §8 Out of Scope 의 "페이지 레벨 로딩/에러/빈 상태" 링크를 신규 `global-states.md` 로 갱신.
