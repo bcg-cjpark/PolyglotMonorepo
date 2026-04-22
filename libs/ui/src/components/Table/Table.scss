@@ -35,8 +35,9 @@
   }
 
   // 본문 행 hover — 미묘한 배경 토큰
+  // hover 배경은 헤더 --background-bg-surface 와 달라야 함 (docs/design-notes/data-display.md §2.1)
   .ui-table__body .ui-table__row:hover {
-    background-color: var(--background-bg-surface);
+    background-color: var(--background-bg-innerframe);
   }
 
   .ui-table__body .ui-table__row--empty:hover {
