@@ -188,7 +188,7 @@ function MemoListPage() {
         onCancel={() => setDialog({ kind: "none" })}
         onConfirm={() => {
           if (dialog.kind === "confirmDelete") {
-            void handleDelete(dialog.memo.id);
+            return handleDelete(dialog.memo.id);
           }
         }}
       >
