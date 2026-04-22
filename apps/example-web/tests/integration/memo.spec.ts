@@ -376,6 +376,22 @@ test.describe("Memo 통합 시나리오", () => {
       const r3 = await apiGet(request, id);
       const after3 = (await r3.json()) as MemoDto;
       expect(after3.content).toBe("");
+
+      // (c) PUT 에 content 키 자체를 누락하면 400 — PRD "두 필드 모두 필수"
+      //     PATCH 가 아니라 PUT 이므로 payload 에 필수 필드가 없으면 실패해야 한다.
+      const missingContent = await apiUpdate(request, id, {
+        title: `${title} (only-title)`,
+      });
+      expect(
+        missingContent.status(),
+        "PUT 에 content 키가 없으면 400 (PUT 은 부분업데이트 아님)",
+      ).toBe(400);
+
+      // 재조회: 이전 상태(content='') 가 보존되어야 함 — 400 이면 저장되지 않음
+      const r4 = await apiGet(request, id);
+      const after4 = (await r4.json()) as MemoDto;
+      expect(after4.title, "400 실패면 title 도 롤백").toBe(`${title} (replaced)`);
+      expect(after4.content, "400 실패면 content 도 롤백").toBe("");
     } finally {
       await apiDelete(request, id);
     }
@@ -405,22 +421,19 @@ test.describe("Memo 통합 시나리오", () => {
   });
 
   /**
-   * T6. 유효성: title 공백/초과, content 초과 는 비정상 상태코드.
+   * T6. 유효성: title 공백/초과, content 초과 는 400.
    *
-   * 중요: 현재 백엔드 관찰 동작은 400 이 아닌 **403** 을 반환한다.
-   *  - Bean Validation 실패 시 Spring 이 /error 로 forward 하는데
-   *    SecurityConfig 에서 `/memos/**` 만 permitAll 이고 `/error` 는 인증 필요.
-   *  - 결과적으로 검증 실패가 403 으로 올라옴. PRD 기대(400) 와 불일치 — 리포트 사항.
-   *
-   * 본 테스트는 "정상 생성되지 않음 = non-2xx" 를 검증해 회귀만 막는다.
-   * 향후 /error 핸들러 또는 ControllerAdvice 가 추가되어 400 으로 바뀌어도 PASS 유지.
+   * 백엔드 fix (commit 55baeb0) 이후 Bean Validation 실패가 403 → 400 으로 정상화됨.
+   * PRD 기대와 일치. 본 테스트는 `.toBe(400)` 으로 타이트하게 고정.
    */
-  test("T6. title/content 유효성 실패 시 생성되지 않음 (non-2xx)", async ({
+  test("T6. title/content 유효성 실패 시 400 (엄격)", async ({
     request,
   }) => {
     const cases: Array<{ label: string; body: Record<string, unknown> }> = [
       { label: "title 빈 문자열", body: { title: "", content: "x" } },
       { label: "title 공백만", body: { title: "   ", content: "x" } },
+      { label: "title 키 누락", body: { content: "x" } },
+      { label: "body 전체 빈 객체", body: {} },
       {
         label: "title 101자",
         body: { title: "a".repeat(101), content: "x" },
@@ -438,12 +451,8 @@ test.describe("Memo 통합 시나리오", () => {
       );
       expect(
         r.status(),
-        `${c.label} → 4xx 기대 (PRD=400, 관찰=403). 실제: ${r.status()}`,
-      ).toBeGreaterThanOrEqual(400);
-      expect(
-        r.status(),
-        `${c.label} → 2xx 가 되어선 안됨. 실제: ${r.status()}`,
-      ).toBeLessThan(500);
+        `${c.label} → 400 기대. 실제: ${r.status()}`,
+      ).toBe(400);
 
       // 혹시 생성됐다면 cleanup (방어적)
       if (r.status() === 201) {
