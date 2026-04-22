@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Checkbox, DataGrid, RadioGroup } from "@monorepo/ui";
-import type { ColDef, ICellRendererParams } from "ag-grid-community";
+import { Button, Checkbox, RadioGroup, Table, type TableColumn } from "@monorepo/ui";
 import { Todo, TodoStatus } from "../services/todos";
 import {
   useDeleteTodoMutation,
@@ -37,77 +36,60 @@ function TodoListPage() {
     deleteTodo.mutate(id);
   };
 
-  const columnDefs = useMemo<ColDef<Todo>[]>(
+  const columns = useMemo<TableColumn<Todo>[]>(
     () => [
       {
-        headerName: "",
-        colId: "completed",
-        maxWidth: 56,
-        sortable: false,
-        filter: false,
-        cellRenderer: (params: ICellRendererParams<Todo>) => {
-          const row = params.data;
-          if (!row) return null;
-          return (
-            <Checkbox
-              checked={row.completed}
-              onChange={() => handleToggle(row.id)}
-            />
-          );
-        },
+        key: "completed",
+        header: "",
+        width: "56px",
+        render: (row) => (
+          <Checkbox
+            checked={row.completed}
+            onChange={() => handleToggle(row.id)}
+          />
+        ),
       },
       {
-        field: "title",
-        headerName: "Title",
-        cellRenderer: (params: ICellRendererParams<Todo>) => {
-          const row = params.data;
-          if (!row) return null;
-          return (
-            <span className={row.completed ? "line-through text-neutral-neutral400" : undefined}>
-              {row.title}
-            </span>
-          );
-        },
+        key: "title",
+        header: "Title",
+        render: (row) => (
+          <span className={row.completed ? "line-through text-neutral-neutral400" : undefined}>
+            {row.title}
+          </span>
+        ),
       },
       {
-        field: "dueDate",
-        headerName: "Due Date",
-        maxWidth: 160,
-        cellRenderer: (params: ICellRendererParams<Todo>) => {
-          const row = params.data;
-          if (!row) return null;
+        key: "dueDate",
+        header: "Due Date",
+        width: "160px",
+        render: (row) => {
           const text = row.dueDate ?? "";
           const overdue = isOverdue(row.dueDate, row.completed);
           return <span className={overdue ? "text-red-red500" : undefined}>{text}</span>;
         },
       },
       {
-        headerName: "",
-        colId: "action",
-        maxWidth: 180,
-        sortable: false,
-        filter: false,
-        cellRenderer: (params: ICellRendererParams<Todo>) => {
-          const row = params.data;
-          if (!row) return null;
-          return (
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outlined"
-                size="sm"
-                label="Edit"
-                onClick={() => navigate(`/todos/${row.id}/edit`)}
-              />
-              <Button
-                variant="outlined"
-                color="red"
-                size="sm"
-                label="Delete"
-                onClick={() => handleDelete(row.id)}
-              />
-            </div>
-          );
-        },
+        key: "action",
+        header: "",
+        align: "right",
+        width: "180px",
+        render: (row) => (
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outlined"
+              size="sm"
+              label="Edit"
+              onClick={() => navigate(`/todos/${row.id}/edit`)}
+            />
+            <Button
+              variant="outlined"
+              color="red"
+              size="sm"
+              label="Delete"
+              onClick={() => handleDelete(row.id)}
+            />
+          </div>
+        ),
       },
     ],
     // 토글/삭제는 뮤테이션 훅을 통해 호출되며, 결과는 쿼리 무효화로 자동 반영.
@@ -149,12 +131,11 @@ function TodoListPage() {
         />
       </div>
 
-      <DataGrid
-        columnDefs={columnDefs}
-        rowData={todos}
-        height="calc(100vh - 260px)"
-        noRowsToShow={'No todos yet. Click "+ New" to add one.'}
-        disableRowSelection
+      <Table
+        columns={columns}
+        rows={todos}
+        getRowKey={(row) => row.id}
+        emptyMessage={'No todos yet. Click "+ New" to add one.'}
       />
     </div>
   );

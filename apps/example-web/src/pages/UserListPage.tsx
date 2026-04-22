@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, DataGrid } from "@monorepo/ui";
-import type { ColDef, ICellRendererParams } from "ag-grid-community";
+import { Button, Table, type TableColumn } from "@monorepo/ui";
 import { User } from "../services/users";
 import {
   useDeleteUserMutation,
@@ -19,30 +18,25 @@ function UserListPage() {
     deleteUser.mutate(id);
   };
 
-  const columnDefs = useMemo<ColDef<User>[]>(
+  const columns = useMemo<TableColumn<User>[]>(
     () => [
-      { field: "id", headerName: "ID", maxWidth: 80 },
-      { field: "email", headerName: "Email" },
-      { field: "name", headerName: "Name" },
+      { key: "id", header: "ID", width: "80px" },
+      { key: "email", header: "Email" },
+      { key: "name", header: "Name" },
       {
-        headerName: "",
-        colId: "action",
-        maxWidth: 120,
-        sortable: false,
-        filter: false,
-        cellRenderer: (params: ICellRendererParams<User>) => {
-          const row = params.data;
-          if (!row) return null;
-          return (
-            <Button
-              variant="outlined"
-              color="red"
-              size="sm"
-              label="Delete"
-              onClick={() => handleDelete(row.id)}
-            />
-          );
-        },
+        key: "action",
+        header: "",
+        align: "right",
+        width: "120px",
+        render: (row) => (
+          <Button
+            variant="outlined"
+            color="red"
+            size="sm"
+            label="Delete"
+            onClick={() => handleDelete(row.id)}
+          />
+        ),
       },
     ],
     // handleDelete 는 deleteUser 뮤테이션을 닫아서 호출하므로 안정.
@@ -70,12 +64,11 @@ function UserListPage() {
           onClick={() => navigate("/users/new")}
         />
       </div>
-      <DataGrid
-        columnDefs={columnDefs}
-        rowData={users}
-        height="calc(100vh - 200px)"
-        noRowsToShow="No users yet."
-        disableRowSelection
+      <Table
+        columns={columns}
+        rows={users}
+        getRowKey={(row) => row.id}
+        emptyMessage="No users yet."
       />
     </div>
   );
