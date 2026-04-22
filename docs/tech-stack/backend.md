@@ -74,6 +74,7 @@ PostgreSQL 로 작성된 기존 스키마를 MySQL 로 옮길 때 이 매핑을 
 - `local` 은 Flyway `enabled: false` + `ddl-auto: create-drop` 으로 JPA 가 스키마 생성.
 - `dev` / `prod` 는 Flyway `enabled: true` + `ddl-auto: validate`.
 - DB 접속 정보는 **환경변수**로만. 예: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. 코드/설정 파일에 실제 시크릿 하드코딩 금지.
+- **DB 이름 규약**: 이 템플릿의 기본 DB 이름은 `polyglot_example`. 여러 프로젝트가 같은 MySQL 인스턴스를 공유할 때 충돌을 피하기 위해 레포 + 앱 이름 기반의 구체적인 이름을 사용한다. `app` 같은 제네릭 이름은 금지. `application.yml` 의 `${DB_NAME:polyglot_example}` 기본값과 `.env.example` 의 `DB_NAME=polyglot_example` 이 이 규약을 반영한다.
 
 ### 2.3 개발 환경 준비 (도커)
 
@@ -83,8 +84,15 @@ PostgreSQL 로 작성된 기존 스키마를 MySQL 로 옮길 때 이 매핑을 
 docker run -d --name mysql-local \
   -p 3306:3306 \
   -e MYSQL_ROOT_PASSWORD=... \
-  -e MYSQL_DATABASE=app \
+  -e MYSQL_DATABASE=polyglot_example \
   mysql:8
+```
+
+이미 돌고 있는 컨테이너에 DB 만 새로 만들고 싶다면:
+
+```bash
+docker exec -it <container> mysql -uroot -p -e \
+  "CREATE DATABASE IF NOT EXISTS polyglot_example CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
 ```
 
 - 포트/자격증명은 개발자별로 다르며 **이 문서에 기록하지 않는다**. 팀 위키나 개인 메모로.
