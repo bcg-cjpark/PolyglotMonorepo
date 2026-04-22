@@ -56,6 +56,7 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 | `apps/example-web/tests/integration/**` | 통합테스트팀 |
 | `apps/example-api/**` | 백엔드팀 |
 | `libs/ui/tests/**` | UI팀 (ui-library-tester) |
+| `docs/tech-stack/**` | 메인(프로젝트 전체 팀장) — 기술 스택 결정 기록 |
 | `.claude/**`, `CLAUDE.md`, 루트 설정 | 메인(프로젝트 전체 팀장) |
 
 ## 작업 검증 규칙 (팀별)
