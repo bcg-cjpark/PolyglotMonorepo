@@ -5,6 +5,8 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.util.UUID
 
 @Entity
@@ -15,6 +17,7 @@ class Memo(
     @Column(nullable = true, length = 5000)
     var content: String? = null,
     @Id
+    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(nullable = false, updatable = false, columnDefinition = "CHAR(36)")
     val id: UUID = UUID.randomUUID(),
 ) : BaseEntity() {
