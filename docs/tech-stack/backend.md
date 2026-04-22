@@ -104,16 +104,23 @@ docker exec -it <container> mysql -uroot -p -e \
 
 ### 2.4 개발 기동 가이드
 
-도커 컨테이너가 돌고 있고 `polyglot_example` DB 가 생성된 상태에서:
+도커 컨테이너가 돌고 있고 `polyglot_example` DB 가 생성된 상태에서, 레포 루트의 `.env.example` 을 `.env` 로 복사해 로컬 값(특히 `DB_PASSWORD`) 만 채우면:
 
 ```bash
-SPRING_PROFILES_ACTIVE=dev DB_PASSWORD=<도커 root 비밀번호> \
-  pnpm nx run example-api:serve
+pnpm nx run example-api:serve
 ```
 
-`application.yml` 의 `dev` 프로필 기본값이 `DB_HOST=localhost`, `DB_PORT=3306`, `DB_NAME=polyglot_example`, `DB_USER=root` 이라 비밀번호만 주입하면 된다. 다른 호스트/포트를 쓰면 해당 `DB_*` 만 override.
+명령 한 줄로 끝난다.
 
-**환경변수 전달 메커니즘**: Gradle daemon 은 client 의 사용자 정의 환경변수(`DB_*` 등) 를 bootRun 자식 JVM 에 자동 상속하지 않는다. `apps/example-api/app/build.gradle.kts` 의 `bootRun` 블록이 `providers.environmentVariable(...)` 를 통해 명시적으로 이 변수들을 자식 JVM 으로 전달한다. 새 환경변수를 추가할 때는 그 블록의 리스트에도 같이 등록해야 `dev` 프로필에서 인식된다.
+**환경변수 로드 메커니즘 (실측 확인)**
+- **Nx** 가 태스크 실행 시 레포 루트의 `.env` 를 자동 로드해서 프로세스 환경변수에 주입한다.
+- `pnpm nx run example-api:serve` → `./gradlew :app:bootRun` 을 spawn 하면서 상속, Gradle `JavaExec` 의 기본 동작상 자식 JVM 이 `System.getenv()` 를 그대로 받는다.
+- 따라서 `.env` 에 있는 `SPRING_PROFILES_ACTIVE`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `API_PORT` 는 별도 쉘 `export` 없이 Spring Boot 까지 도달한다.
+- 커맨드라인에서 `DB_PASSWORD=xxx pnpm nx run example-api:serve` 처럼 붙이면 해당 변수만 `.env` 값을 **override** 한다 (상위 우선).
+
+**흔한 함정: `.env` 가 template 시절 값으로 남아 있을 때**
+- `.env.example` 이 갱신되더라도 이미 만든 `.env` 는 자동으로 바뀌지 않는다. PostgreSQL 시절 값(예: `DB_PORT=5432`, `DB_NAME=app`) 이 남아 있으면 MySQL 기동이 `Communications link failure` 로 떨어진다.
+- 기동 전에 `.env` 의 `DB_*` 가 `.env.example` 과 일치하는지 한 번 확인한다.
 
 ## 3. 금지 사항
 
