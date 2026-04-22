@@ -93,6 +93,13 @@
   --font-line-heights-6: 1.125rem;
   --font-line-heights-7: 1rem;
   --font-line-heights-8: 0.875rem;
+  --font-weights-pretendard-gov-0: 600;
+  --font-weights-pretendard-gov-1: 500;
+  --font-weights-pretendard-gov-2: 400;
+  --font-weights-pretendard-gov-3: 700;
+  --font-weights-roboto-4: 400;
+  --font-weights-inter-5: 700;
+  --font-weights-inter-6: 400;
   --font-letter-spacing-0: 0;
   --font-letter-spacing-1: -0.062rem;
   --font-letter-spacing-2: -0.039rem;
