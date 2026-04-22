@@ -14,7 +14,8 @@
   },
   "scripts": {
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "playwright test"
   },
   "peerDependencies": {
     "@ag-grid-community/locale": "^34.0.0",
@@ -32,6 +33,7 @@
     "@monorepo/tailwind-config": "workspace:*",
     "@monorepo/tokens": "workspace:*",
     "@monorepo/typescript-config": "workspace:*",
+    "@playwright/test": "^1.49.0",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/react-vite": "^10.3.5",
     "@tailwindcss/vite": "^4.2.2",
