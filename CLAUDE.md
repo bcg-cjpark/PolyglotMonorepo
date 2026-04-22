@@ -107,5 +107,5 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 - 팀장이 Edit/Write/Task 사용.
 - 팀원이 다른 에이전트 호출 (Task nesting).
 - 메인이 팀장 검수 없이 커밋.
-- Flyway `V1__init.sql` 수정. 새 버전은 `V<N+1>` 로.
+- Flyway `V1__init.sql` 수정. 새 버전은 `V<N+1>` 로. (예외: DB 엔진 자체를 교체하는 `docs/tech-stack/backend.md` 결정이 선행된 경우에 한해 V1~V<N> 을 새 엔진 문법으로 재작성 가능. 재작성 이후 시점부터 다시 불변.)
 - 앱 코드 내부에 범용 UI primitive 생성.
