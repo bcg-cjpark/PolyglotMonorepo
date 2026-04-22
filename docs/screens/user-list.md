@@ -14,11 +14,11 @@
 - 빈 상태: "No users yet." 메시지
 
 ## 컴포넌트
-| 역할 | 컴포넌트 | 비고 |
+| 역할 | UI 종류 | 비고 |
 |---|---|---|
-| "+ New" 버튼 | `Button` | variant=`contained`, color=`primary` |
-| "Delete" 버튼 | `Button` | variant=`outlined`, color=`red`, size=`sm` |
-| 테이블 | native `<table>` | 단순 리스트, AG Grid 미사용 |
+| "+ New" 버튼 | Primary 버튼 | 클릭 시 `/users/new` 로 이동 |
+| "Delete" 버튼 | 작은 위험(Destructive) 버튼 | 클릭 시 `DELETE /users/{id}` |
+| 사용자 목록 | 데이터 그리드 | 컬럼: ID / Email / Name / Action. 정렬/페이지네이션 불요 |
 
 ## 인터랙션
 1. 화면 진입 시 `GET /users` → `users` 상태에 저장
