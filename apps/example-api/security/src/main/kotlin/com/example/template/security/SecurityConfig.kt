@@ -16,6 +16,7 @@ class SecurityConfig {
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/health").permitAll()
+                    .requestMatchers("/error").permitAll()
                     .requestMatchers("/users/**").permitAll()
                     .requestMatchers("/todos/**").permitAll()
                     .requestMatchers("/memos/**").permitAll()

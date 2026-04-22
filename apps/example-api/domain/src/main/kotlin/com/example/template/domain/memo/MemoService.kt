@@ -39,7 +39,7 @@ class MemoService(
     fun update(
         id: UUID,
         title: String,
-        content: String?,
+        content: String,
     ): Memo {
         require(title.trim().isNotBlank()) { "title must not be blank" }
         val memo = findById(id)

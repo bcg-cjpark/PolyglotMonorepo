@@ -2,6 +2,7 @@ package com.example.template.memo
 
 import com.example.template.domain.memo.Memo
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.springframework.data.domain.Page
 import java.time.LocalDateTime
@@ -38,8 +39,9 @@ data class UpdateMemoRequest(
     @field:NotBlank
     @field:Size(min = 1, max = 100)
     val title: String,
+    @field:NotNull
     @field:Size(max = 5000)
-    val content: String?,
+    val content: String,
 )
 
 data class PageResponse<T>(
