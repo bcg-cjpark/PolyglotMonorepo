@@ -15,7 +15,7 @@ class Memo(
     @Column(nullable = true, length = 5000)
     var content: String? = null,
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, columnDefinition = "CHAR(36)")
     val id: UUID = UUID.randomUUID(),
 ) : BaseEntity() {
     fun update(

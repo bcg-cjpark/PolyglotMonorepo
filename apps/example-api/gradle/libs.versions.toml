@@ -27,10 +27,10 @@ spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-star
 spring-security-test = { module = "org.springframework.security:spring-security-test" }
 
 # Database
-postgresql = { module = "org.postgresql:postgresql" }
+mysql-connector-j = { module = "com.mysql:mysql-connector-j" }
 h2 = { module = "com.h2database:h2" }
 flyway-core = { module = "org.flywaydb:flyway-core" }
-flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+flyway-mysql = { module = "org.flywaydb:flyway-mysql" }
 
 # OpenAPI
 springdoc-openapi-starter = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
@@ -48,7 +48,7 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 fixture-monkey-starter = { module = "com.navercorp.fixturemonkey:fixture-monkey-starter", version.ref = "fixture-monkey" }
 fixture-monkey-kotlin = { module = "com.navercorp.fixturemonkey:fixture-monkey-kotlin", version.ref = "fixture-monkey" }
-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers-mysql = { module = "org.testcontainers:mysql", version.ref = "testcontainers" }
 testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
 
 [plugins]

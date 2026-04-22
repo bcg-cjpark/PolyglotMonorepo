@@ -17,11 +17,11 @@ tasks.getByName<Jar>("jar") {
 dependencies {
     api(libs.spring.boot.starter.data.jpa)
 
-    runtimeOnly(libs.postgresql)
+    runtimeOnly(libs.mysql.connector.j)
     runtimeOnly(libs.h2)
 
     implementation(libs.flyway.core)
-    implementation(libs.flyway.postgresql)
+    implementation(libs.flyway.mysql)
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.kotest.extensions.spring)
