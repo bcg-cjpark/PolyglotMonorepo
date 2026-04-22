@@ -275,3 +275,73 @@ export const CustomActions: Story = {
     children: <p style={{ margin: 0 }}>액션 배열로 푸터 버튼을 동적으로 구성할 수 있습니다.</p>,
   },
 };
+
+/**
+ * async onConfirm 대기 시나리오 — `onConfirm` 이 1.5초 delay 후 resolve 하는 Promise
+ * 를 반환합니다. Modal 은 Promise 가 resolve 될 때까지 대기했다가 자동으로 close 합니다.
+ * 사용자가 "확인" 을 누르면 버튼 로딩/대기 동안 모달이 유지되다가 resolve 후 닫힙니다.
+ */
+export const AsyncConfirm: Story = {
+  args: {
+    title: '비동기 저장',
+    description: '확인을 누르면 1.5초 후 resolve 되는 Promise 를 기다립니다.',
+    confirmText: '저장',
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(true);
+    return (
+      <Modal
+        {...args}
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+        onConfirm={async () => {
+          await new Promise((r) => setTimeout(r, 1500));
+          // Modal 이 await 후 자동으로 onClose 호출 → 여기선 setOpen 만 반영
+        }}
+      >
+        <p style={{ margin: 0, color: '#374151' }}>
+          1.5초 지연 후 resolve 하는 async onConfirm. Modal 이 대기한 뒤 닫힙니다.
+        </p>
+      </Modal>
+    );
+  },
+};
+
+/**
+ * reject 시 모달 유지 — 에러 메시지 표시 UX. `onConfirm` 이 Promise.reject 하면
+ * Modal 은 닫히지 않습니다. 사용자가 에러를 확인한 뒤 재시도하거나 취소할 수 있도록
+ * 모달 내부에 에러 메시지를 노출하는 패턴입니다.
+ */
+export const AsyncConfirmReject: Story = {
+  args: {
+    title: '저장 실패 시나리오',
+    description: '확인을 누르면 0.5초 뒤 reject 되어 모달이 유지됩니다.',
+    confirmText: '저장',
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(true);
+    const [err, setErr] = useState<string | null>(null);
+    return (
+      <Modal
+        {...args}
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+        onConfirm={async () => {
+          setErr(null);
+          await new Promise((r) => setTimeout(r, 500));
+          setErr('저장 실패');
+          throw new Error('mock failure');
+        }}
+      >
+        <p style={{ margin: 0, color: '#374151' }}>
+          onConfirm 이 reject → 모달은 유지됩니다.
+        </p>
+        {err && (
+          <p style={{ color: 'var(--font-color-danger, red)', marginTop: 8 }}>{err}</p>
+        )}
+      </Modal>
+    );
+  },
+};

@@ -31,8 +31,8 @@ export interface ModalFooterProps {
   children?: React.ReactNode;
   /** 취소 시 */
   onCancel?: () => void;
-  /** 확인 시 */
-  onConfirm?: () => void;
+  /** 확인 시 (Promise 반환 시 Modal 이 resolve 될 때까지 대기) */
+  onConfirm?: () => void | Promise<void>;
   /** 액션 클릭 시 */
   onAction?: (action: ModalAction, index: number) => void;
 }

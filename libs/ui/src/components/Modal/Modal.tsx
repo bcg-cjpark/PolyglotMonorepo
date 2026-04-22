@@ -57,8 +57,8 @@ export interface ModalProps {
   onBack?: () => void;
   /** 취소 시 */
   onCancel?: () => void;
-  /** 확인 시 */
-  onConfirm?: () => void;
+  /** 확인 시 (Promise 반환 시 resolve 될 때까지 대기 후 닫힘, reject 시 닫히지 않음) */
+  onConfirm?: () => void | Promise<void>;
   /** 액션 클릭 시 */
   onAction?: (action: ModalAction, index: number) => void;
 }
@@ -125,8 +125,13 @@ export const Modal = memo(function Modal({
     handleClose();
   }, [onCancel, handleClose]);
 
-  const handleConfirm = useCallback(() => {
-    onConfirm?.();
+  const handleConfirm = useCallback(async () => {
+    try {
+      await onConfirm?.();
+    } catch {
+      // onConfirm 이 throw/reject 하면 모달을 닫지 않아 사용자가 재시도할 수 있도록 함
+      return;
+    }
     handleClose();
   }, [onConfirm, handleClose]);
 
