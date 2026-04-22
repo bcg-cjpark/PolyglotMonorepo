@@ -66,9 +66,6 @@ importers:
         specifier: ^4.0.0
         version: 4.2.2
     devDependencies:
-      '@ag-grid-community/locale':
-        specifier: ^34.3.1
-        version: 34.3.1
       '@monorepo/eslint-config':
         specifier: workspace:*
         version: link:../../libs/eslint-config
@@ -93,12 +90,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.7.0(vite@6.4.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.99.0)(terser@5.46.1)(yaml@2.8.3))
-      ag-grid-community:
-        specifier: ^34.3.1
-        version: 34.3.1
-      ag-grid-react:
-        specifier: ^34.3.1
-        version: 34.3.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       eslint:
         specifier: ^9.18.0
         version: 9.39.4(jiti@2.6.1)
@@ -250,9 +241,6 @@ packages:
 
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
-
-  '@ag-grid-community/locale@34.3.1':
-    resolution: {integrity: sha512-fAHvOZ6p6nURaUsm4S0KTOc5vuhDWzsEimljbpAVkVQspvuDvRAYW/cZnTl+KSUEp8QhfZ6JRrwuVitbdpgihg==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -2348,18 +2336,6 @@ packages:
   adm-zip@0.5.17:
     resolution: {integrity: sha512-+Ut8d9LLqwEvHHJl1+PIHqoyDxFgVN847JTVM3Izi3xHDWPE4UtzzXysMZQs64DMcrJfBeS/uoEP4AD3HQHnQQ==}
     engines: {node: '>=12.0'}
-
-  ag-charts-types@12.3.1:
-    resolution: {integrity: sha512-5216xYoawnvMXDFI6kTpPku+mH0Csiwu/FE7lsAm8Z22HEN6ciSG/V7g+IrpLWncELqksgENebCTP75PZ3CsHA==}
-
-  ag-grid-community@34.3.1:
-    resolution: {integrity: sha512-PwlrPudsFOzGumphi2y9ihWeaUlIwKhOra/MXu2LjeV2U8DgLLcYS8CartE5Hszhn1poJHawwI9HWrxlKliwdw==}
-
-  ag-grid-react@34.3.1:
-    resolution: {integrity: sha512-1UTlBT+xJkjNZAuf7RxK61mgxKGTPB+6XR99oIHq7cYC89kJmLbWqhHt/1XqRWF5cAgSKk8u+HtOQaN8tAZStw==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
@@ -5210,8 +5186,6 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@ag-grid-community/locale@34.3.1': {}
-
   '@alloc/quick-lru@5.2.0': {}
 
   '@asamuzakjp/css-color@3.2.0':
@@ -7705,19 +7679,6 @@ snapshots:
   adm-zip@0.5.10: {}
 
   adm-zip@0.5.17: {}
-
-  ag-charts-types@12.3.1: {}
-
-  ag-grid-community@34.3.1:
-    dependencies:
-      ag-charts-types: 12.3.1
-
-  ag-grid-react@34.3.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
-    dependencies:
-      ag-grid-community: 34.3.1
-      prop-types: 15.8.1
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
 
   agent-base@7.1.4: {}
 
