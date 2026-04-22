@@ -164,4 +164,37 @@ High 2건은 runner/tester 단계에서 이미 식별됨. 별도 backend-develop
 
 - **읽기 전용 수행** (본문 작성은 spec-auditor, 파일 저장은 메인)
 - **파일 저장**: 본 리포트
-- **Overall 판정**: **PARTIAL** — High 2건 잔존으로 PASS 불가. 다만 UI/UX/도메인 모델/대부분 API 규약 PASS 로 **구현 품질 높음**. 백엔드 검증 실패 응답 레이어 1건 + PUT 시맨틱 엄격화 1건만 후속 처리하면 **FULL PASS 도달 예정**.
+- **초기 판정 (2026-04-22 감사 시점)**: **PARTIAL** — High 2건 잔존.
+
+## Resolution (2026-04-22)
+
+초기 판정의 Unresolved Gaps High 2건이 후속 커밋으로 해결됨.
+
+| Gap | 해결 커밋 | 내용 |
+|---|---|---|
+| #1 — Bean Validation 실패 403 → 400 | `55baeb0 fix(api): memo 검증 실패 400 응답 및 PUT content 필수화` | `SecurityConfig` 에 `/error` permitAll 1줄 추가. Spring `/error` forward 시 `anyRequest().authenticated()` 에 걸리던 문제 해소 |
+| #2 — `UpdateMemoRequest.content` 필수화 | `55baeb0 fix(api): memo 검증 실패 400 응답 및 PUT content 필수화` | DTO `content: String?` → `String` + `@field:NotNull @field:Size(max=5000)` (`@NotBlank` 금지 — 빈 문자열 허용). `MemoService.update` 시그니처 non-null 전파 |
+
+### 스펙 타이트닝
+
+| 파일 | 커밋 | 내용 |
+|---|---|---|
+| `apps/example-web/tests/integration/memo.spec.ts` | `f2f819c test(integration): memo 스펙 400 응답 타이트닝` | T6 느슨한 status 매처 (`>=400 && <500`) → `.toBe(400)` 엄격화. title 누락 / 빈 객체 케이스 추가. T4 에 content 키 누락 케이스 + 롤백 검증 (c 블록) 추가 |
+
+### 재실행 결과
+
+- `pnpm exec playwright test --project=integration` → **9/9 PASS (7.8s)**
+- `pnpm exec playwright test --project=chromium` → **29/29 PASS (25.7s)** (회귀 없음)
+
+### 잔여 (Low, 정보)
+
+- Gap #3 (경로 표기 `/api/memos` vs 실 매핑 `/memos`) — 런타임 동작 PASS 상태. 문서 명확화 또는 배포 시 nginx/gateway 규약 재검토. 별도 이터레이션.
+
+## Overall 최종 판정
+
+**FULL PASS** — 초기 PARTIAL 판정의 High 2건 모두 해결. Low 1건은 런타임 영향 없음.
+
+### 파이프라인 closure 요약
+
+- 기획 통합 → 백엔드 → UI팀 (Textarea primitive 신규) → 프론트 → 화면 e2e → 통합 e2e → 사후 감사 → 감사 대응 fix → 감사 재검증 = **풀 dogfooding 완주**
+- 총 구현 커밋 체인: `7cc6412 → d914c37 → 562a82f → 999a201 → 946f848 → c5e0130 → a36e2ad → 0dc58d6 → 4b49984 → 55baeb0 → f2f819c`
