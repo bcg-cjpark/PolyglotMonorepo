@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@monorepo/ui";
+import { Button, DataGrid } from "@monorepo/ui";
+import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { UserApi, User } from "../services/users";
 
 function UserListPage() {
@@ -29,8 +30,37 @@ function UserListPage() {
     await load();
   };
 
+  const columnDefs = useMemo<ColDef<User>[]>(
+    () => [
+      { field: "id", headerName: "ID", maxWidth: 80 },
+      { field: "email", headerName: "Email" },
+      { field: "name", headerName: "Name" },
+      {
+        headerName: "",
+        colId: "action",
+        maxWidth: 120,
+        sortable: false,
+        filter: false,
+        cellRenderer: (params: ICellRendererParams<User>) => {
+          const row = params.data;
+          if (!row) return null;
+          return (
+            <Button
+              variant="outlined"
+              color="red"
+              size="sm"
+              label="Delete"
+              onClick={() => handleDelete(row.id)}
+            />
+          );
+        },
+      },
+    ],
+    [],
+  );
+
   if (loading) return <p className="p-6">Loading…</p>;
-  if (error) return <p className="p-6 text-red-600">Error: {error}</p>;
+  if (error) return <p className="p-6 text-red-red600">Error: {error}</p>;
 
   return (
     <div>
@@ -44,41 +74,13 @@ function UserListPage() {
           onClick={() => navigate("/users/new")}
         />
       </div>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b">
-            <th className="p-2 text-left">ID</th>
-            <th className="p-2 text-left">Email</th>
-            <th className="p-2 text-left">Name</th>
-            <th className="p-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id} className="border-b">
-              <td className="p-2">{u.id}</td>
-              <td className="p-2">{u.email}</td>
-              <td className="p-2">{u.name}</td>
-              <td className="p-2">
-                <Button
-                  variant="outlined"
-                  color="red"
-                  size="sm"
-                  label="Delete"
-                  onClick={() => handleDelete(u.id)}
-                />
-              </td>
-            </tr>
-          ))}
-          {users.length === 0 && (
-            <tr>
-              <td colSpan={4} className="py-6 text-center text-gray-500">
-                No users yet.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <DataGrid
+        columnDefs={columnDefs}
+        rowData={users}
+        height="calc(100vh - 200px)"
+        noRowsToShow="No users yet."
+        disableRowSelection
+      />
     </div>
   );
 }

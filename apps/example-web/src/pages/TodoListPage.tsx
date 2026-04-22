@@ -1,7 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Checkbox, RadioGroup } from "@monorepo/ui";
+import { Button, Checkbox, DataGrid, RadioGroup } from "@monorepo/ui";
+import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import { Todo, TodoApi, TodoStatus } from "../services/todos";
+
+const isOverdue = (dueDate: string | null, completed: boolean): boolean => {
+  if (!dueDate || completed) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(dueDate);
+  due.setHours(0, 0, 0, 0);
+  return due.getTime() < today.getTime();
+};
 
 function TodoListPage() {
   const navigate = useNavigate();
@@ -35,17 +45,87 @@ function TodoListPage() {
     await load(filter);
   };
 
-  const isOverdue = (dueDate: string | null, completed: boolean): boolean => {
-    if (!dueDate || completed) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const due = new Date(dueDate);
-    due.setHours(0, 0, 0, 0);
-    return due.getTime() < today.getTime();
-  };
+  const columnDefs = useMemo<ColDef<Todo>[]>(
+    () => [
+      {
+        headerName: "",
+        colId: "completed",
+        maxWidth: 56,
+        sortable: false,
+        filter: false,
+        cellRenderer: (params: ICellRendererParams<Todo>) => {
+          const row = params.data;
+          if (!row) return null;
+          return (
+            <Checkbox
+              checked={row.completed}
+              onChange={() => handleToggle(row.id)}
+            />
+          );
+        },
+      },
+      {
+        field: "title",
+        headerName: "Title",
+        cellRenderer: (params: ICellRendererParams<Todo>) => {
+          const row = params.data;
+          if (!row) return null;
+          return (
+            <span className={row.completed ? "line-through text-neutral-neutral400" : undefined}>
+              {row.title}
+            </span>
+          );
+        },
+      },
+      {
+        field: "dueDate",
+        headerName: "Due Date",
+        maxWidth: 160,
+        cellRenderer: (params: ICellRendererParams<Todo>) => {
+          const row = params.data;
+          if (!row) return null;
+          const text = row.dueDate ?? "";
+          const overdue = isOverdue(row.dueDate, row.completed);
+          return <span className={overdue ? "text-red-red500" : undefined}>{text}</span>;
+        },
+      },
+      {
+        headerName: "",
+        colId: "action",
+        maxWidth: 180,
+        sortable: false,
+        filter: false,
+        cellRenderer: (params: ICellRendererParams<Todo>) => {
+          const row = params.data;
+          if (!row) return null;
+          return (
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outlined"
+                size="sm"
+                label="Edit"
+                onClick={() => navigate(`/todos/${row.id}/edit`)}
+              />
+              <Button
+                variant="outlined"
+                color="red"
+                size="sm"
+                label="Delete"
+                onClick={() => handleDelete(row.id)}
+              />
+            </div>
+          );
+        },
+      },
+    ],
+    // navigate/handleToggle/handleDelete 는 클로저로 filter 를 참조하지만
+    // load(filter) 재호출만 하므로 의존성에 포함하지 않아도 최신 filter 에 도달.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filter],
+  );
 
   if (loading) return <p className="p-6">Loading…</p>;
-  if (error) return <p className="p-6 text-red-600">Error: {error}</p>;
+  if (error) return <p className="p-6 text-red-red600">Error: {error}</p>;
 
   return (
     <div>
@@ -73,68 +153,13 @@ function TodoListPage() {
         />
       </div>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b">
-            <th className="p-2 text-left w-10"></th>
-            <th className="p-2 text-left">Title</th>
-            <th className="p-2 text-left">Due Date</th>
-            <th className="p-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {todos.map((t) => (
-            <tr key={t.id} className="border-b">
-              <td className="p-2">
-                <Checkbox
-                  checked={t.completed}
-                  onChange={() => handleToggle(t.id)}
-                />
-              </td>
-              <td className="p-2">
-                <span
-                  className={
-                    t.completed ? "line-through text-gray-400" : undefined
-                  }
-                >
-                  {t.title}
-                </span>
-              </td>
-              <td
-                className={`p-2 ${
-                  isOverdue(t.dueDate, t.completed) ? "text-red-500" : ""
-                }`}
-              >
-                {t.dueDate ?? ""}
-              </td>
-              <td className="p-2">
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    variant="outlined"
-                    size="sm"
-                    label="Edit"
-                    onClick={() => navigate(`/todos/${t.id}/edit`)}
-                  />
-                  <Button
-                    variant="outlined"
-                    color="red"
-                    size="sm"
-                    label="Delete"
-                    onClick={() => handleDelete(t.id)}
-                  />
-                </div>
-              </td>
-            </tr>
-          ))}
-          {todos.length === 0 && (
-            <tr>
-              <td colSpan={4} className="py-6 text-center text-gray-500">
-                No todos yet. Click "+ New" to add one.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <DataGrid
+        columnDefs={columnDefs}
+        rowData={todos}
+        height="calc(100vh - 260px)"
+        noRowsToShow={'No todos yet. Click "+ New" to add one.'}
+        disableRowSelection
+      />
     </div>
   );
 }
