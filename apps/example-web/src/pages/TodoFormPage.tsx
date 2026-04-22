@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Input } from "@monorepo/ui";
+import { Button, Input, Textarea } from "@monorepo/ui";
 import { TodoApi } from "../services/todos";
 
 function TodoFormPage() {
@@ -76,12 +76,12 @@ function TodoFormPage() {
         </label>
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium">Description</span>
-          <textarea
+          <Textarea
             value={description}
             placeholder="Optional details"
             rows={4}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-            onChange={(e) => setDescription(e.target.value)}
+            full
+            onChange={(v) => setDescription(v)}
           />
         </label>
         <label className="flex flex-col gap-1">
