@@ -1,4 +1,4 @@
-import { test, expect, Page } from "@playwright/test";
+import { test, expect, Page, Locator } from "@playwright/test";
 
 /**
  * libs/ui 의 <Input> 컴포넌트에서 한글(IME) 입력이 제대로 동작하는지 검증.
@@ -30,75 +30,31 @@ async function openNewForm(page: Page) {
 /**
  * 리스트 페이지에서 해당 title 의 row 가 보이는지 검증.
  *
- * TodoListPage 는 `<table>` 대신 `@monorepo/ui` 의 DataGrid(ag-grid-react)
- * 를 사용한다. 행은 `<tr>` 이 아니라 `div[role="row"]` (+ class `ag-row`) 이므로
- * getByRole("row") 로 접근한다. 헤더 행도 role=row 지만 데이터 title 텍스트가
- * 헤더에 없으므로 hasText 필터로 자동 배제된다.
+ * TodoListPage 는 `@monorepo/ui` 의 Table primitive 를 쓰는 native
+ * `<table>` 기반이다. 데이터 행은 `tbody > tr.ui-table__row` (빈 상태 행은
+ * `.ui-table__row--empty`, 헤더 행은 `thead` 내부라 제외됨) 이므로
+ * 해당 조합에 title hasText 필터를 더해 정확한 데이터 행만 잡는다.
  *
- * ag-grid 는 viewport 밖 row 를 DOM 에 렌더하지 않으므로 (row virtualization),
- * 새로 생성된 row 가 리스트 하단에 있으면 스크롤 없이 locator 가 못 찾는다.
- * `.ag-body-viewport` 를 단계적으로 스크롤하면서 row 가 attach 될 때까지 대기.
+ * Table primitive 는 row virtualization 을 쓰지 않으므로 모든 행이 DOM 에
+ * 있으며 단지 viewport 밖에 있을 수 있다. `scrollIntoViewIfNeeded` 로 충분.
  */
+function rowByTitle(page: Page, title: string): Locator {
+  return page
+    .locator("tbody tr.ui-table__row:not(.ui-table__row--empty)")
+    .filter({ hasText: title });
+}
+
 async function expectRowExists(page: Page, title: string) {
   await expect(page).toHaveURL(/\/todos$/, { timeout: 10_000 });
-  const row = page.getByRole("row").filter({ hasText: title });
-  const start = Date.now();
-
-  // 0) 그리드 rowData 가 실제로 로드돼 .ag-row 가 최소 한 개 나오거나 no-rows overlay 가 뜰 때까지 대기.
-  await page.waitForFunction(
-    () => {
-      const hasRow = document.querySelector(".ag-center-cols-container .ag-row");
-      const noRows = document.querySelector(".ag-overlay-no-rows-wrapper");
-      const noRowsVisible =
-        noRows instanceof HTMLElement && noRows.offsetParent !== null;
-      return !!hasRow || noRowsVisible;
-    },
-    undefined,
-    { timeout: 5_000 },
-  );
-
-  // 1) 상단으로 리셋 후 단계 스크롤로 row 를 viewport 에 올리기.
-  await page.evaluate(() => {
-    const vp = document.querySelector<HTMLElement>(".ag-body-viewport");
-    if (vp) vp.scrollTop = 0;
-  });
-  while (Date.now() - start < 10_000) {
-    if ((await row.count()) > 0) {
-      try {
-        await row.first().scrollIntoViewIfNeeded({ timeout: 2_000 });
-        await expect(row.first()).toBeVisible({ timeout: 5_000 });
-        return;
-      } catch {
-        // ag-grid 재렌더 중 detach race — 잠시 후 재시도
-        await page.waitForTimeout(80);
-        continue;
-      }
-    }
-    const state = await page.evaluate(() => {
-      const vp = document.querySelector<HTMLElement>(".ag-body-viewport");
-      if (!vp) return { atBottom: true };
-      const maxScroll = vp.scrollHeight - vp.clientHeight;
-      const was = vp.scrollTop;
-      vp.scrollTop = Math.min(maxScroll, vp.scrollTop + 200);
-      return { atBottom: was >= maxScroll - 1 };
-    });
-    if (state.atBottom) {
-      await page.waitForTimeout(120);
-      if ((await row.count()) > 0) {
-        await row.first().scrollIntoViewIfNeeded();
-        await expect(row.first()).toBeVisible({ timeout: 5_000 });
-        return;
-      }
-      await page.waitForTimeout(200);
-      await page.evaluate(() => {
-        const vp = document.querySelector<HTMLElement>(".ag-body-viewport");
-        if (vp) vp.scrollTop = 0;
-      });
-    }
-    await page.waitForTimeout(60);
-  }
-  // 못 찾으면 표준 expect 로 실패 메시지 남기기
-  await expect(row).toBeVisible({ timeout: 1_000 });
+  // Table 컬럼 헤더(Title) 로 초기 렌더 완료 대기.
+  await page
+    .locator("th.ui-table__cell--head")
+    .filter({ hasText: "Title" })
+    .waitFor({ state: "attached", timeout: 10_000 });
+  const row = rowByTitle(page, title);
+  await expect(row).toHaveCount(1, { timeout: 10_000 });
+  await row.scrollIntoViewIfNeeded();
+  await expect(row).toBeVisible({ timeout: 5_000 });
 }
 
 test.describe("Hangul input on libs/ui <Input>", () => {
