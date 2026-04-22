@@ -29,12 +29,76 @@ async function openNewForm(page: Page) {
 
 /**
  * 리스트 페이지에서 해당 title 의 row 가 보이는지 검증.
+ *
+ * TodoListPage 는 `<table>` 대신 `@monorepo/ui` 의 DataGrid(ag-grid-react)
+ * 를 사용한다. 행은 `<tr>` 이 아니라 `div[role="row"]` (+ class `ag-row`) 이므로
+ * getByRole("row") 로 접근한다. 헤더 행도 role=row 지만 데이터 title 텍스트가
+ * 헤더에 없으므로 hasText 필터로 자동 배제된다.
+ *
+ * ag-grid 는 viewport 밖 row 를 DOM 에 렌더하지 않으므로 (row virtualization),
+ * 새로 생성된 row 가 리스트 하단에 있으면 스크롤 없이 locator 가 못 찾는다.
+ * `.ag-body-viewport` 를 단계적으로 스크롤하면서 row 가 attach 될 때까지 대기.
  */
 async function expectRowExists(page: Page, title: string) {
   await expect(page).toHaveURL(/\/todos$/, { timeout: 10_000 });
-  await expect(page.locator("tr").filter({ hasText: title })).toBeVisible({
-    timeout: 5_000,
+  const row = page.getByRole("row").filter({ hasText: title });
+  const start = Date.now();
+
+  // 0) 그리드 rowData 가 실제로 로드돼 .ag-row 가 최소 한 개 나오거나 no-rows overlay 가 뜰 때까지 대기.
+  await page.waitForFunction(
+    () => {
+      const hasRow = document.querySelector(".ag-center-cols-container .ag-row");
+      const noRows = document.querySelector(".ag-overlay-no-rows-wrapper");
+      const noRowsVisible =
+        noRows instanceof HTMLElement && noRows.offsetParent !== null;
+      return !!hasRow || noRowsVisible;
+    },
+    undefined,
+    { timeout: 5_000 },
+  );
+
+  // 1) 상단으로 리셋 후 단계 스크롤로 row 를 viewport 에 올리기.
+  await page.evaluate(() => {
+    const vp = document.querySelector<HTMLElement>(".ag-body-viewport");
+    if (vp) vp.scrollTop = 0;
   });
+  while (Date.now() - start < 10_000) {
+    if ((await row.count()) > 0) {
+      try {
+        await row.first().scrollIntoViewIfNeeded({ timeout: 2_000 });
+        await expect(row.first()).toBeVisible({ timeout: 5_000 });
+        return;
+      } catch {
+        // ag-grid 재렌더 중 detach race — 잠시 후 재시도
+        await page.waitForTimeout(80);
+        continue;
+      }
+    }
+    const state = await page.evaluate(() => {
+      const vp = document.querySelector<HTMLElement>(".ag-body-viewport");
+      if (!vp) return { atBottom: true };
+      const maxScroll = vp.scrollHeight - vp.clientHeight;
+      const was = vp.scrollTop;
+      vp.scrollTop = Math.min(maxScroll, vp.scrollTop + 200);
+      return { atBottom: was >= maxScroll - 1 };
+    });
+    if (state.atBottom) {
+      await page.waitForTimeout(120);
+      if ((await row.count()) > 0) {
+        await row.first().scrollIntoViewIfNeeded();
+        await expect(row.first()).toBeVisible({ timeout: 5_000 });
+        return;
+      }
+      await page.waitForTimeout(200);
+      await page.evaluate(() => {
+        const vp = document.querySelector<HTMLElement>(".ag-body-viewport");
+        if (vp) vp.scrollTop = 0;
+      });
+    }
+    await page.waitForTimeout(60);
+  }
+  // 못 찾으면 표준 expect 로 실패 메시지 남기기
+  await expect(row).toBeVisible({ timeout: 1_000 });
 }
 
 test.describe("Hangul input on libs/ui <Input>", () => {
