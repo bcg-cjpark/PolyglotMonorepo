@@ -11,7 +11,7 @@ import { defineConfig, devices } from "@playwright/test";
  * CI나 다른 브라우저 추가 필요 시 projects 배열 확장.
  */
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: "./tests",
   timeout: 30_000,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -26,6 +26,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testDir: "./tests/e2e",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "integration",
+      testDir: "./tests/integration",
       use: { ...devices["Desktop Chrome"] },
     },
   ],
