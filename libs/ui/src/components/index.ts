@@ -139,9 +139,6 @@ export type { MobileDrawerProps } from './MobileDrawer';
 export { PIN } from './PIN';
 export type { PINProps } from './PIN';
 
-export { DataGrid } from './DataGrid';
-export type { DataGridHandle, DataGridProps, SortState } from './DataGrid';
-
 export { Table } from './Table';
 export type { TableProps, TableColumn, TableColumnAlign } from './Table';
 

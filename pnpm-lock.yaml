@@ -181,21 +181,12 @@ importers:
 
   libs/ui:
     dependencies:
-      '@ag-grid-community/locale':
-        specifier: ^34.0.0
-        version: 34.3.1
       '@headlessui/react':
         specifier: ^2.2.0
         version: 2.2.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@monorepo/types':
         specifier: workspace:*
         version: link:../types
-      ag-grid-community:
-        specifier: ^34.0.0
-        version: 34.3.1
-      ag-grid-react:
-        specifier: ^34.0.0
-        version: 34.3.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
     devDependencies:
       '@monorepo/eslint-config':
         specifier: workspace:*
