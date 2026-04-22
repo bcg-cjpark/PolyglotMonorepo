@@ -1,8 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Checkbox, DataGrid, RadioGroup } from "@monorepo/ui";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { Todo, TodoApi, TodoStatus } from "../services/todos";
+import { Todo, TodoStatus } from "../services/todos";
+import {
+  useDeleteTodoMutation,
+  useTodosQuery,
+  useToggleTodoMutation,
+} from "../queries/todos";
 
 const isOverdue = (dueDate: string | null, completed: boolean): boolean => {
   if (!dueDate || completed) return false;
@@ -15,34 +20,21 @@ const isOverdue = (dueDate: string | null, completed: boolean): boolean => {
 
 function TodoListPage() {
   const navigate = useNavigate();
-  const [todos, setTodos] = useState<Todo[]>([]);
+  // filter 는 클라이언트 UI 상태 — TanStack Query 는 서버 상태 전담.
   const [filter, setFilter] = useState<TodoStatus>("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const load = async (status: TodoStatus) => {
-    try {
-      setLoading(true);
-      setTodos(await TodoApi.list(status));
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
+  const { data, isLoading, isError, error } = useTodosQuery(filter);
+  const toggleTodo = useToggleTodoMutation();
+  const deleteTodo = useDeleteTodoMutation();
+
+  const todos = data ?? [];
+
+  const handleToggle = (id: number) => {
+    toggleTodo.mutate(id);
   };
 
-  useEffect(() => {
-    load(filter);
-  }, [filter]);
-
-  const handleToggle = async (id: number) => {
-    await TodoApi.toggle(id);
-    await load(filter);
-  };
-
-  const handleDelete = async (id: number) => {
-    await TodoApi.delete(id);
-    await load(filter);
+  const handleDelete = (id: number) => {
+    deleteTodo.mutate(id);
   };
 
   const columnDefs = useMemo<ColDef<Todo>[]>(
@@ -118,14 +110,18 @@ function TodoListPage() {
         },
       },
     ],
-    // navigate/handleToggle/handleDelete 는 클로저로 filter 를 참조하지만
-    // load(filter) 재호출만 하므로 의존성에 포함하지 않아도 최신 filter 에 도달.
+    // 토글/삭제는 뮤테이션 훅을 통해 호출되며, 결과는 쿼리 무효화로 자동 반영.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filter],
+    [],
   );
 
-  if (loading) return <p className="p-6">Loading…</p>;
-  if (error) return <p className="p-6 text-red-red600">Error: {error}</p>;
+  if (isLoading) return <p className="p-6">Loading…</p>;
+  if (isError)
+    return (
+      <p className="p-6 text-red-red600">
+        Error: {(error as Error).message}
+      </p>
+    );
 
   return (
     <div>

@@ -1,24 +1,26 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input } from "@monorepo/ui";
-import { UserApi } from "../services/users";
+import { useCreateUserMutation } from "../queries/users";
 
 function UserFormPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+
+  const createUser = useCreateUserMutation();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     try {
-      await UserApi.create({ email, name });
+      await createUser.mutateAsync({ email, name });
       navigate("/users");
-    } finally {
-      setSubmitting(false);
+    } catch {
+      // 에러는 뮤테이션의 isError / error 로 노출 가능. 현 화면은 별도 UI 없이 이전 동작 유지.
     }
   };
+
+  const submitting = createUser.isPending;
 
   return (
     <div>

@@ -1,6 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Modal } from "@monorepo/ui";
-import { Memo, MemoApi } from "../services/memos";
+import { Memo } from "../services/memos";
+import {
+  useCreateMemoMutation,
+  useDeleteMemoMutation,
+  useMemosQuery,
+  useUpdateMemoMutation,
+} from "../queries/memos";
 import MemoCard from "../components/MemoCard";
 import MemoDetailDialog from "../components/MemoDetailDialog";
 import MemoFormDialog from "../components/MemoFormDialog";
@@ -15,34 +21,19 @@ type DialogState =
   | { kind: "confirmDelete"; memo: Memo };
 
 function MemoListPage() {
-  const [memos, setMemos] = useState<Memo[]>([]);
+  // 페이지 번호는 클라이언트 UI 상태 — TanStack Query 는 서버 상태 전담.
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<DialogState>({ kind: "none" });
 
-  const load = async (targetPage: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await MemoApi.list(targetPage, PAGE_SIZE);
-      setMemos(res.content);
-      setPage(res.page);
-      setTotalPages(res.totalPages);
-      setTotalElements(res.totalElements);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading, isError, error } = useMemosQuery(page, PAGE_SIZE);
 
-  useEffect(() => {
-    load(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const createMemo = useCreateMemoMutation();
+  const updateMemo = useUpdateMemoMutation();
+  const deleteMemo = useDeleteMemoMutation();
+
+  const memos = data?.content ?? [];
+  const totalPages = data?.totalPages ?? 0;
+  const totalElements = data?.totalElements ?? 0;
 
   const handleCreate = async ({
     title,
@@ -51,9 +42,11 @@ function MemoListPage() {
     title: string;
     content: string;
   }) => {
-    await MemoApi.create({ title, content: content || null });
+    await createMemo.mutateAsync({ title, content: content || null });
     setDialog({ kind: "none" });
-    await load(0); // 새 메모는 첫 페이지 맨 위에 오므로 0 페이지 리로드
+    // 새 메모는 첫 페이지 맨 위에 오므로 0 페이지로 이동
+    // (페이지 0 이었다면 setPage 가 변경이 없어도 쿼리는 무효화로 재요청된다)
+    setPage(0);
   };
 
   const handleUpdate = async (
@@ -61,25 +54,29 @@ function MemoListPage() {
     { title, content }: { title: string; content: string },
   ) => {
     // PUT 전체 교체 — title, content 모두 필수
-    const updated = await MemoApi.update(id, { title, content });
+    await updateMemo.mutateAsync({ id, body: { title, content } });
     setDialog({ kind: "none" });
-    await load(page);
-    // 상세 모달을 다시 띄워주진 않음 (편집 완료 후엔 리스트로 복귀)
-    void updated;
+    // 현재 페이지 유지 — 쿼리 무효화로 자동 리페치
   };
 
   const handleDelete = async (id: string) => {
-    await MemoApi.delete(id);
+    await deleteMemo.mutateAsync(id);
     setDialog({ kind: "none" });
     // 마지막 페이지에서 마지막 항목을 지운 경우 한 페이지 앞으로 이동
-    const nextPage =
-      memos.length === 1 && page > 0 ? page - 1 : page;
-    await load(nextPage);
+    if (memos.length === 1 && page > 0) {
+      setPage(page - 1);
+    }
+    // 같은 페이지면 setPage 가 변경되지 않아도 쿼리 무효화가 재요청한다
   };
 
   const renderList = () => {
-    if (loading) return <p className="p-6">Loading…</p>;
-    if (error) return <p className="p-6 text-red-red600">Error: {error}</p>;
+    if (isLoading) return <p className="p-6">Loading…</p>;
+    if (isError)
+      return (
+        <p className="p-6 text-red-red600">
+          Error: {(error as Error).message}
+        </p>
+      );
     if (memos.length === 0) {
       return (
         <p className="py-12 text-center text-neutral-neutral500">
@@ -124,8 +121,8 @@ function MemoListPage() {
             color="grey"
             size="sm"
             label="이전"
-            disabled={page <= 0 || loading}
-            onClick={() => load(page - 1)}
+            disabled={page <= 0 || isLoading}
+            onClick={() => setPage(page - 1)}
           />
           <span className="text-sm text-neutral-neutral600">
             {page + 1} / {totalPages} (총 {totalElements}개)
@@ -135,8 +132,8 @@ function MemoListPage() {
             color="grey"
             size="sm"
             label="다음"
-            disabled={page >= totalPages - 1 || loading}
-            onClick={() => load(page + 1)}
+            disabled={page >= totalPages - 1 || isLoading}
+            onClick={() => setPage(page + 1)}
           />
         </div>
       )}

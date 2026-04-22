@@ -1,33 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, DataGrid } from "@monorepo/ui";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
-import { UserApi, User } from "../services/users";
+import { User } from "../services/users";
+import {
+  useDeleteUserMutation,
+  useUsersQuery,
+} from "../queries/users";
 
 function UserListPage() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError, error } = useUsersQuery();
+  const deleteUser = useDeleteUserMutation();
 
-  const load = async () => {
-    try {
-      setLoading(true);
-      setUsers(await UserApi.list());
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const users = data ?? [];
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    await UserApi.delete(id);
-    await load();
+  const handleDelete = (id: number) => {
+    deleteUser.mutate(id);
   };
 
   const columnDefs = useMemo<ColDef<User>[]>(
@@ -56,11 +45,18 @@ function UserListPage() {
         },
       },
     ],
+    // handleDelete 는 deleteUser 뮤테이션을 닫아서 호출하므로 안정.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
-  if (loading) return <p className="p-6">Loading…</p>;
-  if (error) return <p className="p-6 text-red-red600">Error: {error}</p>;
+  if (isLoading) return <p className="p-6">Loading…</p>;
+  if (isError)
+    return (
+      <p className="p-6 text-red-red600">
+        Error: {(error as Error).message}
+      </p>
+    );
 
   return (
     <div>
