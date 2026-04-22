@@ -142,5 +142,8 @@ export type { PINProps } from './PIN';
 export { DataGrid } from './DataGrid';
 export type { DataGridHandle, DataGridProps, SortState } from './DataGrid';
 
+export { Table } from './Table';
+export type { TableProps, TableColumn, TableColumnAlign } from './Table';
+
 export { Textarea } from './Textarea';
 export type { TextareaProps, TextareaRef } from './Textarea';

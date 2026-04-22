@@ -1,0 +1,110 @@
+// Table 컴포넌트 스타일
+// Tailwind v4 의 @layer base (preflight) 가 컴포넌트 스타일을 덮어쓰는 것을
+// 막기 위해 전체를 @layer components 로 감쌈.
+//
+// 모든 시각 값은 libs/tokens 의 CSS 변수(var(--...)) 로만 참조한다.
+// Light/Dark 는 :root[data-theme="light|dark"] 로 자동 스위칭되므로
+// 여기서는 변수만 사용하고 테마 분기를 직접 하지 않는다.
+
+@layer components {
+
+  .ui-table__wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background-color: var(--background-bg-default);
+  }
+
+  .ui-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: var(--background-bg-default);
+    color: var(--font-color-default);
+    font-size: var(--font-size-font-14);
+    line-height: var(--font-line-heights-5);
+  }
+
+  // 헤더
+  .ui-table__head {
+    background-color: var(--background-bg-surface);
+  }
+
+  .ui-table__row {
+    // 기본 행. hover 는 body 쪽에서만.
+    transition: background-color 0.15s ease;
+  }
+
+  // 본문 행 hover — 미묘한 배경 토큰
+  .ui-table__body .ui-table__row:hover {
+    background-color: var(--background-bg-surface);
+  }
+
+  .ui-table__body .ui-table__row--empty:hover {
+    // 빈 상태 행은 hover 강조 제거
+    background-color: transparent;
+  }
+
+  // 셀 공통
+  .ui-table__cell {
+    padding: var(--padding-padding-12) var(--padding-padding-16);
+    border-bottom: 1px solid var(--background-divider);
+    vertical-align: middle;
+    box-sizing: border-box;
+  }
+
+  // 헤더 셀
+  .ui-table__cell--head {
+    font-size: var(--font-size-font-13);
+    font-weight: var(--font-weights-pretendard-gov-1);
+    color: var(--font-color-default-muted);
+    background-color: var(--background-bg-surface);
+    white-space: nowrap;
+    // 정렬/필터는 지원하지 않으므로 커서는 기본값.
+    cursor: default;
+    user-select: none;
+  }
+
+  // 본문 셀
+  .ui-table__cell--body {
+    color: var(--font-color-default);
+  }
+
+  // 정렬
+  .ui-table__cell--align-left {
+    text-align: left;
+  }
+  .ui-table__cell--align-center {
+    text-align: center;
+  }
+  .ui-table__cell--align-right {
+    text-align: right;
+  }
+
+  // 빈 상태 행
+  .ui-table__cell--empty {
+    padding: var(--padding-padding-16);
+    text-align: center;
+    color: var(--font-color-default-muted);
+    font-size: var(--font-size-font-14);
+    background-color: var(--background-bg-default);
+  }
+
+  // 마지막 행의 border-bottom 제거 (둘러싼 wrapper 가 경계 역할)
+  .ui-table__body .ui-table__row:last-child .ui-table__cell {
+    border-bottom: none;
+  }
+
+  // 반응형
+  @media (max-width: 768px) {
+    .ui-table {
+      font-size: var(--font-size-font-13);
+    }
+    .ui-table__cell {
+      padding: var(--padding-padding-10) var(--padding-padding-12);
+    }
+    .ui-table__cell--head {
+      font-size: var(--font-size-font-12);
+    }
+  }
+
+} // @layer components
