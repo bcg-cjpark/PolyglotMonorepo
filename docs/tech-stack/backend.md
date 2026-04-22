@@ -15,7 +15,7 @@
 | 프레임워크 | **Spring Boot 3.3** | `spring-boot-starter-*` | 변경 없음 |
 | ORM | **Spring Data JPA + Hibernate** | `spring-boot-starter-data-jpa` | 변경 없음 |
 | 마이그레이션 | **Flyway** | `flyway-core`, `flyway-mysql` | MySQL 전용으로 전환 |
-| **운영 / 개발 DB** | **MySQL 8.x** | `mysql-connector-j` | **2026-04-22 PostgreSQL → MySQL 전환** |
+| **운영 / 개발 DB** | **MySQL 8.4 (LTS)** | `mysql-connector-j` | **2026-04-22 PostgreSQL → MySQL 8.4 LTS 전환** |
 | 로컬(인메모리) DB | **H2 (MySQL 모드)** | `com.h2database:h2` | 프로필: `local` |
 | API 문서 | **springdoc-openapi** | `springdoc-openapi-starter-webmvc-ui` | 변경 없음 |
 | 인증 | **Spring Security + JJWT** | `spring-security`, `jjwt-*` | 변경 없음 |
@@ -24,16 +24,20 @@
 
 ## 2. 결정 배경 및 사용 규칙
 
-### 2.1 DB: MySQL 8.x (2026-04-22 전환)
+### 2.1 DB: MySQL 8.4 LTS (2026-04-22 전환)
 
 **배경**
 템플릿 레포 초기값은 PostgreSQL 이었으나, 실제 사내 표준 RDBMS 가 MySQL 이므로 템플릿의 기본을 MySQL 로 맞춘다. 실 운영 DB 와 동일한 엔진에서 로컬/개발 환경을 돌려 문법/기능 차이로 인한 이슈를 제거한다.
 
-**결정**: MySQL **8.x** (8.0 이상).
+**결정**: MySQL **8.4 LTS** (Long-Term Support 트랙).
 
 **이유**
 - 8.0+ 에서 `CHAR(36)` 에 저장한 UUID 인덱스, 내림차순 인덱스(`INDEX ... DESC`), `DEFAULT (UUID())` 등 현재 스키마가 의존하는 기능이 모두 지원.
-- 사내 표준이 MySQL 이라 운영 DBA / 인프라 지원을 그대로 받을 수 있음.
+- **8.4 LTS 를 특정한 이유**: Oracle 의 MySQL 은 2024 년부터 Innovation 트랙(9.x) 과 LTS 트랙(8.4) 으로 분리됨. Innovation 은 기능 실험용 단명 릴리스라 운영에 부적합하고, Flyway/JPA/각종 드라이버의 공식 지원 범위도 보수적이라 innovation 버전(9.x) 에서는 "support has not been tested" 경고가 뜬다. 사내 표준이 MySQL 이라 운영 DBA / 인프라 지원을 그대로 받을 수 있는 것도 LTS 전제.
+
+**금지**
+- **MySQL `latest` 태그 / innovation 트랙(9.x) 사용 금지**. 도커 이미지는 반드시 구체적인 LTS 태그(`mysql:8.4.4` 또는 `mysql:8.4.4.x`) 로 고정한다.
+- 8.0.x 도 허용되지만 신규 환경은 8.4 LTS 권장 (2032 년까지 LTS 지원).
 
 **전환 범위**
 - `libs.versions.toml`: `postgresql` → `mysql-connector-j`, `flyway-postgresql` → `flyway-mysql`, `testcontainers-postgresql` → `testcontainers-mysql`.
@@ -85,7 +89,7 @@ docker run -d --name mysql-local \
   -p 3306:3306 \
   -e MYSQL_ROOT_PASSWORD=... \
   -e MYSQL_DATABASE=polyglot_example \
-  mysql:8
+  mysql:8.4
 ```
 
 이미 돌고 있는 컨테이너에 DB 만 새로 만들고 싶다면:
@@ -97,6 +101,19 @@ docker exec -it <container> mysql -uroot -p -e \
 
 - 포트/자격증명은 개발자별로 다르며 **이 문서에 기록하지 않는다**. 팀 위키나 개인 메모로.
 - `docker-compose` 는 이 레포에 포함하지 않는다 (사내 표준 배포 파이프라인과 별개라 불필요).
+
+### 2.4 개발 기동 가이드
+
+도커 컨테이너가 돌고 있고 `polyglot_example` DB 가 생성된 상태에서:
+
+```bash
+SPRING_PROFILES_ACTIVE=dev DB_PASSWORD=<도커 root 비밀번호> \
+  pnpm nx run example-api:serve
+```
+
+`application.yml` 의 `dev` 프로필 기본값이 `DB_HOST=localhost`, `DB_PORT=3306`, `DB_NAME=polyglot_example`, `DB_USER=root` 이라 비밀번호만 주입하면 된다. 다른 호스트/포트를 쓰면 해당 `DB_*` 만 override.
+
+**환경변수 전달 메커니즘**: Gradle daemon 은 client 의 사용자 정의 환경변수(`DB_*` 등) 를 bootRun 자식 JVM 에 자동 상속하지 않는다. `apps/example-api/app/build.gradle.kts` 의 `bootRun` 블록이 `providers.environmentVariable(...)` 를 통해 명시적으로 이 변수들을 자식 JVM 으로 전달한다. 새 환경변수를 추가할 때는 그 블록의 리스트에도 같이 등록해야 `dev` 프로필에서 인식된다.
 
 ## 3. 금지 사항
 
