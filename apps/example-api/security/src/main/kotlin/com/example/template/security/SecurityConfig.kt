@@ -17,9 +17,8 @@ class SecurityConfig {
                 it
                     .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/health").permitAll()
                     .requestMatchers("/error").permitAll()
-                    .requestMatchers("/users/**").permitAll()
-                    .requestMatchers("/todos/**").permitAll()
-                    .requestMatchers("/memos/**").permitAll()
+                    // 피처별 엔드포인트는 각 피처의 백엔드팀 구현 시점에 여기 추가.
+                    // 예: .requestMatchers("/users/**").permitAll()
                     .anyRequest().authenticated()
             }
             .build()
