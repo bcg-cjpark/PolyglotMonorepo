@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — TodoListPage Variant B (칸반 2-column)</title>
+<!--
+  시안: Todo List — Variant B (칸반 2-column, 대안 A)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD:   docs/prd/todo.md
+  원본 Brief: docs/stitch-brief/todo.md
+
+  이 variant 의 포인트:
+  - "진행 중" / "완료" 2-column 칸반 레이아웃. 각 컬럼 = 해당 상태의 카드 스택.
+  - 상태 필터(세그먼트) 는 여전히 존재하나 "전체" 선택 시 2-column, 단일 상태 선택 시 1-column 으로 붕괴.
+  - 체크박스 / 편집 / 삭제 액션은 카드 내부로 이동.
+  - overdue 는 카드 좌측 2px 위험 색 accent strip + 마감일 텍스트 font-color-red.
+  - 완료 컬럼 카드: 제목 취소선 + muted.
+
+  ※ 위험/전제 (카탈로그 "위험" 라벨):
+  - data-display.md §3 매트릭스는 "정형 스키마 CRUD → 표" 로 결정됨. 칸반은 "간트 / 칸반" 으로 §6 엣지 케이스에 분류돼 있음 → 전용 primitive 부재.
+  - PRD Out-of-scope "드래그앤드롭 정렬 핸들" 의 사용 기대를 시각적으로 유도 (위치 이동 가능하다는 오해).
+  - 컬럼 분할 자체가 "카테고리/분류" UI 범주에 가까워 V1 out-of-scope 와 충돌.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary100: #fcefd9;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-green-green800: #00a22f;
+  --base-colors-green-green050: #f1f9f3;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-outline-text: #242424;
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+  --background-primary-light: var(--base-colors-primary-primary100);
+
+  --chips-status-done-bg: var(--base-colors-green-green050);
+  --chips-status-done-text: var(--base-colors-green-green800);
+  --chips-status-pending-bg: var(--base-colors-primary-primary050);
+  --chips-status-pending-text: var(--base-colors-primary-primary-deep);
+
+  --padding-padding-4: 0.25rem;
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-default: 0.5rem;
+  --radius-pill: 9999px;
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary100: #38290f;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-green-green800: #08b63a;
+  --base-colors-green-green050: #122317;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: #151719;
+  --base-colors-common-light-gray-ea: #1a1c1e;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: #ff595c;
+  --button-red-border: #ff595c;
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+  --background-primary-light: var(--base-colors-primary-primary100);
+
+  --chips-status-done-bg: #10381c;
+  --chips-status-done-text: var(--base-colors-green-green800);
+  --chips-status-pending-bg: var(--base-colors-primary-primary200);
+  --chips-status-pending-text: var(--base-colors-primary-primary800);
+
+  --padding-padding-4: 0.25rem;
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-default: 0.5rem;
+  --radius-pill: 9999px;
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
+* { box-sizing: border-box; }
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.theme-toggle:hover { background-color: var(--background-bg-innerframe); }
+
+.page-container {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-16);
+}
+
+/* 위험/전제 배너 */
+.warn-banner {
+  background-color: var(--base-colors-secondary-secondary100);
+  border: 1px solid var(--alert-warning-icon-color);
+  color: var(--alert-warning-icon-color);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-sm {
+  padding: var(--padding-padding-4) var(--padding-padding-12);
+  font-size: 0.8125rem;
+}
+
+/* 세그먼트 컨트롤 (A와 동일) */
+.segmented {
+  display: inline-flex;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-4);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+.segmented__option {
+  padding: var(--padding-padding-4) var(--padding-padding-12);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--font-color-default-muted);
+  background-color: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+.segmented__option.is-active {
+  color: var(--button-primary-text);
+  background-color: var(--button-primary-background);
+  border-color: var(--button-primary-border);
+}
+
+/* 칸반 board */
+.kanban {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--padding-padding-16);
+}
+@media (max-width: 860px) {
+  .kanban { grid-template-columns: 1fr; }
+}
+
+.kanban-col {
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-12);
+  min-height: 18rem;
+}
+.kanban-col__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-8);
+}
+.kanban-col__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.kanban-col__count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px var(--padding-padding-8);
+  border-radius: var(--radius-pill);
+  background-color: var(--background-bg-surface-muted);
+  color: var(--font-color-default-muted);
+}
+
+/* 카드 (합성 TodoCard) */
+.todo-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+.todo-card.is-overdue {
+  border-left: 2px solid var(--font-color-red);
+  padding-left: calc(var(--padding-padding-16) - 2px);
+}
+.todo-card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--padding-padding-8);
+}
+.checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  min-width: 1.125rem;
+  border: 1.5px solid var(--background-bg-surface-muted);
+  border-radius: var(--radius-xs);
+  background-color: var(--background-bg-default);
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  margin: 0;
+  margin-top: 2px;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.checkbox:checked {
+  background-color: var(--button-primary-background);
+  border-color: var(--button-primary-border);
+}
+.checkbox:checked::after {
+  content: '';
+  width: 0.4rem;
+  height: 0.7rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+.todo-card__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--font-color-default);
+  line-height: 1.4;
+  flex: 1;
+}
+.todo-card.is-completed .todo-card__title {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  color: var(--font-color-default-muted);
+}
+.todo-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-8);
+}
+.todo-card__due {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.todo-card__due.is-overdue {
+  color: var(--font-color-red);
+  font-weight: 600;
+}
+.todo-card__due--none {
+  color: var(--font-color-default-muted);
+  font-style: italic;
+}
+.todo-card__actions {
+  display: flex;
+  gap: var(--padding-padding-4);
+}
+
+.empty-col {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+  padding: var(--padding-padding-16);
+  text-align: center;
+  border: 1px dashed var(--background-divider);
+  border-radius: var(--radius-default);
+  background-color: var(--background-bg-default);
+}
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+  <div class="page-container">
+
+    <div class="warn-banner" role="alert">
+      위험/전제: data-display.md §3 은 "정형 스키마 CRUD → 표" 로 결정 — 칸반은 §6 "엣지 케이스(칸반 primitive 부재)" 에 해당.
+      PRD Out-of-scope "드래그앤드롭 정렬 핸들" 의 시각적 기대를 유도. 컬럼 분할은 "분류/카테고리" 범주에 근접해 V1 단일 리스트 전제와 충돌. 채택 시 PRD/Brief 개정 필요.
+    </div>
+
+    <header class="page-header" role="banner">
+      <h1 class="page-title">할 일</h1>
+      <a class="btn btn-primary" href="#" aria-label="새 할 일 추가">+ 새 할 일</a>
+    </header>
+
+    <!--
+      상태 필터: 여전히 3탭. "전체" = 2-column 보드 / "진행 중" or "완료" 단일 선택 시 해당 컬럼만 렌더.
+    -->
+    <div role="radiogroup" aria-label="상태 필터" class="segmented">
+      <button type="button" class="segmented__option is-active" aria-pressed="true">전체</button>
+      <button type="button" class="segmented__option" aria-pressed="false">진행 중</button>
+      <button type="button" class="segmented__option" aria-pressed="false">완료</button>
+    </div>
+
+    <!--
+      칸반: 진행 중 (좌) / 완료 (우). 카드 내부에 Checkbox + 제목 + 마감일 + 액션.
+      상태 전환 (구현 단계):
+        - Loading: 각 컬럼 내부를 CardSkeleton n개로 치환. 페이지 헤더·필터 유지.
+        - Error  : 각 컬럼 내부를 에러 안내 + "다시 시도" Button 으로 치환.
+        - Empty  : 컬럼별 "진행 중인 할 일이 없습니다" / "완료된 항목이 없습니다" 안내.
+    -->
+    <div class="kanban" aria-label="할 일 칸반">
+
+      <!-- 진행 중 컬럼 -->
+      <section class="kanban-col" aria-label="진행 중">
+        <header class="kanban-col__header">
+          <h2 class="kanban-col__title">진행 중</h2>
+          <span class="kanban-col__count">3</span>
+        </header>
+
+        <article class="todo-card">
+          <div class="todo-card__top">
+            <input type="checkbox" class="checkbox" aria-label="'디자인 시안 리뷰 노트 정리' 완료 토글" />
+            <span class="todo-card__title">디자인 시안 리뷰 노트 정리</span>
+          </div>
+          <div class="todo-card__meta">
+            <span class="todo-card__due todo-card__due--none">기한 없음</span>
+            <div class="todo-card__actions">
+              <button class="btn btn-ghost btn-sm" type="button">편집</button>
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="todo-card">
+          <div class="todo-card__top">
+            <input type="checkbox" class="checkbox" aria-label="'통합 e2e 시나리오 업데이트' 완료 토글" />
+            <span class="todo-card__title">통합 e2e 시나리오 업데이트</span>
+          </div>
+          <div class="todo-card__meta">
+            <span class="todo-card__due">마감 2026-04-30</span>
+            <div class="todo-card__actions">
+              <button class="btn btn-ghost btn-sm" type="button">편집</button>
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- overdue: 좌측 2px 위험 accent + 마감일 red -->
+        <article class="todo-card is-overdue">
+          <div class="todo-card__top">
+            <input type="checkbox" class="checkbox" aria-label="'Flyway V2 스펙 확정' 완료 토글" />
+            <span class="todo-card__title">Flyway V2 스펙 확정</span>
+          </div>
+          <div class="todo-card__meta">
+            <span class="todo-card__due is-overdue">마감 2026-04-20 · 기한 지남</span>
+            <div class="todo-card__actions">
+              <button class="btn btn-ghost btn-sm" type="button">편집</button>
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- 완료 컬럼 -->
+      <section class="kanban-col" aria-label="완료">
+        <header class="kanban-col__header">
+          <h2 class="kanban-col__title">완료</h2>
+          <span class="kanban-col__count">2</span>
+        </header>
+
+        <article class="todo-card is-completed">
+          <div class="todo-card__top">
+            <input type="checkbox" class="checkbox" checked aria-label="'스토리북 8 업그레이드' 완료 토글" />
+            <span class="todo-card__title">스토리북 8 업그레이드</span>
+          </div>
+          <div class="todo-card__meta">
+            <span class="todo-card__due">마감 2026-04-18</span>
+            <div class="todo-card__actions">
+              <button class="btn btn-ghost btn-sm" type="button">편집</button>
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="todo-card is-completed">
+          <div class="todo-card__top">
+            <input type="checkbox" class="checkbox" checked aria-label="'MySQL 마이그레이션 검증' 완료 토글" />
+            <span class="todo-card__title">MySQL 마이그레이션 검증</span>
+          </div>
+          <div class="todo-card__meta">
+            <span class="todo-card__due">마감 2026-04-15</span>
+            <div class="todo-card__actions">
+              <button class="btn btn-ghost btn-sm" type="button">편집</button>
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+    </div>
+
+  </div>
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>

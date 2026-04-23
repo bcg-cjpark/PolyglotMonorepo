@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — TodoFormPage Variant B (날짜 퀵픽 Chip)</title>
+<!--
+  시안: Todo Form — Variant B (날짜 퀵픽 Chip, 대안 A)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD:   docs/prd/todo.md
+  원본 Brief: docs/stitch-brief/todo.md
+
+  이 variant 의 포인트:
+  - dueDate 입력을 "오늘 / 내일 / 다음 주 / 날짜 선택 / 없음" 의 Chip-toggle 그룹으로 확장.
+  - Chip "날짜 선택" 선택 시 실제 date input 노출, 그 외 프리셋은 클라이언트에서 ISO date 계산 후 payload 에 반영.
+  - title / completed 필드는 Variant A 와 동일.
+
+  ※ 위험/전제 (카탈로그 "위험" 라벨):
+  - PRD 도메인 모델의 dueDate 의미(LocalDate, 미래/과거 모두 허용) 내에서 표현만 변형이지만,
+    "퀵픽 프리셋" 은 Brief 의 "날짜 선택 입력" 범주를 넘어선 새 UI 축 — Brief 개정 필요.
+  - 프리셋 라벨("다음 주" 등) 의 의미 고정이 추가 스펙. 국제화/다국어 시 추가 작업.
+  - Chip primitive 의 single-select toggle 그룹 사용 가능 여부 확인 필요 — RadioGroup 으로 대체 가능한지 재검토.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary100: #fcefd9;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: #242424;
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral000);
+  --input-color-border-static: var(--base-colors-neutral-neutral250);
+  --input-color-border-focus: var(--base-colors-primary-primary800);
+  --input-color-border-error: var(--base-colors-red-red900);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral400);
+  --input-color-text-static: var(--base-colors-neutral-neutral800);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --padding-padding-4: 0.25rem;
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+
+  --radius-xs: 0.25rem;
+  --radius-default: 0.5rem;
+  --radius-pill: 9999px;
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary100: #38290f;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: #151719;
+  --base-colors-common-light-gray-ea: #1a1c1e;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: #dadbdd;
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral050);
+  --input-color-border-static: var(--base-colors-neutral-neutral200);
+  --input-color-border-focus: #2d22e0;
+  --input-color-border-error: #962325;
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral300);
+  --input-color-text-static: var(--base-colors-neutral-neutral700);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --padding-padding-4: 0.25rem;
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+
+  --radius-xs: 0.25rem;
+  --radius-default: 0.5rem;
+  --radius-pill: 9999px;
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
+* { box-sizing: border-box; }
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.theme-toggle:hover { background-color: var(--background-bg-innerframe); }
+
+.page-container {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+.warn-banner {
+  background-color: var(--base-colors-secondary-secondary100);
+  border: 1px solid var(--alert-warning-icon-color);
+  color: var(--alert-warning-icon-color);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+  padding: var(--padding-padding-24);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+}
+.form-field__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--font-color-default);
+}
+.form-field__label .required-mark {
+  color: var(--font-color-red);
+  margin-left: 2px;
+}
+.form-field__label .optional-mark {
+  color: var(--font-color-default-muted);
+  margin-left: var(--padding-padding-8);
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+.form-field__input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--padding-padding-12);
+  background-color: var(--input-color-surface);
+  border: 1px solid var(--input-color-border-static);
+  border-radius: var(--radius-default);
+  color: var(--input-color-text-static);
+  font-size: 0.9375rem;
+  font-family: inherit;
+}
+.form-field__input::placeholder { color: var(--input-color-text-placeholder); }
+.form-field__input:focus {
+  outline: none;
+  border-color: var(--input-color-border-focus);
+  box-shadow: 0 0 0 3px var(--base-colors-primary-primary100);
+}
+.form-field__helper {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+  line-height: 1.4;
+}
+
+/* Chip 그룹 — 단일 선택 toggle */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--padding-padding-8);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 1px solid var(--background-divider);
+  background-color: var(--background-bg-innerframe);
+  color: var(--font-color-default);
+  cursor: pointer;
+  font-family: inherit;
+}
+.chip:hover { border-color: var(--base-colors-primary-primary-deep); }
+.chip[aria-pressed="true"] {
+  background-color: var(--base-colors-primary-primary100);
+  border-color: var(--button-primary-border);
+  color: var(--base-colors-primary-primary-deep);
+}
+
+.date-picker-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-12);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+.date-picker-reveal-hint {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+}
+
+.completed-row {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-padding-12);
+  padding: var(--padding-padding-12);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+.checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  min-width: 1.125rem;
+  border: 1.5px solid var(--background-bg-surface-muted);
+  border-radius: var(--radius-xs);
+  background-color: var(--background-bg-default);
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  margin: 0;
+}
+.checkbox:checked {
+  background-color: var(--button-primary-background);
+  border-color: var(--button-primary-border);
+}
+.checkbox:checked::after {
+  content: '';
+  width: 0.4rem;
+  height: 0.7rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+.completed-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--font-color-default);
+}
+.completed-hint {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+  margin-left: auto;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--padding-padding-8);
+  padding-top: var(--padding-padding-8);
+  border-top: 1px solid var(--background-divider);
+  margin-top: var(--padding-padding-8);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+  height: 2.5rem;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover { background-color: var(--button-outline-background-hover); }
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+  <div class="page-container">
+
+    <div class="warn-banner" role="alert">
+      위험/전제: Brief 는 "날짜 선택 입력" 범주만 지정. 퀵픽 프리셋("오늘"/"내일"/"다음 주") 은 Brief 개정 필요.
+      프리셋 라벨 의미 고정·국제화·"다음 주" 의 요일 기준(월요일 기준?) 등 추가 스펙이 붙음.
+    </div>
+
+    <header class="page-header" role="banner">
+      <h1 class="page-title">새 할 일</h1>
+      <a class="btn btn-ghost" href="#" aria-label="목록으로 돌아가기">취소</a>
+    </header>
+
+    <!--
+      본문: 세로 스택 + dueDate 는 Chip toggle 그룹 → 선택 시 date input reveal.
+      상태 전환: A 와 동일 (헤더 유지, 저장 중 disabled).
+    -->
+    <form class="form-stack" novalidate>
+
+      <div class="form-field">
+        <label class="form-field__label" for="field-title-b">
+          제목<span class="required-mark" aria-hidden="true">*</span>
+        </label>
+        <input
+          id="field-title-b"
+          class="form-field__input"
+          type="text"
+          name="title"
+          placeholder="예: 디자인 시안 리뷰 노트 정리"
+          value="디자인 시안 리뷰 노트 정리"
+          maxlength="200"
+          autocomplete="off"
+        />
+        <span class="form-field__helper">최대 200자. 한글 IME 입력 허용.</span>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label">
+          마감일<span class="optional-mark">선택 · 비우면 기한 없음</span>
+        </label>
+        <!-- Chip 그룹: 단일 선택 toggle. 현재 선택 = "날짜 선택" -->
+        <div role="radiogroup" aria-label="마감일 퀵픽" class="chip-group">
+          <button type="button" class="chip" aria-pressed="false">오늘</button>
+          <button type="button" class="chip" aria-pressed="false">내일</button>
+          <button type="button" class="chip" aria-pressed="false">다음 주</button>
+          <button type="button" class="chip" aria-pressed="true">날짜 선택</button>
+          <button type="button" class="chip" aria-pressed="false">없음</button>
+        </div>
+
+        <!-- "날짜 선택" 선택 시 date input reveal -->
+        <div class="date-picker-reveal">
+          <input
+            id="field-due-b"
+            class="form-field__input"
+            type="date"
+            name="dueDate"
+            value="2026-04-30"
+          />
+          <span class="date-picker-reveal-hint">
+            퀵픽은 payload 로 ISO date 변환 후 전송 · "없음" 선택 시 <code>dueDate: null</code>.
+          </span>
+        </div>
+      </div>
+
+      <div class="completed-row">
+        <input id="field-completed-b" type="checkbox" class="checkbox" />
+        <label for="field-completed-b" class="completed-label">완료 처리</label>
+        <span class="completed-hint">편집 모드 전용</span>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn btn-ghost" href="#" type="button">취소</a>
+        <button class="btn btn-primary" type="submit">저장</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>

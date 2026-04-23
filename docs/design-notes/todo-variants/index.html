@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>Todo 화면 시안 — 비교군 목록</title>
+<!--
+  Level 1: Todo 피처 비교군 목록. 각 카드 클릭 → Level 2 (compare-<page>.html).
+  원본 PRD: ../../prd/todo.md
+  원본 Brief: ../../stitch-brief/todo.md
+  카탈로그: ../todo-variants.md
+
+  외부 리소스 0 — 모든 토큰/스타일/스크립트 인라인.
+  3 레이어 구조:
+    Level 1 (this file)  → 페이지 비교군 카드 목록
+    Level 2 compare-*    → 해당 페이지의 variant 동시 비교 (iframe)
+    Level 3 <page>-<x>   → variant 본체
+  테마는 ?theme=light|dark 쿼리로 Level 간 이동 시 유지.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary900: #3a30e2;
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+
+  --font-size-font-14: 0.875rem;
+  --font-size-font-16: 1rem;
+  --font-size-font-20: 1.25rem;
+  --font-size-font-24: 1.5rem;
+  --font-weights-regular: 400;
+  --font-weights-semibold: 600;
+  --font-weights-bold: 700;
+
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+  --padding-padding-32: 2rem;
+}
+
+:root[data-theme="dark"] {
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary900: #3a30e2;
+
+  --background-bg-default: #212325;
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --font-color-default: #ecedee;
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+
+  --font-size-font-14: 0.875rem;
+  --font-size-font-16: 1rem;
+  --font-size-font-20: 1.25rem;
+  --font-size-font-24: 1.5rem;
+  --font-weights-regular: 400;
+  --font-weights-semibold: 600;
+  --font-weights-bold: 700;
+
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+  --padding-padding-32: 2rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-surface);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--background-bg-default);
+  border-bottom: 1px solid var(--background-divider);
+  padding: var(--padding-padding-16) var(--padding-padding-32);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+.top-title {
+  margin: 0;
+  font-size: var(--font-size-font-24);
+  font-weight: var(--font-weights-bold);
+  letter-spacing: -0.02em;
+}
+.top-subtitle {
+  font-size: var(--font-size-font-14);
+  color: var(--font-color-default-muted);
+  margin-top: 2px;
+}
+.theme-toggle {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border: 1px solid var(--button-primary-border);
+  border-radius: 0.5rem;
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  font-size: var(--font-size-font-14);
+  font-weight: var(--font-weights-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+.theme-toggle:hover {
+  background-color: var(--button-primary-background-hover);
+}
+
+main.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--padding-padding-24);
+  padding: var(--padding-padding-32);
+}
+@media (max-width: 900px) {
+  main.grid { grid-template-columns: 1fr; }
+}
+
+a.feature-card {
+  display: block;
+  padding: var(--padding-padding-24);
+  border: 1px solid var(--background-divider);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--font-color-default);
+  background-color: var(--background-bg-default);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+a.feature-card:hover {
+  background-color: var(--background-bg-innerframe);
+  border-color: var(--font-color-default-muted);
+}
+a.feature-card h2 {
+  margin: 0 0 var(--padding-padding-8) 0;
+  font-size: var(--font-size-font-20);
+  font-weight: var(--font-weights-bold);
+  letter-spacing: -0.01em;
+}
+a.feature-card p.summary {
+  margin: 0 0 var(--padding-padding-12) 0;
+  font-size: var(--font-size-font-16);
+  line-height: 1.55;
+  color: var(--font-color-default);
+}
+a.feature-card p.meta {
+  margin: 0;
+  font-size: var(--font-size-font-14);
+  color: var(--font-color-default-muted);
+  font-weight: var(--font-weights-semibold);
+  letter-spacing: 0.02em;
+}
+
+.footer-note {
+  padding: var(--padding-padding-16) var(--padding-padding-32) var(--padding-padding-32);
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.footer-note a {
+  color: var(--button-primary-background);
+  text-decoration: none;
+}
+.footer-note a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+  <header class="top-bar" role="banner">
+    <div>
+      <h1 class="top-title"><strong>Todo</strong> 화면 시안</h1>
+      <div class="top-subtitle">페이지 비교군을 선택하면 해당 페이지의 variant 를 한 화면에서 비교합니다.</div>
+    </div>
+    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+  </header>
+
+  <main class="grid">
+
+    <a class="feature-card" href="compare-list.html">
+      <h2>TodoListPage — 3 variant</h2>
+      <p class="summary">목록 화면의 레이아웃 대안. 표 + 세그먼트 필터 (A, 권장) / 칸반 2-column (B) / 컴팩트 List (C).</p>
+      <p class="meta">Variant A · B · C</p>
+    </a>
+
+    <a class="feature-card" href="compare-form.html">
+      <h2>TodoFormPage — 3 variant</h2>
+      <p class="summary">폼의 입력 구성 대안. 세로 스택 (A, 권장) / 날짜 퀵픽 Chip (B) / 모달 in-place (C).</p>
+      <p class="meta">Variant A · B · C</p>
+    </a>
+
+  </main>
+
+  <p class="footer-note">
+    Level 1 카드 클릭 → Level 2 (해당 페이지 variant 동시 비교). Level 2 각 cell 에서 "전체 화면으로 보기" → Level 3 (variant 본체).
+    테마 상태는 <code>?theme=</code> 쿼리로 레벨 간 이동에도 유지됩니다.
+    카탈로그: <a href="../todo-variants.md">../todo-variants.md</a>
+  </p>
+
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      var theme = (q === 'dark' || q === 'light') ? q : 'light';
+      document.documentElement.dataset.theme = theme;
+      document.querySelectorAll('a.feature-card').forEach(function (a) {
+        var base = a.getAttribute('href').split('?')[0];
+        a.href = base + '?theme=' + theme;
+      });
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      document.querySelectorAll('a.feature-card').forEach(function (a) {
+        var base = a.getAttribute('href').split('?')[0];
+        a.href = base + '?theme=' + next;
+      });
+    }
+  </script>
+</body>
+</html>
