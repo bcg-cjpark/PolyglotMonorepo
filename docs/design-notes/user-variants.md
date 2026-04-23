@@ -17,7 +17,7 @@
   - [`global-states.md`](./global-states.md) — Loading / Error / Empty 에서 페이지 헤더(제목 + 주요 액션) 유지. 본문만 상태별 뷰로 치환.
   - [`data-display.md`](./data-display.md) — 정형 스키마 CRUD 는 `Table` primitive. native `<table>` 금지. 행 hover 배경은 `--background-bg-innerframe`.
 - HTML 시안은 **시각 근사** — 실제 렌더는 구현 단계에서 `@monorepo/ui` primitive 로. 매핑 표가 진실 소스.
-- Light/Dark 자동 대응 (primitive 기반). HTML 시안은 Light 만 제공.
+- Light/Dark 자동 대응 (primitive 기반). HTML 시안은 한 파일에 양쪽 토큰을 인라인해 우상단 토글로 즉시 스위칭.
 - 한국어 기본, 한글 IME 필드(`name`) 포함.
 
 ---
