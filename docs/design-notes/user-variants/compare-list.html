@@ -2,19 +2,16 @@
 <html lang="ko" data-theme="light">
 <head>
 <meta charset="utf-8" />
-<title>User 화면 시안 — 비교군 목록</title>
+<title>UserListPage 비교 — Variant A/B/C</title>
 <!--
-  Level 1: User 피처 비교군 목록. 각 카드 클릭 → Level 2 (compare-<page>.html).
+  Level 2: UserListPage 의 3 variant 동시 비교. iframe 의 'Transferable' 테마는 ?theme= 쿼리로 전달.
   원본 PRD: ../../prd/user.md
   원본 Brief: ../../stitch-brief/user.md
-  카탈로그: ../user-variants.md
+  상위: index.html (Level 1)
+  하위: user-list-a.html / user-list-b.html / user-list-c.html (Level 3)
 
   외부 리소스 0 — 모든 토큰/스타일/스크립트 인라인.
-  3 레이어 구조:
-    Level 1 (this file)  → 페이지 비교군 카드 목록
-    Level 2 compare-*    → 해당 페이지의 variant 동시 비교 (iframe)
-    Level 3 <page>-<x>   → variant 본체
-  테마는 ?theme=light|dark 쿼리로 Level 간 이동 시 유지.
+  전역 Light/Dark 토글은 iframe src + a.open-full href 둘 다 ?theme= 쿼리를 재작성해 동기화.
 -->
 <style>
 :root[data-theme="light"] {
@@ -116,22 +113,40 @@ body {
   z-index: 50;
   background-color: var(--background-bg-default);
   border-bottom: 1px solid var(--background-divider);
-  padding: var(--padding-padding-16) var(--padding-padding-32);
+  padding: var(--padding-padding-12) var(--padding-padding-24);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--padding-padding-16);
 }
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-padding-12);
+  min-width: 0;
+}
+.back-link {
+  color: var(--font-color-default-muted);
+  text-decoration: none;
+  font-size: var(--font-size-font-14);
+  font-weight: var(--font-weights-semibold);
+  padding: var(--padding-padding-4) var(--padding-padding-8);
+  border-radius: 0.375rem;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.back-link:hover {
+  background-color: var(--background-bg-innerframe);
+  color: var(--font-color-default);
+}
+.top-divider {
+  color: var(--font-color-default-muted);
+  font-size: var(--font-size-font-14);
+}
 .top-title {
   margin: 0;
-  font-size: var(--font-size-font-24);
+  font-size: var(--font-size-font-20);
   font-weight: var(--font-weights-bold);
   letter-spacing: -0.02em;
-}
-.top-subtitle {
-  font-size: var(--font-size-font-14);
-  color: var(--font-color-default-muted);
-  margin-top: 2px;
 }
 .theme-toggle {
   background-color: var(--button-primary-background);
@@ -151,113 +166,140 @@ body {
 
 main.grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--padding-padding-24);
-  padding: var(--padding-padding-32);
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--padding-padding-16);
+  padding: var(--padding-padding-16);
 }
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   main.grid { grid-template-columns: 1fr; }
 }
 
-a.feature-card {
-  display: block;
-  padding: var(--padding-padding-24);
-  border: 1px solid var(--background-divider);
-  border-radius: 12px;
-  text-decoration: none;
-  color: var(--font-color-default);
+figure.variant-cell {
+  margin: 0;
   background-color: var(--background-bg-default);
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  border: 1px solid var(--background-divider);
+  border-radius: 8px;
+  padding: var(--padding-padding-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
 }
-a.feature-card:hover {
-  background-color: var(--background-bg-innerframe);
-  border-color: var(--font-color-default-muted);
+figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-8);
+  flex-wrap: wrap;
 }
-a.feature-card h2 {
-  margin: 0 0 var(--padding-padding-8) 0;
-  font-size: var(--font-size-font-20);
+.variant-label {
+  font-size: var(--font-size-font-14);
+  color: var(--font-color-default);
+  font-weight: var(--font-weights-regular);
+}
+.variant-label strong {
   font-weight: var(--font-weights-bold);
   letter-spacing: -0.01em;
+  margin-right: 2px;
 }
-a.feature-card p.summary {
-  margin: 0 0 var(--padding-padding-12) 0;
-  font-size: var(--font-size-font-16);
-  line-height: 1.55;
-  color: var(--font-color-default);
-}
-a.feature-card p.meta {
-  margin: 0;
-  font-size: var(--font-size-font-14);
-  color: var(--font-color-default-muted);
-  font-weight: var(--font-weights-semibold);
-  letter-spacing: 0.02em;
-}
-
-.footer-note {
-  padding: var(--padding-padding-16) var(--padding-padding-32) var(--padding-padding-32);
-  color: var(--font-color-default-muted);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-}
-.footer-note a {
+a.open-full {
   color: var(--button-primary-background);
   text-decoration: none;
+  font-size: var(--font-size-font-14);
+  font-weight: var(--font-weights-semibold);
 }
-.footer-note a:hover {
+a.open-full:hover {
   text-decoration: underline;
+}
+iframe {
+  width: 100%;
+  height: 720px;
+  border: 1px solid var(--background-divider);
+  border-radius: 8px;
+  background-color: var(--background-bg-default);
 }
 </style>
 </head>
 <body>
 
   <header class="top-bar" role="banner">
-    <div>
-      <h1 class="top-title"><strong>User</strong> 화면 시안</h1>
-      <div class="top-subtitle">페이지 비교군을 선택하면 해당 페이지의 variant 를 한 화면에서 비교합니다.</div>
+    <div class="top-left">
+      <a class="back-link" href="index.html">← 비교군 목록</a>
+      <span class="top-divider">·</span>
+      <h1 class="top-title"><strong>UserListPage</strong> 비교</h1>
     </div>
-    <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+    <button class="theme-toggle" type="button" onclick="toggleAll()" aria-label="전역 Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
   </header>
 
   <main class="grid">
 
-    <a class="feature-card" href="compare-list.html">
-      <h2>UserListPage — 3 variant</h2>
-      <p class="summary">목록 화면의 레이아웃 대안. 표 중심 (A, 권장) / 카드 리스트 (B) / 표 + 요약 Badge (C).</p>
-      <p class="meta">Variant A · B · C</p>
-    </a>
+    <figure class="variant-cell">
+      <figcaption>
+        <div class="variant-label">
+          <strong>Variant A</strong> — 표 중심 (권장)
+        </div>
+        <a class="open-full" target="_top" href="user-list-a.html">전체 화면으로 보기 →</a>
+      </figcaption>
+      <iframe src="user-list-a.html" loading="lazy" title="UserListPage Variant A"></iframe>
+    </figure>
 
-    <a class="feature-card" href="compare-form.html">
-      <h2>UserFormPage — 3 variant</h2>
-      <p class="summary">생성 폼의 레이아웃 대안. 세로 스택 (A, 권장) / 2열 그리드 (B) / 모달형 (C).</p>
-      <p class="meta">Variant A · B · C</p>
-    </a>
+    <figure class="variant-cell">
+      <figcaption>
+        <div class="variant-label">
+          <strong>Variant B</strong> — 카드 리스트
+        </div>
+        <a class="open-full" target="_top" href="user-list-b.html">전체 화면으로 보기 →</a>
+      </figcaption>
+      <iframe src="user-list-b.html" loading="lazy" title="UserListPage Variant B"></iframe>
+    </figure>
+
+    <figure class="variant-cell">
+      <figcaption>
+        <div class="variant-label">
+          <strong>Variant C</strong> — 표 + 요약 Badge
+        </div>
+        <a class="open-full" target="_top" href="user-list-c.html">전체 화면으로 보기 →</a>
+      </figcaption>
+      <iframe src="user-list-c.html" loading="lazy" title="UserListPage Variant C"></iframe>
+    </figure>
 
   </main>
 
-  <p class="footer-note">
-    Level 1 카드 클릭 → Level 2 (해당 페이지 variant 동시 비교). Level 2 각 cell 에서 "전체 화면으로 보기" → Level 3 (variant 본체).
-    테마 상태는 <code>?theme=</code> 쿼리로 레벨 간 이동에도 유지됩니다.
-    카탈로그: <a href="../user-variants.md">../user-variants.md</a>
-  </p>
-
   <script>
+    var currentTheme = 'light';
     (function initTheme() {
       var q = new URL(location.href).searchParams.get('theme');
-      var theme = (q === 'dark' || q === 'light') ? q : 'light';
-      document.documentElement.dataset.theme = theme;
-      document.querySelectorAll('a.feature-card').forEach(function (a) {
-        var base = a.getAttribute('href').split('?')[0];
-        a.href = base + '?theme=' + theme;
+      if (q === 'dark' || q === 'light') currentTheme = q;
+      document.documentElement.dataset.theme = currentTheme;
+      document.querySelectorAll('iframe').forEach(function (f) {
+        var base = f.getAttribute('src').split('?')[0];
+        f.src = base + '?theme=' + currentTheme;
       });
+      document.querySelectorAll('a.open-full').forEach(function (a) {
+        var base = a.getAttribute('href').split('?')[0];
+        a.href = base + '?theme=' + currentTheme;
+      });
+      var back = document.querySelector('a.back-link');
+      if (back) {
+        var baseBack = back.getAttribute('href').split('?')[0];
+        back.href = baseBack + '?theme=' + currentTheme;
+      }
     })();
-    function toggleTheme() {
-      var cur = document.documentElement.dataset.theme || 'light';
-      var next = cur === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = next;
-      document.querySelectorAll('a.feature-card').forEach(function (a) {
-        var base = a.getAttribute('href').split('?')[0];
-        a.href = base + '?theme=' + next;
+    function toggleAll() {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = currentTheme;
+      document.querySelectorAll('iframe').forEach(function (f) {
+        var base = f.src.split('?')[0];
+        f.src = base + '?theme=' + currentTheme;
       });
+      document.querySelectorAll('a.open-full').forEach(function (a) {
+        var base = a.href.split('?')[0];
+        a.href = base + '?theme=' + currentTheme;
+      });
+      var back = document.querySelector('a.back-link');
+      if (back) {
+        var baseBack = back.href.split('?')[0];
+        back.href = baseBack + '?theme=' + currentTheme;
+      }
     }
   </script>
 </body>
