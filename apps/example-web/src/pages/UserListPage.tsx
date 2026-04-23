@@ -9,7 +9,8 @@ import {
 
 function UserListPage() {
   const navigate = useNavigate();
-  const { data, isLoading, isError, error } = useUsersQuery();
+  // error 객체는 의도적으로 구독하지 않음 — 사용자에게는 일반 한국어 메시지만 노출.
+  const { data, isLoading, isError } = useUsersQuery();
   const deleteUser = useDeleteUserMutation();
 
   const users = data ?? [];
@@ -44,13 +45,29 @@ function UserListPage() {
     [],
   );
 
-  if (isLoading) return <p className="p-6">Loading…</p>;
-  if (isError)
+  // 헤더(제목 + "+ New") 는 Loading/Error 중에도 유지. 본문만 상태 뷰로 치환.
+  // 디자인 노트: docs/design-notes/global-states.md §2, §4
+  const renderBody = () => {
+    if (isLoading) {
+      return <p className="py-12 text-center text-muted">불러오는 중…</p>;
+    }
+    if (isError) {
+      // 스택 트레이스 노출 금지 — raw error.message 대신 한국어 일반 메시지.
+      return (
+        <p className="py-12 text-center text-red-red600">
+          목록을 불러오지 못했습니다.
+        </p>
+      );
+    }
     return (
-      <p className="p-6 text-red-red600">
-        Error: {(error as Error).message}
-      </p>
+      <Table
+        columns={columns}
+        rows={users}
+        getRowKey={(row) => row.id}
+        emptyMessage="No users yet."
+      />
     );
+  };
 
   return (
     <div>
@@ -64,12 +81,7 @@ function UserListPage() {
           onClick={() => navigate("/users/new")}
         />
       </div>
-      <Table
-        columns={columns}
-        rows={users}
-        getRowKey={(row) => row.id}
-        emptyMessage="No users yet."
-      />
+      {renderBody()}
     </div>
   );
 }

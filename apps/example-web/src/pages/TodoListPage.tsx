@@ -22,7 +22,8 @@ function TodoListPage() {
   // filter 는 클라이언트 UI 상태 — TanStack Query 는 서버 상태 전담.
   const [filter, setFilter] = useState<TodoStatus>("all");
 
-  const { data, isLoading, isError, error } = useTodosQuery(filter);
+  // error 객체는 의도적으로 구독하지 않음 — 사용자에게는 일반 한국어 메시지만 노출.
+  const { data, isLoading, isError } = useTodosQuery(filter);
   const toggleTodo = useToggleTodoMutation();
   const deleteTodo = useDeleteTodoMutation();
 
@@ -41,7 +42,8 @@ function TodoListPage() {
       {
         key: "completed",
         header: "",
-        width: "56px",
+        // 프로젝트 스페이싱 스케일(8·12·16·24·32·48·64) 정합 — 체크박스엔 48px 이 적정.
+        width: "48px",
         render: (row) => (
           <Checkbox
             checked={row.completed}
@@ -52,8 +54,9 @@ function TodoListPage() {
       {
         key: "title",
         header: "Title",
+        // 완료 항목은 의미 토큰 text-muted (--font-color-default-muted) 로 약화.
         render: (row) => (
-          <span className={row.completed ? "line-through text-neutral-neutral400" : undefined}>
+          <span className={row.completed ? "line-through text-muted" : undefined}>
             {row.title}
           </span>
         ),
@@ -97,13 +100,30 @@ function TodoListPage() {
     [],
   );
 
-  if (isLoading) return <p className="p-6">Loading…</p>;
-  if (isError)
+  // 헤더(제목 + "+ New") 와 필터 RadioGroup 은 Loading/Error 중에도 유지.
+  // 필터는 클라이언트 UI 상태라 서버 상태와 독립적으로 동작해야 함.
+  // 디자인 노트: docs/design-notes/global-states.md §2, §4
+  const renderBody = () => {
+    if (isLoading) {
+      return <p className="py-12 text-center text-muted">불러오는 중…</p>;
+    }
+    if (isError) {
+      // 스택 트레이스 노출 금지 — raw error.message 대신 한국어 일반 메시지.
+      return (
+        <p className="py-12 text-center text-red-red600">
+          목록을 불러오지 못했습니다.
+        </p>
+      );
+    }
     return (
-      <p className="p-6 text-red-red600">
-        Error: {(error as Error).message}
-      </p>
+      <Table
+        columns={columns}
+        rows={todos}
+        getRowKey={(row) => row.id}
+        emptyMessage={'No todos yet. Click "+ New" to add one.'}
+      />
     );
+  };
 
   return (
     <div>
@@ -131,12 +151,7 @@ function TodoListPage() {
         />
       </div>
 
-      <Table
-        columns={columns}
-        rows={todos}
-        getRowKey={(row) => row.id}
-        emptyMessage={'No todos yet. Click "+ New" to add one.'}
-      />
+      {renderBody()}
     </div>
   );
 }
