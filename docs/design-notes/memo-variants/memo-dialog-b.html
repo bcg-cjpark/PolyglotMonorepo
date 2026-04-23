@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — MemoDialogContainer Variant B (풀페이지 분리)</title>
+<!--
+  시안: Memo Dialog — Variant B (상세/편집 풀페이지 라우트 + 삭제 확인 모달, 위험)
+  원본 PRD: docs/prd/memo.md
+  원본 Brief: docs/stitch-brief/memo.md
+
+  설계 의도: "긴 본문" 메모를 편하게 읽/쓰기 위해 상세와 편집을 독립 라우트 (/memos/:id, /memos/:id/edit) 로 풀페이지.
+            삭제 확인만 모달로 유지. 긴 글 편집 UX 가 좋아지는 대신 "3 단계 모달 흐름" 의 단일 오버레이 재활용 의도는 포기.
+
+  위험: 높음.
+    1) PRD/Brief "비포함" 에 "독립 라우트 형태의 편집 화면 (/memos/new, /memos/:id/edit) — 모달 오버레이가 유일 경로" 가 명시.
+       채택 시 PRD 비포함 항목을 포함으로 개정해야 함.
+    2) Brief 의 "상세/편집/삭제 확인 3 단계 흐름 = 하나의 오버레이 컨테이너 위 모드 전환" 설계 의도 이탈.
+    3) Route 가 늘어 프론트·e2e 작성 비용 증가.
+  시안은 라우트 전환을 직접 보여줄 수 없으므로 "풀페이지 상세 · 풀페이지 편집 · 삭제 확인 모달" 을 세로로 나열.
+  외부 리소스 0.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+  --base-colors-secondary-secondary050: #fef7ec;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-red-solid-background: var(--base-colors-red-red900);
+  --button-red-solid-text: #ffffff;
+  --button-red-solid-border: var(--base-colors-red-red900);
+  --button-red-solid-hover: #cd292c;
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral000);
+  --input-color-border-static: var(--base-colors-neutral-neutral250);
+  --input-color-border-focus: var(--base-colors-primary-primary800);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral400);
+  --input-color-text-static: var(--base-colors-neutral-neutral800);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --modal-overlay-dim: rgba(0, 0, 0, 0.45);
+  --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary500: #251cc5;
+  --base-colors-primary-primary400: #1e17a1;
+  --base-colors-primary-primary300: #211c72;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+  --base-colors-secondary-secondary050: #2f230f;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-red-solid-background: var(--base-colors-red-red900);
+  --button-red-solid-text: #ffffff;
+  --button-red-solid-border: var(--base-colors-red-red900);
+  --button-red-solid-hover: #e82c30;
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral050);
+  --input-color-border-static: var(--base-colors-neutral-neutral200);
+  --input-color-border-focus: var(--base-colors-primary-primary700);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral300);
+  --input-color-text-static: var(--base-colors-neutral-neutral700);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --modal-overlay-dim: rgba(0, 0, 0, 0.6);
+  --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.35);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.theme-toggle:hover { background-color: var(--background-bg-innerframe); }
+
+.page-container {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+.warn-banner {
+  border: 1px solid var(--alert-warning-icon-color);
+  border-left-width: 4px;
+  background-color: var(--base-colors-secondary-secondary050);
+  color: var(--font-color-default);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.warn-banner code {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.75rem;
+  background-color: var(--background-bg-innerframe);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--font-color-default-muted);
+  padding: var(--padding-padding-4) var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+.mode-label__num {
+  color: var(--base-colors-primary-primary-deep);
+  font-weight: 800;
+}
+.mode-label__route {
+  color: var(--font-color-default);
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover { background-color: var(--button-outline-background-hover); }
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-destructive-solid {
+  background-color: var(--button-red-solid-background);
+  color: var(--button-red-solid-text);
+  border-color: var(--button-red-solid-border);
+}
+.btn-destructive-solid:hover { background-color: var(--button-red-solid-hover); }
+
+/* 풀페이지 시안 프레임 (브라우저 윈도우 흉내) */
+.page-frame {
+  margin-top: var(--padding-padding-12);
+  background-color: var(--background-bg-surface);
+  border: 1px solid var(--background-divider);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.page-frame__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: var(--background-bg-innerframe);
+  border-bottom: 1px solid var(--background-divider);
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+}
+.page-frame__dots { display: inline-flex; gap: 4px; }
+.page-frame__dots span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--background-bg-surface-muted);
+}
+.page-frame__body {
+  padding: var(--padding-padding-24);
+  background-color: var(--background-bg-default);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-padding-12);
+  margin-bottom: var(--padding-padding-16);
+}
+.page-header__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+  background-color: transparent;
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+}
+.page-header__back:hover {
+  background-color: var(--background-bg-innerframe);
+  color: var(--font-color-default);
+}
+.page-title-group {
+  flex: 1;
+  min-width: 0;
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+  margin: 0;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.page-meta {
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+  margin-top: 2px;
+}
+.page-header__actions {
+  display: inline-flex;
+  gap: var(--padding-padding-8);
+  flex-shrink: 0;
+}
+
+.detail-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--font-color-default);
+  background-color: transparent;
+  padding: 0;
+  max-width: 36rem;
+}
+
+.form-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-16);
+  max-width: 36rem;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+}
+.form-field__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.form-field__label .required-mark {
+  color: var(--font-color-red);
+  margin-left: 2px;
+}
+.form-field__input,
+.form-field__textarea {
+  width: 100%;
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  background-color: var(--input-color-surface);
+  border: 1px solid var(--input-color-border-static);
+  border-radius: var(--radius-default);
+  color: var(--input-color-text-static);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.form-field__input { height: 2.5rem; }
+.form-field__textarea {
+  min-height: 16rem;
+  resize: vertical;
+}
+.form-field__input::placeholder,
+.form-field__textarea::placeholder { color: var(--input-color-text-placeholder); }
+.form-field__input:focus,
+.form-field__textarea:focus {
+  outline: none;
+  border-color: var(--input-color-border-focus);
+  box-shadow: 0 0 0 3px var(--base-colors-primary-primary100);
+}
+.form-field__helper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-8);
+}
+.form-field__helper {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+}
+.form-field__counter {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+  font-variant-numeric: tabular-nums;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--padding-padding-8);
+}
+
+/* 삭제 확인: 모달 (A 와 공통 구조) */
+.modal-stage {
+  position: relative;
+  padding: var(--padding-padding-24);
+  background-color: var(--background-bg-surface);
+  border-radius: 12px;
+  border: 1px solid var(--background-divider);
+  display: flex;
+  justify-content: center;
+  margin-top: var(--padding-padding-12);
+}
+.modal-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background-color: var(--modal-overlay-dim);
+  pointer-events: none;
+}
+.modal-panel {
+  position: relative;
+  width: min(100%, 24rem);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  box-shadow: var(--modal-box-shadow);
+  overflow: hidden;
+  z-index: 1;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-12);
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-bottom: 1px solid var(--background-divider);
+}
+.modal-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+}
+.modal-close {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--font-color-default-muted);
+  border: 1px solid transparent;
+  font-size: 1.125rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.modal-body {
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-12);
+}
+.modal-footer {
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-top: 1px solid var(--background-divider);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+}
+.confirm-target {
+  font-weight: 700;
+  color: var(--font-color-default);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.confirm-warn {
+  color: var(--font-color-red);
+  font-size: 0.8125rem;
+}
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+
+  <div class="page-container">
+
+    <div class="warn-banner" role="alert">
+      위험: PRD 의 "비포함" 항목에 <code>"독립 라우트 형태의 편집 화면 (/memos/new, /memos/:id/edit) — 모달 오버레이가 유일 경로"</code> 가 명시됨.
+      Variant B 는 상세/편집을 풀페이지 라우트로 분리 → <code>docs/prd/memo.md</code> 의 해당 비포함 항목을 "포함" 으로 개정해야 하며,
+      Brief 의 "3 단계 흐름 = 하나의 오버레이 모드 전환" 설계 의도와도 충돌한다.
+    </div>
+
+    <!-- 모드 1: 상세 — 풀페이지 /memos/:id -->
+    <section aria-labelledby="mode-detail-label">
+      <span class="mode-label" id="mode-detail-label">
+        <span class="mode-label__num">1</span> 상세 · 풀페이지
+        <span class="mode-label__route">/memos/:id</span>
+      </span>
+      <div class="page-frame">
+        <div class="page-frame__bar">
+          <span class="page-frame__dots"><span></span><span></span><span></span></span>
+          <span>app · /memos/5f8c-…/detail</span>
+        </div>
+        <div class="page-frame__body">
+          <header class="page-header">
+            <a class="page-header__back" href="#" aria-label="목록으로 돌아가기">← 목록</a>
+            <div class="page-title-group">
+              <h1 class="page-title">주간 회고 — 4월 셋째 주</h1>
+              <div class="page-meta">작성 2026-04-19 · 수정 2026-04-19</div>
+            </div>
+            <div class="page-header__actions">
+              <button class="btn btn-destructive" type="button">삭제</button>
+              <button class="btn btn-primary" type="button">편집</button>
+            </div>
+          </header>
+          <div class="detail-body">월요일 MR 리뷰 2건 마무리.
+수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다.
+원인은 인덱스 이름이 기존 V1 과 충돌하는 거였고, rollback 후 V4 로 새 파일을 만드는 쪽으로 정리.
+
+금요일 오후 디자인 회의에서 Memo 피처 카드 레이아웃 합의:
+- 제목 단일 라인
+- 본문 스니펫 2~3줄
+- 메타 (작성/수정) 는 보조 톤</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 모드 2: 편집 — 풀페이지 /memos/:id/edit (또는 /memos/new) -->
+    <section aria-labelledby="mode-form-label">
+      <span class="mode-label" id="mode-form-label">
+        <span class="mode-label__num">2</span> 편집 · 풀페이지
+        <span class="mode-label__route">/memos/:id/edit · /memos/new</span>
+      </span>
+      <div class="page-frame">
+        <div class="page-frame__bar">
+          <span class="page-frame__dots"><span></span><span></span><span></span></span>
+          <span>app · /memos/5f8c-…/edit</span>
+        </div>
+        <div class="page-frame__body">
+          <header class="page-header">
+            <a class="page-header__back" href="#" aria-label="상세로 돌아가기">← 취소</a>
+            <div class="page-title-group">
+              <h1 class="page-title">메모 편집</h1>
+              <div class="page-meta">작성자 변경 이력 없음 · V1 범위</div>
+            </div>
+          </header>
+          <form class="form-wrap" novalidate>
+            <div class="form-field">
+              <label class="form-field__label" for="memo-title-b">
+                제목<span class="required-mark" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="memo-title-b"
+                class="form-field__input"
+                type="text"
+                placeholder="예: 오늘 할 일"
+                value="주간 회고 — 4월 셋째 주"
+                maxlength="100"
+              />
+              <div class="form-field__helper-row">
+                <span class="form-field__helper">공백만 입력 불가. (최대 100자)</span>
+                <span class="form-field__counter">18 / 100</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-field__label" for="memo-content-b">본문</label>
+              <textarea
+                id="memo-content-b"
+                class="form-field__textarea"
+                placeholder="본문은 비워둘 수 있습니다. 마크다운은 적용되지 않고 입력 그대로 표시됩니다."
+                maxlength="5000"
+              >월요일 MR 리뷰 2건 마무리.
+수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다.
+원인은 인덱스 이름이 기존 V1 과 충돌하는 거였고, rollback 후 V4 로 새 파일을 만드는 쪽으로 정리.
+
+금요일 오후 디자인 회의에서 Memo 피처 카드 레이아웃 합의.</textarea>
+              <div class="form-field__helper-row">
+                <span class="form-field__helper">줄바꿈은 유지되며, 마크다운/HTML 은 적용되지 않습니다.</span>
+                <span class="form-field__counter">218 / 5000</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-ghost" type="button">취소</button>
+              <button class="btn btn-primary" type="submit">저장</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 모드 3: 삭제 확인 — 모달 유지 (A 와 동일) -->
+    <section aria-labelledby="mode-confirm-label">
+      <span class="mode-label" id="mode-confirm-label">
+        <span class="mode-label__num">3</span> 삭제 확인 · 모달 유지
+        <span class="mode-label__route">(오버레이, 상세 페이지 위)</span>
+      </span>
+      <div class="modal-stage">
+        <article class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title-b">
+          <header class="modal-header">
+            <h3 class="modal-title" id="confirm-title-b">메모 삭제</h3>
+            <button class="modal-close" type="button" aria-label="닫기">×</button>
+          </header>
+          <div class="modal-body">
+            <p style="margin: 0; font-size: 0.9375rem; line-height: 1.55;">
+              아래 메모를 삭제하시겠습니까?
+            </p>
+            <div class="confirm-target">주간 회고 — 4월 셋째 주</div>
+            <p class="confirm-warn" style="margin: 0;">
+              삭제한 메모는 복구할 수 없습니다.
+            </p>
+          </div>
+          <footer class="modal-footer">
+            <button class="btn btn-ghost" type="button">취소</button>
+            <button class="btn btn-destructive-solid" type="button">삭제</button>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>

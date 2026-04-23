@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — MemoListPage Variant C (표 형태)</title>
+<!--
+  시안: Memo List — Variant C (표 형태, 위험)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD: docs/prd/memo.md
+  원본 Brief: docs/stitch-brief/memo.md
+  참조 디자인 노트:
+    - data-display.md §3 매트릭스: "콘텐츠 중심 목록" = List + 합성 카드 (Table 아님)
+    - global-states.md §2 (헤더 유지)
+
+  의도: 표(Table primitive) 로 제목 / 본문 스니펫 / 작성일 / 수정일 / 액션을 컬럼화.
+        관리자 스타일의 스캔성 극대화.
+  위험: 높음.
+    1) data-display.md §3 "콘텐츠 중심 목록" 범주를 명시적으로 벗어남.
+       Memo 는 정형 스키마가 아닌 콘텐츠(제목+본문) 중심 — 행마다 스니펫 길이가 제각각.
+    2) Brief 가 "편안한 개인 노트" 톤 · "카드 단위로 숨을 쉬는 여백" 을 명시 — 표와 충돌.
+    3) 본문 스니펫을 고정 컬럼 폭에 구겨 넣게 되어 plain text 의 줄바꿈 의도 상실.
+  채택 시 data-display.md §3 매트릭스 개정 + Brief "톤" 섹션 개정 필요.
+  외부 리소스 0.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+  --base-colors-secondary-secondary050: #fef7ec;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary500: #251cc5;
+  --base-colors-primary-primary400: #1e17a1;
+  --base-colors-primary-primary300: #211c72;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+  --base-colors-secondary-secondary050: #2f230f;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.theme-toggle:hover { background-color: var(--background-bg-innerframe); }
+
+.page-container {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-16);
+}
+
+.warn-banner {
+  border: 1px solid var(--alert-warning-icon-color);
+  border-left-width: 4px;
+  background-color: var(--base-colors-secondary-secondary050);
+  color: var(--font-color-default);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.warn-banner code {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.75rem;
+  background-color: var(--background-bg-innerframe);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover { background-color: var(--button-outline-background-hover); }
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-sm {
+  padding: var(--padding-padding-4) var(--padding-padding-12);
+  font-size: 0.8125rem;
+}
+
+/* Table primitive 흉내 */
+.data-table-wrap {
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  overflow: hidden;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.data-table thead th {
+  background-color: var(--background-bg-surface);
+  color: var(--font-color-default);
+  text-align: left;
+  font-weight: 600;
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-bottom: 1px solid var(--background-divider);
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
+}
+.data-table tbody td {
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-bottom: 1px solid var(--background-divider);
+  color: var(--font-color-default);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr { cursor: pointer; }
+.data-table tbody tr:hover td { background-color: var(--background-bg-innerframe); }
+.data-table td.align-right { text-align: right; }
+.cell-muted {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+}
+.cell-snippet {
+  color: var(--font-color-default-muted-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 22rem;
+}
+.cell-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 14rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-12);
+  padding-top: var(--padding-padding-12);
+}
+.pagination__indicator {
+  font-size: 0.875rem;
+  color: var(--font-color-default-muted);
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+.page-footnote {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+
+  <div class="page-container">
+
+    <div class="warn-banner" role="alert">
+      위험: <code>data-display.md §3</code> 매트릭스는 "콘텐츠 중심 목록" = List + 합성 카드로 이미 결정.
+      Memo 는 정형 스키마 CRUD 가 아닌 콘텐츠 중심 피처라 Table 범주가 어색하며,
+      Brief 의 "편안한 개인 노트 톤" 과도 충돌한다. 채택하려면 <code>data-display.md §3</code> 매트릭스 개정과
+      Brief 톤 섹션 개정을 함께 진행해야 한다.
+    </div>
+
+    <header class="page-header" role="banner">
+      <h1 class="page-title">메모</h1>
+      <button class="btn btn-primary" type="button" aria-label="새 메모 작성">+ 새 메모</button>
+    </header>
+
+    <!--
+      본문: Table primitive.
+      컬럼: 제목 / 본문 스니펫 / 작성일 / 수정일 / 액션.
+      상태 전환 (구현 단계):
+        - Loading: tbody 자리를 ListSkeleton 으로 치환.
+        - Error  : tbody 자리를 에러 안내 + "다시 시도".
+        - Empty  : Table 의 emptyMessage="아직 메모가 없습니다." 로 본문 빈 행 자리에 문구.
+    -->
+    <div class="data-table-wrap" role="region" aria-label="메모 목록">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 22%;">제목</th>
+            <th style="width: 38%;">본문</th>
+            <th style="width: 14%;">작성일</th>
+            <th style="width: 14%;">수정일</th>
+            <th style="width: 12%;" class="align-right">액션</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-title">주간 회고 — 4월 셋째 주</td>
+            <td class="cell-snippet">월요일 MR 리뷰 2건 마무리. 수요일 내내 Flyway V3 마이그레이션 때문에…</td>
+            <td class="cell-muted">2026-04-19</td>
+            <td class="cell-muted">2026-04-19</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="cell-title">장보기</td>
+            <td class="cell-snippet">우유, 계란, 통밀빵, 바나나, 사과, 양파 두 개. 저녁에 수프 끓일 셀러리도.</td>
+            <td class="cell-muted">2026-04-18</td>
+            <td class="cell-muted">2026-04-18</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="cell-title">도서관에서 본 인용문</td>
+            <td class="cell-snippet">"추상은 구체의 반대가 아니라 구체 여럿의 패턴을 이름 붙인 것이다. 추상이…</td>
+            <td class="cell-muted">2026-04-17</td>
+            <td class="cell-muted">2026-04-18</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="cell-title">오늘의 작업 점검</td>
+            <td class="cell-snippet" style="font-style: italic; color: var(--font-color-default-muted);">(본문 없음)</td>
+            <td class="cell-muted">2026-04-16</td>
+            <td class="cell-muted">2026-04-16</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="cell-title">데이터 구조 복습 메모 — 그래프의 위상 정렬</td>
+            <td class="cell-snippet">DAG 에서 의존성 순서대로 노드를 나열하는 알고리즘. Kahn 알고리즘은…</td>
+            <td class="cell-muted">2026-04-15</td>
+            <td class="cell-muted">2026-04-15</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="cell-title">팀 회식 후보 정리</td>
+            <td class="cell-snippet">사내 근처 도보 10분 이내 조건. 1) 한식 — 종로설렁탕, 2) 중식…</td>
+            <td class="cell-muted">2026-04-14</td>
+            <td class="cell-muted">2026-04-14</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="pagination" aria-label="페이지 이동">
+      <button class="btn btn-ghost" type="button" aria-label="이전 페이지">← 이전</button>
+      <span class="pagination__indicator" aria-live="polite">2 / 8</span>
+      <button class="btn btn-ghost" type="button" aria-label="다음 페이지">다음 →</button>
+    </nav>
+
+    <p class="page-footnote">
+      Table primitive 기반 · 행 클릭 → 상세 모달 · 행 내 "삭제" 는 상세 모달을 거치지 않고 바로 삭제 확인 모달로 점프하는 동선(PRD 의 "3단계 흐름" 축약) 이 되어 의도 이탈 가능성도 함께 존재.
+    </p>
+  </div>
+
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — MemoDialogContainer Variant C (우측 사이드 패널)</title>
+<!--
+  시안: Memo Dialog — Variant C (우측 사이드 패널 Drawer 로 3 모드 호스팅, 위험)
+  원본 PRD: docs/prd/memo.md
+  원본 Brief: docs/stitch-brief/memo.md
+
+  설계 의도: 목록 컨텍스트(왼쪽 카드 리스트) 를 시야에서 놓치지 않은 채 상세/편집을 진행.
+            우측에서 슬라이드 인하는 Drawer 컨테이너 한 개가 "상세 → 편집" 을 모드 전환으로 호스팅.
+            삭제 확인만 중앙 모달로 (삭제는 "하던 작업 흐름 차단이 필요한 파괴 액션" 이므로 중앙).
+
+  위험: 높음.
+    1) Brief "오버레이 컨테이너 (모달 유형): 화면 중앙 배치" 명시 이탈 — Drawer 는 사이드 배치.
+    2) Brief "한 개의 오버레이 위에서 상세/편집/삭제 확인 세 모드 전환" 에 대해, 이 시안은
+       Drawer (상세/편집) + 중앙 모달 (삭제 확인) 두 컨테이너로 분리 — "단일 컨테이너 재활용" 의도 부분 이탈.
+    3) 데스크톱 뷰포트 가정이 강해짐 (좁은 화면에서 Drawer 가 목록 카드 리스트를 완전히 덮음).
+    4) `@monorepo/ui` 에는 `MobileDrawer` 가 있으나 "데스크톱 우측 사이드 패널" 전용 primitive 는 없음 → UI팀 신규 요청 또는 Modal 의 variant 확장 필요.
+  시안은 "목록 뒷배경 + 우측 Drawer (상세/편집 탭) + 중앙 모달 (삭제 확인)" 3 레이어를 각 stage 에 나눠 보여준다.
+  외부 리소스 0.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+  --base-colors-secondary-secondary050: #fef7ec;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-red-solid-background: var(--base-colors-red-red900);
+  --button-red-solid-text: #ffffff;
+  --button-red-solid-border: var(--base-colors-red-red900);
+  --button-red-solid-hover: #cd292c;
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral000);
+  --input-color-border-static: var(--base-colors-neutral-neutral250);
+  --input-color-border-focus: var(--base-colors-primary-primary800);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral400);
+  --input-color-text-static: var(--base-colors-neutral-neutral800);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --modal-overlay-dim: rgba(0, 0, 0, 0.35);
+  --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+  --drawer-shadow: -6px 0 16px -6px rgba(0, 0, 0, 0.2);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary500: #251cc5;
+  --base-colors-primary-primary400: #1e17a1;
+  --base-colors-primary-primary300: #211c72;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+  --base-colors-secondary-secondary050: #2f230f;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-red-solid-background: var(--base-colors-red-red900);
+  --button-red-solid-text: #ffffff;
+  --button-red-solid-border: var(--base-colors-red-red900);
+  --button-red-solid-hover: #e82c30;
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral050);
+  --input-color-border-static: var(--base-colors-neutral-neutral200);
+  --input-color-border-focus: var(--base-colors-primary-primary700);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral300);
+  --input-color-text-static: var(--base-colors-neutral-neutral700);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --modal-overlay-dim: rgba(0, 0, 0, 0.5);
+  --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.35);
+  --drawer-shadow: -6px 0 16px -6px rgba(0, 0, 0, 0.45);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.page-container {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+.warn-banner {
+  border: 1px solid var(--alert-warning-icon-color);
+  border-left-width: 4px;
+  background-color: var(--base-colors-secondary-secondary050);
+  color: var(--font-color-default);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.warn-banner code {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.75rem;
+  background-color: var(--background-bg-innerframe);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--font-color-default-muted);
+  padding: var(--padding-padding-4) var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+.mode-label__num {
+  color: var(--base-colors-primary-primary-deep);
+  font-weight: 800;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover { background-color: var(--button-outline-background-hover); }
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-destructive-solid {
+  background-color: var(--button-red-solid-background);
+  color: var(--button-red-solid-text);
+  border-color: var(--button-red-solid-border);
+}
+.btn-destructive-solid:hover { background-color: var(--button-red-solid-hover); }
+.btn-sm {
+  padding: var(--padding-padding-4) var(--padding-padding-12);
+  font-size: 0.8125rem;
+}
+
+/* 무대 (stage) — 목록 배경 + 우측 Drawer 오버레이 */
+.stage {
+  position: relative;
+  height: 32rem;
+  background-color: var(--background-bg-surface);
+  border-radius: 12px;
+  border: 1px solid var(--background-divider);
+  overflow: hidden;
+  margin-top: var(--padding-padding-12);
+}
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--modal-overlay-dim);
+  pointer-events: none;
+  z-index: 1;
+}
+.stage--no-dim::before { display: none; }
+.stage__bg-list {
+  position: absolute;
+  inset: 0;
+  padding: var(--padding-padding-24);
+  background-color: var(--background-bg-default);
+  overflow: hidden;
+}
+.stage__bg-list h2 {
+  margin: 0 0 var(--padding-padding-12) 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+}
+.stage__bg-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+}
+.stage__bg-list li {
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+.stage__bg-list li strong {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stage__bg-list li p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Drawer: 우측에서 슬라이드 인 (시안에서는 정지 상태) */
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(28rem, 70%);
+  background-color: var(--background-bg-default);
+  border-left: 1px solid var(--background-divider);
+  box-shadow: var(--drawer-shadow);
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-12);
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-bottom: 1px solid var(--background-divider);
+}
+.drawer-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.drawer-close {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--font-color-default-muted);
+  border: 1px solid transparent;
+  font-size: 1.125rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.drawer-close:hover {
+  background-color: var(--background-bg-innerframe);
+  color: var(--font-color-default);
+}
+.drawer-modes {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--background-divider);
+}
+.drawer-mode-tab {
+  flex: 1;
+  padding: var(--padding-padding-12);
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--font-color-default-muted);
+  background-color: var(--background-bg-innerframe);
+  border: none;
+  border-right: 1px solid var(--background-divider);
+  cursor: pointer;
+  font-family: inherit;
+}
+.drawer-mode-tab:last-child { border-right: none; }
+.drawer-mode-tab--active {
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  position: relative;
+}
+.drawer-mode-tab--active::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 2px;
+  background-color: var(--base-colors-primary-primary800);
+}
+.drawer-body {
+  flex: 1;
+  padding: var(--padding-padding-24);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-16);
+}
+.drawer-footer {
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-top: 1px solid var(--background-divider);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+}
+
+.detail-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--font-color-default);
+  flex: 1;
+}
+.detail-meta {
+  display: flex;
+  gap: var(--padding-padding-12);
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+}
+.form-field__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.form-field__label .required-mark {
+  color: var(--font-color-red);
+  margin-left: 2px;
+}
+.form-field__input,
+.form-field__textarea {
+  width: 100%;
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  background-color: var(--input-color-surface);
+  border: 1px solid var(--input-color-border-static);
+  border-radius: var(--radius-default);
+  color: var(--input-color-text-static);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.form-field__input { height: 2.5rem; }
+.form-field__textarea {
+  min-height: 10rem;
+  resize: vertical;
+}
+.form-field__input:focus,
+.form-field__textarea:focus {
+  outline: none;
+  border-color: var(--input-color-border-focus);
+  box-shadow: 0 0 0 3px var(--base-colors-primary-primary100);
+}
+.form-field__helper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-8);
+}
+.form-field__helper,
+.form-field__counter {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+}
+.form-field__counter { font-variant-numeric: tabular-nums; }
+
+/* 삭제 확인 — 중앙 모달 (A 와 공통) */
+.central-modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+.modal-panel {
+  position: relative;
+  width: min(24rem, calc(100% - 32px));
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  box-shadow: var(--modal-box-shadow);
+  overflow: hidden;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-12);
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-bottom: 1px solid var(--background-divider);
+}
+.modal-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.modal-body {
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-12);
+}
+.modal-footer {
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-top: 1px solid var(--background-divider);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+}
+.confirm-target {
+  font-weight: 700;
+  color: var(--font-color-default);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.confirm-warn {
+  color: var(--font-color-red);
+  font-size: 0.8125rem;
+}
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+
+  <div class="page-container">
+
+    <div class="warn-banner" role="alert">
+      위험: Brief 는 오버레이 컨테이너의 "화면 중앙 배치" 를 명시. Variant C 는 우측 Drawer 배치로 이탈.
+      또한 Drawer(상세·편집) + 중앙 모달(삭제 확인) 두 컨테이너로 분리되어 "단일 컨테이너 재활용" 설계 의도와 부분 충돌.
+      <code>@monorepo/ui</code> 는 <code>MobileDrawer</code> 만 보유 — 데스크톱 우측 사이드 패널 primitive 는 부재.
+      채택 시 UI팀에 신규 primitive 요청 또는 Modal 의 side variant 확장 필요.
+    </div>
+
+    <!-- 모드 1: 상세 — 우측 Drawer (탭: 상세 활성) -->
+    <section aria-labelledby="mode-detail-label">
+      <span class="mode-label" id="mode-detail-label"><span class="mode-label__num">1</span> 상세 · 우측 Drawer</span>
+      <div class="stage">
+        <div class="stage__bg-list" aria-hidden="true">
+          <h2>메모</h2>
+          <ul>
+            <li><strong>주간 회고 — 4월 셋째 주</strong><p>월요일 MR 리뷰 2건 마무리. 수요일 내내 Flyway V3…</p></li>
+            <li><strong>장보기</strong><p>우유, 계란, 통밀빵, 바나나, 사과, 양파 두 개.</p></li>
+            <li><strong>도서관에서 본 인용문</strong><p>"추상은 구체의 반대가 아니라 구체 여럿의 패턴을…</p></li>
+            <li><strong>오늘의 작업 점검</strong><p>(본문 없음)</p></li>
+            <li><strong>데이터 구조 복습 메모 — 그래프의 위상 정렬</strong><p>DAG 에서 의존성 순서대로 노드를 나열하는 알고리즘…</p></li>
+          </ul>
+        </div>
+        <aside class="drawer" role="dialog" aria-modal="false" aria-labelledby="drawer-title-a">
+          <header class="drawer-header">
+            <h3 class="drawer-title" id="drawer-title-a">주간 회고 — 4월 셋째 주</h3>
+            <button class="drawer-close" type="button" aria-label="닫기">×</button>
+          </header>
+          <div class="drawer-modes" role="tablist">
+            <button class="drawer-mode-tab drawer-mode-tab--active" role="tab" aria-selected="true">상세</button>
+            <button class="drawer-mode-tab" role="tab" aria-selected="false">편집</button>
+          </div>
+          <div class="drawer-body">
+            <div class="detail-body">월요일 MR 리뷰 2건 마무리.
+수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다.
+원인은 인덱스 이름이 기존 V1 과 충돌하는 거였고, rollback 후 V4 로 새 파일을 만드는 쪽으로 정리.
+
+금요일 오후 디자인 회의에서 Memo 피처 카드 레이아웃 합의.</div>
+            <div class="detail-meta">
+              <span>작성 2026-04-19 21:04</span>
+              <span>·</span>
+              <span>수정 2026-04-19 21:04</span>
+            </div>
+          </div>
+          <footer class="drawer-footer">
+            <button class="btn btn-destructive" type="button">삭제</button>
+            <button class="btn btn-primary" type="button">편집</button>
+          </footer>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 모드 2: 편집 — 동일 Drawer, 탭 전환 -->
+    <section aria-labelledby="mode-form-label">
+      <span class="mode-label" id="mode-form-label"><span class="mode-label__num">2</span> 편집 · 동일 Drawer (탭 전환)</span>
+      <div class="stage">
+        <div class="stage__bg-list" aria-hidden="true">
+          <h2>메모</h2>
+          <ul>
+            <li><strong>주간 회고 — 4월 셋째 주</strong><p>월요일 MR 리뷰 2건 마무리. 수요일 내내 Flyway V3…</p></li>
+            <li><strong>장보기</strong><p>우유, 계란, 통밀빵, 바나나, 사과, 양파 두 개.</p></li>
+            <li><strong>도서관에서 본 인용문</strong><p>"추상은 구체의 반대가 아니라 구체 여럿의 패턴을…</p></li>
+            <li><strong>오늘의 작업 점검</strong><p>(본문 없음)</p></li>
+            <li><strong>데이터 구조 복습 메모 — 그래프의 위상 정렬</strong><p>DAG 에서 의존성 순서대로 노드를 나열하는 알고리즘…</p></li>
+          </ul>
+        </div>
+        <aside class="drawer" role="dialog" aria-modal="false" aria-labelledby="drawer-title-b">
+          <header class="drawer-header">
+            <h3 class="drawer-title" id="drawer-title-b">메모 편집</h3>
+            <button class="drawer-close" type="button" aria-label="닫기">×</button>
+          </header>
+          <div class="drawer-modes" role="tablist">
+            <button class="drawer-mode-tab" role="tab" aria-selected="false">상세</button>
+            <button class="drawer-mode-tab drawer-mode-tab--active" role="tab" aria-selected="true">편집</button>
+          </div>
+          <form class="drawer-body" novalidate>
+            <div class="form-field">
+              <label class="form-field__label" for="memo-title-c">
+                제목<span class="required-mark" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="memo-title-c"
+                class="form-field__input"
+                type="text"
+                value="주간 회고 — 4월 셋째 주"
+                maxlength="100"
+              />
+              <div class="form-field__helper-row">
+                <span class="form-field__helper">공백만 입력 불가. (최대 100자)</span>
+                <span class="form-field__counter">18 / 100</span>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="memo-content-c">본문</label>
+              <textarea
+                id="memo-content-c"
+                class="form-field__textarea"
+                placeholder="본문은 비워둘 수 있습니다."
+                maxlength="5000"
+              >월요일 MR 리뷰 2건 마무리.
+수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다.</textarea>
+              <div class="form-field__helper-row">
+                <span class="form-field__helper">줄바꿈은 유지. 마크다운/HTML 은 적용 없음.</span>
+                <span class="form-field__counter">82 / 5000</span>
+              </div>
+            </div>
+          </form>
+          <footer class="drawer-footer">
+            <button class="btn btn-ghost" type="button">취소</button>
+            <button class="btn btn-primary" type="submit">저장</button>
+          </footer>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 모드 3: 삭제 확인 — 중앙 모달 (Drawer 위에 중앙 오버레이) -->
+    <section aria-labelledby="mode-confirm-label">
+      <span class="mode-label" id="mode-confirm-label"><span class="mode-label__num">3</span> 삭제 확인 · 중앙 모달 (Drawer 위 오버레이)</span>
+      <div class="stage">
+        <div class="stage__bg-list" aria-hidden="true">
+          <h2>메모</h2>
+          <ul>
+            <li><strong>주간 회고 — 4월 셋째 주</strong><p>월요일 MR 리뷰 2건…</p></li>
+            <li><strong>장보기</strong><p>우유, 계란, 통밀빵, 바나나…</p></li>
+            <li><strong>도서관에서 본 인용문</strong><p>"추상은 구체의 반대가…</p></li>
+          </ul>
+        </div>
+        <aside class="drawer" aria-hidden="true">
+          <header class="drawer-header">
+            <h3 class="drawer-title">주간 회고 — 4월 셋째 주</h3>
+            <button class="drawer-close" type="button" tabindex="-1">×</button>
+          </header>
+          <div class="drawer-modes">
+            <button class="drawer-mode-tab drawer-mode-tab--active" tabindex="-1">상세</button>
+            <button class="drawer-mode-tab" tabindex="-1">편집</button>
+          </div>
+          <div class="drawer-body">
+            <div class="detail-body" style="opacity: 0.5;">월요일 MR 리뷰 2건 마무리. 수요일 내내 Flyway V3 마이그레이션 때문에…</div>
+          </div>
+        </aside>
+        <div class="central-modal">
+          <article class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title-c">
+            <header class="modal-header">
+              <h3 class="modal-title" id="confirm-title-c">메모 삭제</h3>
+              <button class="drawer-close" type="button" aria-label="닫기">×</button>
+            </header>
+            <div class="modal-body">
+              <p style="margin: 0; font-size: 0.9375rem; line-height: 1.55;">
+                아래 메모를 삭제하시겠습니까?
+              </p>
+              <div class="confirm-target">주간 회고 — 4월 셋째 주</div>
+              <p class="confirm-warn" style="margin: 0;">
+                삭제한 메모는 복구할 수 없습니다.
+              </p>
+            </div>
+            <footer class="modal-footer">
+              <button class="btn btn-ghost" type="button">취소</button>
+              <button class="btn btn-destructive-solid" type="button">삭제</button>
+            </footer>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — MemoDialogContainer Variant A (중앙 모달 × 3 모드, 권장)</title>
+<!--
+  시안: Memo Dialog — Variant A (중앙 모달 × 3 모드 통합, 권장)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD: docs/prd/memo.md
+  원본 Brief: docs/stitch-brief/memo.md
+
+  설계 의도: PRD/Brief 의 "3 단계 모달 흐름" (상세 → 편집 → 삭제 확인) 을 하나의 오버레이 컨테이너
+            내 모드 전환으로 처리한다. 이 시안은 "같은 컨테이너 재활용" 의도를 한 눈에 보여주기 위해
+            세 모드를 세로로 나란히 배치했다. 실제 런타임에는 하나의 Modal primitive 가
+            mode state ('detail' | 'form' | 'confirmDelete') 에 따라 내용을 교체한다.
+
+  dim 배경은 맨 위 모드에만 렌더해 "실제 화면에 뜨는 모습" 을 대표로 보여준다.
+  외부 리소스 0.
+-->
+<style>
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-13: 0.812rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-red-solid-background: var(--base-colors-red-red900);
+  --button-red-solid-text: #ffffff;
+  --button-red-solid-border: var(--base-colors-red-red900);
+  --button-red-solid-hover: #cd292c;
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral000);
+  --input-color-border-static: var(--base-colors-neutral-neutral250);
+  --input-color-border-focus: var(--base-colors-primary-primary800);
+  --input-color-border-error: var(--base-colors-red-red900);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral400);
+  --input-color-text-static: var(--base-colors-neutral-neutral800);
+  --input-color-text-error: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --modal-overlay-dim: rgba(0, 0, 0, 0.45);
+  --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary500: #251cc5;
+  --base-colors-primary-primary400: #1e17a1;
+  --base-colors-primary-primary300: #211c72;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-13: 0.812rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-red-solid-background: var(--base-colors-red-red900);
+  --button-red-solid-text: #ffffff;
+  --button-red-solid-border: var(--base-colors-red-red900);
+  --button-red-solid-hover: #e82c30;
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral050);
+  --input-color-border-static: var(--base-colors-neutral-neutral200);
+  --input-color-border-focus: var(--base-colors-primary-primary700);
+  --input-color-border-error: var(--base-colors-red-red900);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral300);
+  --input-color-text-static: var(--base-colors-neutral-neutral700);
+  --input-color-text-error: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --modal-overlay-dim: rgba(0, 0, 0, 0.6);
+  --modal-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.35);
+
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.theme-toggle:hover { background-color: var(--background-bg-innerframe); }
+
+.page-container {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+.doc-note {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--font-color-default-muted);
+  background-color: var(--background-bg-innerframe);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  border: 1px dashed var(--background-divider);
+}
+
+.mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--font-color-default-muted);
+  padding: var(--padding-padding-4) var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+.mode-label__num {
+  color: var(--base-colors-primary-primary-deep);
+  font-weight: 800;
+}
+
+/* Modal primitive 흉내: overlay + panel. 실제는 하나의 인스턴스지만 시안은 3 모드를 세로 스택. */
+.modal-stage {
+  position: relative;
+  padding: var(--padding-padding-24);
+  background-color: var(--background-bg-surface);
+  border-radius: 12px;
+  border: 1px solid var(--background-divider);
+  display: flex;
+  justify-content: center;
+}
+.modal-stage.dim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background-color: var(--modal-overlay-dim);
+  pointer-events: none;
+}
+.modal-panel {
+  position: relative;
+  width: min(100%, 28rem);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  box-shadow: var(--modal-box-shadow);
+  overflow: hidden;
+  z-index: 1;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-12);
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-bottom: 1px solid var(--background-divider);
+}
+.modal-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.modal-close {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--font-color-default-muted);
+  border: 1px solid transparent;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+.modal-close:hover {
+  background-color: var(--background-bg-innerframe);
+  color: var(--font-color-default);
+}
+.modal-body {
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-16);
+}
+.modal-footer {
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  border-top: 1px solid var(--background-divider);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--padding-padding-8);
+  background-color: var(--background-bg-innerframe);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover { background-color: var(--button-outline-background-hover); }
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-destructive-solid {
+  background-color: var(--button-red-solid-background);
+  color: var(--button-red-solid-text);
+  border-color: var(--button-red-solid-border);
+}
+.btn-destructive-solid:hover { background-color: var(--button-red-solid-hover); }
+
+/* 상세 모드: plain-text 본문 블록 */
+.detail-body {
+  white-space: pre-wrap;      /* 줄바꿈 유지 */
+  word-break: break-word;
+  max-height: 16rem;
+  overflow-y: auto;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--font-color-default);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+}
+.detail-meta {
+  display: flex;
+  gap: var(--padding-padding-12);
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+}
+.detail-meta .sep { color: var(--background-bg-surface-muted); }
+
+/* 편집/신규 모드: 폼 필드 */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+}
+.form-field__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.form-field__label .required-mark {
+  color: var(--font-color-red);
+  margin-left: 2px;
+}
+.form-field__input,
+.form-field__textarea {
+  width: 100%;
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  background-color: var(--input-color-surface);
+  border: 1px solid var(--input-color-border-static);
+  border-radius: var(--radius-default);
+  color: var(--input-color-text-static);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  line-height: 1.5;
+}
+.form-field__input { height: 2.5rem; }
+.form-field__textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+.form-field__input::placeholder,
+.form-field__textarea::placeholder { color: var(--input-color-text-placeholder); }
+.form-field__input:focus,
+.form-field__textarea:focus {
+  outline: none;
+  border-color: var(--input-color-border-focus);
+  box-shadow: 0 0 0 3px var(--base-colors-primary-primary100);
+}
+.form-field__helper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-8);
+}
+.form-field__helper {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+}
+.form-field__counter {
+  font-size: 0.75rem;
+  color: var(--font-color-default-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 삭제 확인 모드 */
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-12);
+}
+.confirm-target {
+  font-weight: 700;
+  color: var(--font-color-default);
+  background-color: var(--background-bg-innerframe);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-sm);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.confirm-warn {
+  color: var(--font-color-red);
+  font-size: 0.8125rem;
+}
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+
+  <div class="page-container">
+
+    <p class="doc-note">
+      <strong>설계 의도 — 같은 오버레이 컨테이너, 3 모드 전환.</strong>
+      실제 런타임에는 Modal primitive 가 하나만 뜨고 내부 내용이
+      <code>detail → form → confirmDelete</code> 로 교체된다.
+      이 시안은 세 모드를 세로로 나란히 그려 "동일 컨테이너 재활용" 을 한 눈에 보여준다.
+      전환 애니메이션은 과하지 않게 (크로스페이드 · 절제된 높이 조정).
+    </p>
+
+    <!-- 모드 1: 상세 모드 (MemoDetailDialog) -->
+    <section aria-labelledby="mode-detail-label">
+      <span class="mode-label" id="mode-detail-label"><span class="mode-label__num">1</span> 상세 모드 · MemoDetailDialog</span>
+      <div class="modal-stage dim" style="margin-top: var(--padding-padding-12);">
+        <!--
+          진입: 목록 카드 클릭.
+          본문: 읽기 전용 plain text (white-space: pre-wrap 줄바꿈 유지, 마크다운/HTML 렌더 금지).
+          액션: Secondary "삭제" (위험 톤) + Primary "편집".
+        -->
+        <article class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+          <header class="modal-header">
+            <h3 class="modal-title" id="detail-title">주간 회고 — 4월 셋째 주</h3>
+            <button class="modal-close" type="button" aria-label="닫기">×</button>
+          </header>
+          <div class="modal-body">
+            <div class="detail-body">월요일 MR 리뷰 2건 마무리.
+수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다.
+원인은 인덱스 이름이 기존 V1 과 충돌하는 거였고, rollback 후 V4 로 새 파일을 만드는 쪽으로 정리.
+
+금요일 오후 디자인 회의에서 Memo 피처 카드 레이아웃 합의:
+- 제목 단일 라인
+- 본문 스니펫 2~3줄
+- 메타 (작성/수정) 는 보조 톤
+
+다음 주 할 일:
+1. Memo 백엔드 PUT 전체 교체 구현 리뷰
+2. 스펙 감사(spec-auditor) 붙이기</div>
+
+            <div class="detail-meta">
+              <span>작성 2026-04-19 21:04</span>
+              <span class="sep">·</span>
+              <span>수정 2026-04-19 21:04</span>
+            </div>
+          </div>
+          <footer class="modal-footer">
+            <button class="btn btn-destructive" type="button" aria-label="삭제 확인으로 이동">삭제</button>
+            <button class="btn btn-primary" type="button" aria-label="편집 모드로 이동">편집</button>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <!-- 모드 2: 편집 / 신규 작성 모드 (MemoFormDialog) -->
+    <section aria-labelledby="mode-form-label">
+      <span class="mode-label" id="mode-form-label"><span class="mode-label__num">2</span> 편집 · 신규 모드 · MemoFormDialog</span>
+      <div class="modal-stage" style="margin-top: var(--padding-padding-12);">
+        <!--
+          진입: 헤더의 "+ 새 메모" 버튼 → 신규(빈 폼). 상세 모드의 "편집" → 기존 값 주입.
+          필드: 제목 (단일행, 1~100자, 필수) / 본문 (다중행, 0~5000자, 선택).
+          본문 필드는 한글 IME composition 입력을 깨지 않는 방식으로 구현 (구현 단계).
+          본문 글자수 카운터는 선택.
+          액션: Secondary "취소" / Primary "저장".
+        -->
+        <article class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="form-title">
+          <header class="modal-header">
+            <h3 class="modal-title" id="form-title">메모 편집</h3>
+            <button class="modal-close" type="button" aria-label="닫기">×</button>
+          </header>
+          <form class="modal-body" novalidate>
+            <div class="form-field">
+              <label class="form-field__label" for="memo-title">
+                제목<span class="required-mark" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="memo-title"
+                class="form-field__input"
+                type="text"
+                placeholder="예: 오늘 할 일"
+                value="주간 회고 — 4월 셋째 주"
+                maxlength="100"
+              />
+              <div class="form-field__helper-row">
+                <span class="form-field__helper">공백만 입력 불가. (최대 100자)</span>
+                <span class="form-field__counter">18 / 100</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-field__label" for="memo-content">본문</label>
+              <textarea
+                id="memo-content"
+                class="form-field__textarea"
+                placeholder="본문은 비워둘 수 있습니다. 마크다운은 적용되지 않고 입력 그대로 표시됩니다."
+                maxlength="5000"
+              >월요일 MR 리뷰 2건 마무리.
+수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다.</textarea>
+              <div class="form-field__helper-row">
+                <span class="form-field__helper">줄바꿈은 유지되며, 마크다운/HTML 은 적용되지 않습니다.</span>
+                <span class="form-field__counter">82 / 5000</span>
+              </div>
+            </div>
+          </form>
+          <footer class="modal-footer">
+            <button class="btn btn-ghost" type="button">취소</button>
+            <button class="btn btn-primary" type="submit">저장</button>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <!-- 모드 3: 삭제 확인 모드 (MemoDeleteConfirmDialog) -->
+    <section aria-labelledby="mode-confirm-label">
+      <span class="mode-label" id="mode-confirm-label"><span class="mode-label__num">3</span> 삭제 확인 모드 · MemoDeleteConfirmDialog</span>
+      <div class="modal-stage" style="margin-top: var(--padding-padding-12);">
+        <!--
+          진입: 상세 모드의 "삭제" 버튼.
+          본문: 대상 제목 강조 + 복구 불가 고지.
+          액션: Secondary "취소" → 상세 모드로 복귀 / Primary(위험 solid) "삭제" → DELETE /memos/{id}.
+        -->
+        <article class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="confirm-title" style="max-width: 24rem;">
+          <header class="modal-header">
+            <h3 class="modal-title" id="confirm-title">메모 삭제</h3>
+            <button class="modal-close" type="button" aria-label="닫기">×</button>
+          </header>
+          <div class="modal-body">
+            <div class="confirm-body">
+              <p style="margin: 0; font-size: 0.9375rem; line-height: 1.55;">
+                아래 메모를 삭제하시겠습니까?
+              </p>
+              <div class="confirm-target">주간 회고 — 4월 셋째 주</div>
+              <p class="confirm-warn" style="margin: 0;">
+                삭제한 메모는 복구할 수 없습니다.
+              </p>
+            </div>
+          </div>
+          <footer class="modal-footer">
+            <button class="btn btn-ghost" type="button" aria-label="취소하고 상세 모드로 복귀">취소</button>
+            <button class="btn btn-destructive-solid" type="button" aria-label="메모 영구 삭제">삭제</button>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <p class="doc-note">
+      구현 단계: 하나의 Modal primitive 인스턴스가
+      <code>mode</code> state 에 따라 header title / body / footer 를 교체한다.
+      ESC · 배경 클릭 · 닫기 아이콘은 어느 모드에서든 오버레이 전체 닫기.
+      삭제 확인 "취소" 는 <strong>상세 모드로 복귀</strong> (양보 경로).
+    </p>
+  </div>
+
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>

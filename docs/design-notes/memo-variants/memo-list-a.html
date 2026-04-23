@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>시안 — MemoListPage Variant A (목록 + 합성 카드, 권장)</title>
+<!--
+  시안: Memo List — Variant A (목록 + 합성 카드, 권장)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD: docs/prd/memo.md
+  원본 Brief: docs/stitch-brief/memo.md
+  참조 디자인 노트:
+    - global-states.md §2 (Loading/Error/Empty 에서 페이지 헤더 유지)
+    - data-display.md §3 ("콘텐츠 중심 목록" = List + 합성 카드, Table 아님)
+  외부 리소스 0 — 모든 토큰/스타일/스크립트 인라인.
+-->
+<style>
+/* ========================================================================
+   libs/tokens/styles/__tokens-light.css 실사용 변수 서브셋 (원본 그대로 복사)
+   ======================================================================== */
+:root[data-theme="light"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-13: 0.812rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-neutral-neutral000);
+  --button-outline-background-hover: #f7f7f7;
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+
+  --padding-padding-48: var(--base-size-size-48);
+  --padding-padding-36: var(--base-size-size-36);
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+/* ========================================================================
+   libs/tokens/styles/__tokens-dark.css 실사용 변수 서브셋 (동일 변수명)
+   ======================================================================== */
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary500: #251cc5;
+  --base-colors-primary-primary400: #1e17a1;
+  --base-colors-primary-primary300: #211c72;
+  --base-colors-primary-primary200: #1c194d;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-13: 0.812rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-0: 0;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --padding-padding-48: var(--base-size-size-48);
+  --padding-padding-36: var(--base-size-size-36);
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+}
+
+/* ========================================================================
+   시안용 레이아웃 (primitive 시각 흉내)
+   ======================================================================== */
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.theme-toggle:hover { background-color: var(--background-bg-innerframe); }
+
+.page-container {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover { background-color: var(--button-primary-background-hover); }
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover { background-color: var(--button-outline-background-hover); }
+.btn-ghost[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* List 흉내 — 세로 스택 */
+.memo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-12);
+}
+
+/* MemoCard 합성 — apps/example-web/src/components/MemoCard.tsx 예정
+   내부 구성: 제목 (단일 라인, ellipsis) + 본문 스니펫 (2~3줄 clamp, plain text) + 메타 (생성일 / 수정일) */
+.memo-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-8);
+  padding: var(--padding-padding-16) var(--padding-padding-24);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.memo-card:hover {
+  background-color: var(--background-bg-innerframe);
+  border-color: var(--font-color-default-muted);
+}
+.memo-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--font-color-default);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.memo-card__snippet {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--font-color-default);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* PRD: plain text 렌더만 — 마크다운/HTML 금지. 줄바꿈 유지는 구현 단계에서 white-space: pre-wrap 로. */
+}
+.memo-card__snippet--empty {
+  color: var(--font-color-default-muted);
+  font-style: italic;
+}
+.memo-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-padding-8);
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+}
+.memo-card__meta .sep {
+  color: var(--background-bg-surface-muted);
+}
+
+/* 페이지네이션 (아래쪽 이전/다음) */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-12);
+  padding-top: var(--padding-padding-12);
+}
+.pagination__indicator {
+  font-size: 0.875rem;
+  color: var(--font-color-default-muted);
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+.page-footnote {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+</style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+
+  <div class="page-container">
+
+    <!-- 페이지 헤더: 제목 + Primary CTA. Loading/Error/Empty 에서도 유지 (global-states.md §2) -->
+    <header class="page-header" role="banner">
+      <h1 class="page-title">메모</h1>
+      <button class="btn btn-primary" type="button" aria-label="새 메모 작성">+ 새 메모</button>
+    </header>
+
+    <!--
+      본문: List + 페이지 전용 합성 카드 (MemoCard).
+      컬럼 격자 없음 — data-display.md §3 의 "콘텐츠 중심 목록" 범주.
+      상태 전환 (구현 단계):
+        - Loading: ul 자리를 CardSkeleton × n 으로 치환 (페이지 헤더는 유지).
+        - Error  : ul 자리를 에러 안내 + "다시 시도" Button 으로 치환.
+        - Empty  : ul 자리를 중앙 정렬 안내 텍스트로 치환 ("아직 메모가 없어요").
+                   헤더의 "+ 새 메모" 버튼이 1차 경로이므로 본문 내 중복 CTA 없음.
+    -->
+    <ul class="memo-list" role="list" aria-label="메모 목록">
+
+      <li class="memo-card" role="listitem" tabindex="0">
+        <h2 class="memo-card__title">주간 회고 — 4월 셋째 주</h2>
+        <p class="memo-card__snippet">월요일 MR 리뷰 2건 마무리. 수요일 내내 Flyway V3 마이그레이션 때문에 API 쪽 CI 가 빨갛게 떠서 오전을 다 썼다. 금요일 오후 디자인 회의에서 Memo 피처 카드 레이아웃 합의.</p>
+        <div class="memo-card__meta">
+          <span>작성 2026-04-19</span>
+          <span class="sep">·</span>
+          <span>수정 2026-04-19</span>
+        </div>
+      </li>
+
+      <li class="memo-card" role="listitem" tabindex="0">
+        <h2 class="memo-card__title">장보기</h2>
+        <p class="memo-card__snippet">우유, 계란, 통밀빵, 바나나, 사과, 양파 두 개. 저녁에 수프 끓일 셀러리도.</p>
+        <div class="memo-card__meta">
+          <span>작성 2026-04-18</span>
+          <span class="sep">·</span>
+          <span>수정 2026-04-18</span>
+        </div>
+      </li>
+
+      <li class="memo-card" role="listitem" tabindex="0">
+        <h2 class="memo-card__title">도서관에서 본 인용문</h2>
+        <p class="memo-card__snippet">"추상은 구체의 반대가 아니라 구체 여럿의 패턴을 이름 붙인 것이다. 추상이 무서워지는 순간은 그 이름이 원래 구체들을 덮어 버릴 때다." — 읽던 책에서.</p>
+        <div class="memo-card__meta">
+          <span>작성 2026-04-17</span>
+          <span class="sep">·</span>
+          <span>수정 2026-04-18</span>
+        </div>
+      </li>
+
+      <li class="memo-card" role="listitem" tabindex="0">
+        <h2 class="memo-card__title">오늘의 작업 점검</h2>
+        <p class="memo-card__snippet memo-card__snippet--empty">(본문 없음)</p>
+        <div class="memo-card__meta">
+          <span>작성 2026-04-16</span>
+          <span class="sep">·</span>
+          <span>수정 2026-04-16</span>
+        </div>
+      </li>
+
+      <li class="memo-card" role="listitem" tabindex="0">
+        <h2 class="memo-card__title">데이터 구조 복습 메모 — 그래프의 위상 정렬</h2>
+        <p class="memo-card__snippet">DAG 에서 의존성 순서대로 노드를 나열하는 알고리즘. Kahn 알고리즘은 진입차수 0 인 노드부터 큐에 넣고, 큐에서 꺼낼 때마다 그 노드가 가리키던 노드의 진입차수를 1 감소. 감소 후 0 이 되면 큐에 추가. 반복.</p>
+        <div class="memo-card__meta">
+          <span>작성 2026-04-15</span>
+          <span class="sep">·</span>
+          <span>수정 2026-04-15</span>
+        </div>
+      </li>
+
+      <li class="memo-card" role="listitem" tabindex="0">
+        <h2 class="memo-card__title">팀 회식 후보 정리</h2>
+        <p class="memo-card__snippet">사내 근처 도보 10분 이내 조건. 1) 한식 — 종로설렁탕, 2) 중식 — 만리향, 3) 일식 — 스시조, 4) 채식 옵션이 있는 곳으로는 순 비건식당.</p>
+        <div class="memo-card__meta">
+          <span>작성 2026-04-14</span>
+          <span class="sep">·</span>
+          <span>수정 2026-04-14</span>
+        </div>
+      </li>
+
+    </ul>
+
+    <!--
+      페이지네이션: 아래쪽 이전/다음 + 현재/총 인디케이터. size=20 기본 (Brief).
+      첫/마지막 페이지에서 해당 방향 버튼 비활성 (aria-disabled).
+    -->
+    <nav class="pagination" aria-label="페이지 이동">
+      <button class="btn btn-ghost" type="button" aria-label="이전 페이지">← 이전</button>
+      <span class="pagination__indicator" aria-live="polite">2 / 8</span>
+      <button class="btn btn-ghost" type="button" aria-label="다음 페이지">다음 →</button>
+    </nav>
+
+    <p class="page-footnote">
+      createdAt DESC 고정 정렬 · size=20 · 카드 클릭 → 상세 모달 (독립 Route 없음).
+    </p>
+  </div>
+
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
+</body>
+</html>
