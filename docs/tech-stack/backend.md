@@ -6,6 +6,44 @@
 관련 규약:
 - 멀티모듈 경계 / 예제 패턴 → `CLAUDE.md` "파일 편집 소유권" 및 `.claude/agents/backend/`
 - Flyway 버전 관리 → `CLAUDE.md` "금지사항"
+- **프로젝트 모드 정의 / 활성 팀 / 전환 체크리스트** → `CLAUDE.md` "프로젝트 모드"
+
+## 0. 프로젝트 모드 (단일 진실 소스)
+
+> 이 블록의 `mode` 가 메인 에이전트의 팀 활성/비활성을 결정한다. 변경 시 `CLAUDE.md` "프로젝트 모드 전환 체크리스트" 를 선행.
+
+```yaml
+mode: inhouse
+engine: MySQL 8.4 LTS
+profiles: [local, dev, prod]
+```
+
+### 모드별 헤더 예시
+
+- `inhouse` (이 레포의 기본)
+  ```yaml
+  mode: inhouse
+  engine: MySQL 8.4 LTS
+  profiles: [local, dev, prod]
+  ```
+- `external` (외부 API 사용)
+  ```yaml
+  mode: external
+  baseUrl: https://api.example.com
+  swagger: https://api.example.com/v3/api-docs   # 또는 로컬 파일 경로 ./docs/external/swagger.json
+  ```
+- `mock` (MSW 로 프론트만 개발)
+  ```yaml
+  mode: mock
+  contract: docs/prd/*.md                        # 수기 계약 출처
+  fallbackTo: external                           # (선택) 백엔드 배포 후 전환 예정 모드
+  ```
+
+### 모드별 이 문서의 의미
+
+- `inhouse`: 아래 §1~§4 (DB/ORM/Flyway/테스트 등) 가 **전부 유효**.
+- `external`: §1~§4 는 "이 레포가 `inhouse` 로 되돌아갈 때 참고" 용으로 **보존만**. 현 프로젝트 스코프 밖이므로 백엔드팀 에이전트는 비활성.
+- `mock`: `external` 과 동일하게 §1~§4 는 참고용. 대신 "mock 모드 규약" 이 `CLAUDE.md` 에 있으며, MSW handler / service worker 셋업은 프론트 개발팀 책임.
 
 ## 1. 결정 요약 (2026-04-22)
 

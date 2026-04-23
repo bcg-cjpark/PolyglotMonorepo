@@ -16,17 +16,72 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 각 팀의 구성/역할/호출 시점은 [`.claude/agents/README.md`](./.claude/agents/README.md) 참조.
 
+## 프로젝트 모드
+
+이 템플릿은 세 가지 운영 모드를 지원한다. **모드는 `docs/tech-stack/backend.md` 헤더의 `mode` 필드가 단일 진실 소스**. 메인 에이전트가 파이프라인을 시작하기 전에 이 필드를 읽고 아래 표에 따라 팀을 활성/비활성화한다.
+
+### 모드 정의
+
+| 모드 | 뜻 | `docs/tech-stack/backend.md` 헤더 예 |
+|---|---|---|
+| `inhouse` | 이 레포의 `apps/example-api` 가 실제 백엔드. 이 템플릿의 기본. | `mode: inhouse` + engine/profile 필드 |
+| `external` | 백엔드는 외부에 존재. `swagger.json` 또는 서버 URL 제공. | `mode: external` + `baseUrl:` + `swagger:` |
+| `mock` | 백엔드 미정/대기. MSW 로 mock 해서 프론트만 먼저 구현. | `mode: mock` + `contract:` (+ 선택적 `fallbackTo:`) |
+
+### 모드별 활성 팀
+
+| 모드 | 활성 | 비활성 |
+|---|---|---|
+| `inhouse` | 기획 · 디자인 · UI · 프론트개발 · 프론트테스트 · **백엔드** · **통합테스트** | — |
+| `external` | 기획 · 디자인 · UI · 프론트개발 · 프론트테스트 · **통합테스트** | 백엔드 |
+| `mock` | 기획 · 디자인 · UI · 프론트개발 · 프론트테스트 | 백엔드, 통합테스트 |
+
+- `external` 모드의 통합테스트팀은 외부 API 의 실 endpoint 에 대한 결합 시나리오만 검증. DB 스키마/트랜잭션은 검증 범위 밖.
+- `mock` 모드에서는 `tests/e2e/**` (프론트 테스트팀) 가 MSW service worker 위에서 돌며 통합의 역할까지 흡수. `tests/integration/**` 는 **존재해도 실행하지 않음** (mock 과 실 백엔드가 붙기 전까지 비활성).
+- 비활성 팀의 에이전트 파일은 `.claude/agents/` 에 그대로 존재하지만 메인이 호출하지 않는다. 모드 전환 시 즉시 복귀 가능.
+
+### mock 모드 파일/셋업 규약
+
+- MSW handler 위치: `apps/example-web/src/mocks/**` (프론트 개발팀 소유).
+- Service worker 파일: `apps/example-web/public/mockServiceWorker.js` (`npx msw init` 산출물, **수정 금지**).
+- 토글: `.env` 의 `VITE_USE_MOCK=true` 일 때만 `main.tsx` 에서 `worker.start()` 호출 (dev 전용, prod 번들에서 tree-shake).
+- 계약 출처: `docs/prd/<feature>.md` 의 API 섹션 또는 별도 `libs/api-types` 수작업 타입.
+- **MSW 기본 설치 안 함** — 템플릿 원칙 유지. 모드가 `mock` 으로 설정된 프로젝트에서만 `pnpm add -D msw --filter example-web` + `npx msw init apps/example-web/public --save` + `src/mocks/` 스캐폴드를 1회 실행한다. 이 셋업은 메인(프로젝트 전체 팀장) 책임.
+
+### external 모드 규약
+
+- `libs/api-types` 는 외부 `swagger.json` 에서 `openapi-typescript` 로 자동 생성. 수작업 편집 금지.
+- `apps/example-web/.env` 의 `VITE_API_BASE_URL` 에 외부 서버 URL. Vite dev 프록시는 이 변수를 기반으로 구성.
+- `apps/example-api/**` 는 삭제하지 않고 보관 (향후 `inhouse` 로 되돌릴 가능성). 단 빌드 파이프라인에서는 제외.
+
+### 모드 전환 체크리스트 (메인이 수행)
+
+| 전환 | 체크리스트 |
+|---|---|
+| `mock → external` | (1) `docs/tech-stack/backend.md` 헤더 `mode: external` + `baseUrl` + `swagger` 갱신 → (2) `libs/api-types` 를 외부 스펙에서 재생성 → (3) `apps/example-web/src/mocks/**` 삭제 + `pnpm remove msw --filter example-web` → (4) `.env.VITE_USE_MOCK` 제거 → (5) 통합테스트팀 활성, `tests/integration/**` 스펙 작성/복구. |
+| `mock → inhouse` | 위 (1)(3)(4) + `apps/example-api/**` 스캐폴드 확인 + Flyway `V1` 재생성 + 백엔드팀 활성. |
+| `external → inhouse` | `apps/example-api/**` 스캐폴드 + Flyway `V1` + `VITE_API_BASE_URL` 을 프록시(`/api`) 기본값으로 되돌림 + 백엔드팀 활성. |
+| `inhouse → external` | `apps/example-api/**` 는 보존, 빌드만 off + `baseUrl`/`swagger` 갱신 + 백엔드팀 비활성. |
+| `inhouse → mock` | 비권장 (이미 백엔드가 있는데 mock 으로 되돌리는 것). 단기 회귀 실험 외 사용 금지. |
+
+각 전환은 **메타 작업** 이므로 메인이 직접 커밋 (`chore(config): mode <prev> → <next> 전환` 류).
+
 ## 표준 파이프라인
+
+**공통 흐름** — `[1] → [2] → [3] → [4/5] → [6] → [7] → [9]`. 단계 [4] 의 백엔드 축과 단계 [7] 통합 e2e 는 **모드에 따라 스킵**.
 
 ```
 [1] 기획 통합       doc-consolidator → stitch-brief-writer → planning-lead (커밋)
 [2] (사용자 수동)   Stitch 로 화면정의서 생성 → docs/screens/*.md 로 투입
 [3] 디자인 노트     design-trend-scout → design-lead (커밋)          ← 선택
-[4] 백엔드 ∥ UI    backend-developer → backend-lead (커밋)
-                   ui-composer → ui-storybook-curator → ui-library-tester → ui-lead (커밋)
+[4] 백엔드 ∥ UI    [inhouse 만] backend-developer → backend-lead (커밋)
+                   [모든 모드] ui-composer → ui-storybook-curator → ui-library-tester → ui-lead (커밋)
 [5] 프론트 화면     frontend-developer → design-consistency-auditor → frontend-lead (커밋)
+                   (mock 모드는 frontend-developer 가 src/mocks/ 핸들러도 함께 작성)
 [6] 화면 e2e        frontend-e2e-tester → frontend-test-lead (커밋)
-[7] 통합 e2e        integration-e2e-runner → integration-lead (커밋)
+                   (mock 모드는 MSW 서비스워커 위에서 실행)
+[7] 통합 e2e        [inhouse | external 만] integration-e2e-runner → integration-lead (커밋)
+                   (mock 모드는 스킵 — [6] 이 커버)
 [8] 실패 루프       lead FAIL → 해당 팀원 재호출 (≤ 3회)
 [9] 사후 감사       spec-auditor → planning-lead (커밋)
 ```
@@ -52,9 +107,11 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 | `libs/tokens/styles/__tokens-*.css` | UI팀 (`scripts/apply-theme-colors.mjs` 경유 필수, 의도 결정은 디자인팀) |
 | `libs/tailwind-config/globals.css` (Tailwind `@theme inline` 매핑) | UI팀 |
 | `apps/example-web/src/**` | 프론트 개발팀 |
+| `apps/example-web/src/mocks/**` (mock 모드 전용) | 프론트 개발팀 |
+| `apps/example-web/public/mockServiceWorker.js` | **수정 금지** (`npx msw init` 산출물, 모드 셋업 스크립트로만 생성/삭제) |
 | `apps/example-web/tests/e2e/**` | 프론트 테스트팀 |
-| `apps/example-web/tests/integration/**` | 통합테스트팀 |
-| `apps/example-api/**` | 백엔드팀 |
+| `apps/example-web/tests/integration/**` | 통합테스트팀 (`inhouse` / `external` 모드에서만 활성) |
+| `apps/example-api/**` | 백엔드팀 (`inhouse` 모드에서만 활성) |
 | `libs/ui/tests/**` | UI팀 (ui-library-tester) |
 | `docs/tech-stack/**` | 메인(프로젝트 전체 팀장) — 기술 스택 결정 기록 |
 | `.claude/**`, `CLAUDE.md`, 루트 설정 | 메인(프로젝트 전체 팀장) |
@@ -109,3 +166,6 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 - 메인이 팀장 검수 없이 커밋.
 - Flyway `V1__init.sql` 수정. 새 버전은 `V<N+1>` 로. (예외: DB 엔진 자체를 교체하는 `docs/tech-stack/backend.md` 결정이 선행된 경우에 한해 V1~V<N> 을 새 엔진 문법으로 재작성 가능. 재작성 이후 시점부터 다시 불변.)
 - 앱 코드 내부에 범용 UI primitive 생성.
+- **모드 불일치 작업** — `docs/tech-stack/backend.md` 의 `mode` 가 `mock` 인데 `apps/example-api/**` 편집, `external` 인데 `swagger.json` 없이 `libs/api-types` 수작업 편집 같은 것. 모드 변경은 위 "모드 전환 체크리스트" 를 선행하고 반영.
+- **`external` / `mock` 모드에서 `tests/integration/**` 를 실행**. 스펙 파일은 남겨둘 수 있지만 CI/로컬 실행 대상 아님.
+- **`mock` 모드에서 프로덕션 번들에 MSW 포함**. `worker.start()` 는 반드시 `import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true'` 같은 dev-only 조건부로.
