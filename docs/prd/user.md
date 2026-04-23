@@ -41,7 +41,8 @@
 
 ## 관련 화면
 - [screens/user-list.md](../screens/user-list.md)
-- [screens/user-form.md](../screens/user-form.md)
+
+신규 사용자 생성 UI 는 목록 화면의 오버레이 컨테이너(모달) 로 제공한다. 별도 생성 전용 페이지는 V1 에서 두지 않는다.
 
 ## 비기능 요구사항
 - 페이지네이션은 V1 에 적용하지 않는다 (전체 리스트 반환). 데이터 규모가 수백 건 이상으로 증가하기 전에 재검토한다.
