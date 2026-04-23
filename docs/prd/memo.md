@@ -44,7 +44,8 @@
 
 ## 관련 화면
 - [screens/memo-list.md](../screens/memo-list.md)
-- [screens/memo-form.md](../screens/memo-form.md)
+- [screens/memo-dialog.md](../screens/memo-dialog.md)
+- 신규/편집/삭제 확인 3 모드 UI 는 목록 화면 위 동일 오버레이 컨테이너(모달) 로 제공. 별도 편집 전용 페이지는 V1 에서 두지 않는다.
 
 ## 비기능 요구사항
 - 리스트는 페이지네이션을 기본으로 적용한다 (`size=20`, `createdAt DESC`). 메모가 쌓이는 것이 기본 가정이므로 전체 로드 방식은 사용하지 않는다.
