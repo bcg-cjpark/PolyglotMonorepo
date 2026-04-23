@@ -1,6 +1,7 @@
 package com.example.template.user
 
 import com.example.template.domain.user.User
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -39,8 +40,10 @@ data class UpdateUserRequest(
     @field:NotBlank
     @field:Email
     @field:Size(max = 255)
+    @field:JsonProperty(required = true)
     val email: String,
     @field:NotBlank
     @field:Size(max = 100)
+    @field:JsonProperty(required = true)
     val name: String,
 )

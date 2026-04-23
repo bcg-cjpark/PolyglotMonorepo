@@ -303,6 +303,26 @@ class MemoControllerTest(
                     jsonPath("$.errors.title") { exists() }
                 }
             }
+
+            it("content 필드 누락 시 400 (PUT 전체 교체 계약 강제)") {
+                mockMvc.put("/memos/$id1") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(mapOf("title" to "only"))
+                }.andExpect {
+                    status { isBadRequest() }
+                    jsonPath("$.message") { exists() }
+                }
+            }
+
+            it("title 필드 누락 시 400 (PUT 전체 교체 계약 강제)") {
+                mockMvc.put("/memos/$id1") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(mapOf("content" to "only"))
+                }.andExpect {
+                    status { isBadRequest() }
+                    jsonPath("$.message") { exists() }
+                }
+            }
         }
 
         describe("DELETE /memos/{id}") {

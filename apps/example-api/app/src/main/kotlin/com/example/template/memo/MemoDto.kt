@@ -1,6 +1,7 @@
 package com.example.template.memo
 
 import com.example.template.domain.memo.Memo
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.springframework.data.domain.Page
@@ -56,7 +57,9 @@ data class CreateMemoRequest(
 data class UpdateMemoRequest(
     @field:NotBlank
     @field:Size(max = 100)
+    @field:JsonProperty(required = true)
     val title: String,
     @field:Size(max = 5000)
+    @field:JsonProperty(required = true)
     val content: String?,
 )

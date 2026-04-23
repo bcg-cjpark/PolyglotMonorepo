@@ -1,6 +1,7 @@
 package com.example.template.todo
 
 import com.example.template.domain.todo.Todo
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.time.LocalDate
@@ -37,7 +38,10 @@ data class CreateTodoRequest(
 data class UpdateTodoRequest(
     @field:NotBlank
     @field:Size(max = 200)
+    @field:JsonProperty(required = true)
     val title: String,
+    @field:JsonProperty(required = true)
     val completed: Boolean,
+    @field:JsonProperty(required = true)
     val dueDate: LocalDate?,
 )

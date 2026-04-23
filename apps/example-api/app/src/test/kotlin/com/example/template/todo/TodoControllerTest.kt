@@ -270,6 +270,36 @@ class TodoControllerTest(
                     jsonPath("$.errors.title") { exists() }
                 }
             }
+
+            it("completed 필드 누락 시 400 (PUT 전체 교체 계약 강제)") {
+                mockMvc.put("/todos/1") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(mapOf("title" to "only", "dueDate" to null))
+                }.andExpect {
+                    status { isBadRequest() }
+                    jsonPath("$.message") { exists() }
+                }
+            }
+
+            it("dueDate 필드 누락 시 400 (PUT 전체 교체 계약 강제)") {
+                mockMvc.put("/todos/1") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(mapOf("title" to "only", "completed" to false))
+                }.andExpect {
+                    status { isBadRequest() }
+                    jsonPath("$.message") { exists() }
+                }
+            }
+
+            it("title 필드 누락 시 400 (PUT 전체 교체 계약 강제)") {
+                mockMvc.put("/todos/1") {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = objectMapper.writeValueAsString(mapOf("completed" to false, "dueDate" to null))
+                }.andExpect {
+                    status { isBadRequest() }
+                    jsonPath("$.message") { exists() }
+                }
+            }
         }
 
         describe("PATCH /todos/{id}/toggle") {
