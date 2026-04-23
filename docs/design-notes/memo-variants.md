@@ -3,7 +3,7 @@
 **원본 PRD**: [../prd/memo.md](../prd/memo.md)
 **원본 Brief**: [../stitch-brief/memo.md](../stitch-brief/memo.md)
 **작성일**: 2026-04-23
-**상태**: 선택 대기
+**상태**: 선택 완료 — MemoListPage: Variant A (List + 합성 카드) / MemoDialogContainer: Variant A (3 모드 통합 중앙 모달)
 
 **한 눈 비교**: [index.html](./memo-variants/index.html) — 모든 variant 를 한 페이지에서 Light/Dark 토글하며 비교.
 
