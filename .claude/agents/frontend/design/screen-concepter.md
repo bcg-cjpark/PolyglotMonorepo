@@ -55,17 +55,26 @@ Markdown 카탈로그로 생성.
 
 ## 출력
 
-두 개의 산출물을 함께 낸다:
+세 개의 산출물을 함께 낸다:
 
 1. **시안 HTML 파일** — `docs/design-notes/<feature>-variants/<page>-<variant>.html` (variant 당 1 파일).
-   - **self-contained**: 외부 CDN/스크립트 없이 `<style>` 인라인 CSS 만. 더블클릭으로 브라우저에서 렌더 가능해야 함.
-   - **토큰 강제**: `libs/tokens/styles/__tokens-light.css` 의 `:root` 변수 블록을 그대로 복사해 `<style>` 에 붙이고, 레이아웃은 그 변수(`var(--background-bg-default)`, `var(--font-color-default)`, `var(--padding-padding-16)` 등) 로만 작성. 하드코딩 색/간격 금지.
+   - **self-contained**: 외부 CDN/네트워크 리소스 없이 `<style>` 인라인 CSS + 최소 인라인 `<script>`. 더블클릭으로 브라우저에서 렌더 가능해야 함.
+   - **토큰 강제 — Light/Dark 양쪽 포함 필수**: 한 HTML 안에 Light 와 Dark 두 테마 토큰 블록을 함께 인라인한다:
+     - `libs/tokens/styles/__tokens-light.css` 의 `:root[data-theme="light"]` 블록에서 실사용 변수만 취사 복사.
+     - `libs/tokens/styles/__tokens-dark.css` 의 `:root[data-theme="dark"]` 블록에서 동일 변수명들을 복사.
+     - 레이아웃은 그 변수(`var(--background-bg-default)` 등) 로만 참조. `<html data-theme="light|dark">` 스위칭으로 자동 대응.
+   - **테마 토글**: `<body>` 상단에 "Light ↔ Dark" 토글 컨트롤 배치 + URL 쿼리(`?theme=dark`) 초기화 대응. (규약에서 예외적으로 JavaScript 최소 허용 — 섹션 아래 "HTML 작성 규칙" 참조)
    - **한글 폰트 폴백**: `font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;`
    - **시각 근사 용도**: HTML 은 `@monorepo/ui` primitive 의 **rendered HTML 구조를 흉내** 내는 수준. React 인터랙션/상태 전환은 구현 단계에서. 매핑 표가 "이 시각은 실제로 어느 primitive 인가" 의 진실 소스.
-   - **Light 기본, Dark 는 선택**: 기본은 Light 한 파일. 필요 시 `<page>-<variant>-dark.html` 로 별도. 대부분의 variant 는 Light 만으로 충분.
    - **PRD V1 이탈 기능은 파일 내에 "위험/전제" 배너 주석** 으로 명시.
 
-2. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
+2. **비교 인덱스 HTML** — `docs/design-notes/<feature>-variants/index.html`
+   - 모든 variant HTML 을 **iframe grid** 로 한 페이지에서 동시 비교.
+   - 상단에 전역 "Light ↔ Dark" 토글 — iframe src 에 `?theme=light|dark` 쿼리를 붙여 재로드 방식으로 모든 시안 동기 스위칭 (file:// same-origin 차단 회피).
+   - 2 열 grid, 각 iframe 상단에 "Page / Variant" 레이블.
+   - 역시 self-contained. 외부 리소스 0.
+
+3. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
 
 ```markdown
 # 화면 시안 카탈로그: <feature>
@@ -126,19 +135,62 @@ Route: `/<path>`
 
 ## HTML 작성 규칙 (구체)
 
-- `<!DOCTYPE html>` + `<html lang="ko">`.
+### 1. 개별 variant HTML
+
+- `<!DOCTYPE html>` + `<html lang="ko" data-theme="light">`. (초기값 light, JS 로 변경)
 - `<head>` 에 `<meta charset="utf-8">` + `<title>` + 인라인 `<style>`.
 - `<style>` 구조:
-  1. `:root { /* libs/tokens/styles/__tokens-light.css 에서 이 시안이 실제 참조하는 변수만 추출해 복사 */ }`
-     - **서브셋 복사 허용**: 전체 599줄 복사는 과도 — `var(--*)` 로 실제 쓰는 변수만 원본에서 취사 복사 (변수명/값 원본 유지, 임의 변형 금지).
-     - **변수 정의 누락 금지**: HTML 본문이 `var(--foo)` 를 참조하면 `:root` 에 반드시 `--foo` 정의 포함. 누락되면 렌더 실패.
-     - 참고: 시안당 100~200줄 내외가 일반적. 400줄 넘어가면 "정말 다 쓰는지" 재검토.
-  2. `body` 기본 설정 (`font-family`, `background-color: var(--background-bg-default)`, `color: var(--font-color-default)`, `margin: 0`, `min-height: 100vh`).
-  3. 레이아웃 class (page-header, page-body, table-like, form-like 등) — 각 class 는 primitive 의 시각 구조를 흉내내는 CSS. 변수만 사용.
+  1. `:root[data-theme="light"] { /* __tokens-light.css 에서 실사용 변수 서브셋 복사 */ }`
+  2. `:root[data-theme="dark"] { /* __tokens-dark.css 에서 동일 변수명 서브셋 복사 */ }`
+     - **서브셋 복사 허용**: 전체 복사는 과도 — 실제 쓰는 변수만 양쪽 파일에서 취사 복사 (변수명/값 원본 유지, 임의 변형 금지).
+     - **변수 정의 누락 금지**: HTML 본문이 `var(--foo)` 를 참조하면 양쪽 블록에 `--foo` 정의 포함. Light 만 있고 Dark 에 없으면 Dark 로 스위칭 시 렌더 실패.
+  3. `body` 기본 설정 (`font-family`, `background-color: var(--background-bg-default)`, `color: var(--font-color-default)`, `margin: 0`, `min-height: 100vh`, `transition: background-color 0.15s ease, color 0.15s ease`).
+  4. 레이아웃 class (page-header, page-body, table-like, form-like 등) — 각 class 는 primitive 의 시각 구조를 흉내. 변수만 사용.
+  5. `.theme-toggle` 스타일 (우상단 고정, `position: fixed; top: 12px; right: 12px; ...`).
 - `<body>` 는 실제 페이지처럼 헤더 + 본문 구조. 더미 데이터 3~5 행.
-- 접근성은 최소 수준 (`role`, `aria-label` 기본만).
-- **JavaScript 없음**. 상태 전환(hover/focus 제외) 은 정적으로 보여주거나 주석으로 설명.
+- **테마 토글 버튼**: `<body>` 최상단에 `<button class="theme-toggle" onclick="toggleTheme()">Light ↔ Dark</button>` 배치.
+- **최소 JS** — `<body>` 끝 `<script>` 에 아래 두 함수만:
+  ```js
+  (function initTheme() {
+    var q = new URL(location.href).searchParams.get('theme');
+    if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+  })();
+  function toggleTheme() {
+    var cur = document.documentElement.dataset.theme || 'light';
+    document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+  }
+  ```
+  - 이 JS 는 **테마 스위칭 전용** 으로만 허용. 인터랙션 로직/상태/페칭 등 추가 JS 금지.
+- 접근성: 최소 수준 (`role`, `aria-label` 기본만).
 - 파일 상단에 주석으로 "시안 용도, 실제 렌더는 @monorepo/ui primitive 로 구현됨. 이 HTML 은 시각 근사 목적" 명시.
+
+### 2. 비교 인덱스 HTML (`index.html`)
+
+- 위 개별 HTML 과 같은 톤의 self-contained 페이지.
+- 상단 sticky 헤더: 기능명 제목 + 전역 "Light ↔ Dark" 토글 버튼.
+- 본문 CSS grid 2 열 (`grid-template-columns: 1fr 1fr; gap: 16px;`).
+- 각 grid cell 은 `<figure>`:
+  - `<figcaption>` 에 "Page / Variant — 한 줄 의도" 레이블
+  - `<iframe src="<page>-<variant>.html" loading="lazy" style="width: 100%; height: 720px; border: 1px solid var(--background-divider); border-radius: 8px;">`
+- 전역 토글 JS:
+  ```js
+  var currentTheme = 'light';
+  document.documentElement.dataset.theme = currentTheme;
+  function toggleAll() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = currentTheme;
+    document.querySelectorAll('iframe').forEach(function(f) {
+      var base = f.src.split('?')[0];
+      f.src = base + '?theme=' + currentTheme;
+    });
+  }
+  ```
+  - iframe 재로드로 each 시안 테마 동기화. file:// 프로토콜 same-origin 차단을 querystring 방식으로 회피.
+- `:root[data-theme="..."]` 블록은 index 자체의 배경/텍스트 색을 위해 간단히 포함 (개별 HTML 과 동일한 서브셋이면 충분).
+
+### 3. 카탈로그 .md 에 index.html 링크 필수
+
+- 카탈로그 헤더 바로 아래 "**한 눈 비교**: [index.html](./<feature>-variants/index.html)" 줄 추가.
 
 ## 작성 절차
 

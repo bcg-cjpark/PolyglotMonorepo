@@ -33,16 +33,20 @@
 
 ## 3. 시안 카탈로그 포맷
 
-산출물은 **2 종**:
+산출물은 **3 종**:
 
 1. **HTML 시안 파일들** — `docs/design-notes/<feature>-variants/<page>-<variant>.html`
-   - Variant 당 1 HTML. Self-contained (외부 스크립트 없음). 더블클릭으로 브라우저 렌더 가능.
-   - `<style>` 인라인에 `libs/tokens/styles/__tokens-light.css` 의 `:root` 변수 블록 복사.
+   - Variant 당 1 HTML. Self-contained (외부 네트워크 리소스 없음). 더블클릭으로 브라우저 렌더 가능.
+   - `<style>` 인라인에 `:root[data-theme="light"]` + `:root[data-theme="dark"]` 두 토큰 블록 모두 복사 (각 파일 `libs/tokens/styles/__tokens-{light,dark}.css` 에서 실사용 변수만 서브셋 복사).
    - 레이아웃/색/간격은 오직 CSS 변수로만. 하드코딩 금지.
+   - 우상단 "Light ↔ Dark" 토글 버튼 + URL `?theme=` 쿼리 초기화 (최소 JS 허용).
    - primitive 의 실제 React 인터랙션은 없음 — **시각 근사**. 매핑 표가 진실 소스.
-   - Light 기본. Dark 가 필요하면 `<page>-<variant>-dark.html` 별도.
-2. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
+2. **비교 인덱스 HTML** — `docs/design-notes/<feature>-variants/index.html`
+   - 모든 variant 를 iframe grid 로 한 페이지에서 동시 비교.
+   - 전역 Light/Dark 토글 — iframe src 에 `?theme=` 쿼리를 붙여 재로드 방식으로 동기화 (file:// same-origin 회피).
+3. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
    - 각 HTML 에 대한 링크 + 의도 + 컴포넌트 매핑 표 + 선택 가이드.
+   - 헤더 바로 아래 "한 눈 비교: [index.html]" 링크.
 
 소유: 디자인팀 (커밋은 `design-lead`).
 
