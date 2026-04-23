@@ -3,7 +3,7 @@
 **원본 PRD**: [../prd/user.md](../prd/user.md)
 **원본 Brief**: [../stitch-brief/user.md](../stitch-brief/user.md)
 **작성일**: 2026-04-23
-**상태**: 선택 대기
+**상태**: 선택 완료 — UserListPage: Variant A (표 중심) / UserFormPage: Variant C (모달형, PRD 개정 후 채택)
 
 **한 눈 비교**: [index.html](./user-variants/index.html) — 모든 variant 를 한 페이지에서 Light/Dark 토글하며 비교.
 
