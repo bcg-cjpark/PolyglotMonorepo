@@ -165,6 +165,27 @@ export const Empty: Story = {
   },
 };
 
+/** emptyMessage 를 지정하지 않을 때 기본값 '데이터가 없습니다' 가 렌더되는지 확인. */
+export const EmptyDefaultMessage: Story = {
+  args: {
+    columns: [
+      { key: 'id', header: 'ID', width: '80px' },
+      { key: 'name', header: '이름' },
+      { key: 'email', header: '이메일' },
+    ] satisfies ReadonlyArray<TableColumn<SampleUser>>,
+    rows: [],
+  },
+};
+
+/** columns=[] 일 때 colSpan=1 폴백으로 빈 상태 셀이 단일 컬럼으로 렌더. */
+export const EmptyNoColumns: Story = {
+  args: {
+    columns: [] satisfies ReadonlyArray<TableColumn<SampleUser>>,
+    rows: [],
+    emptyMessage: '컬럼 정의가 없습니다',
+  },
+};
+
 /**
  * 다크 테마 — `.storybook/preview.ts` 의 `globalTypes.theme` 토글을
  * 스토리 레벨에서 'dark' 로 고정. Table.scss 는 `:root[data-theme=...]` 기반

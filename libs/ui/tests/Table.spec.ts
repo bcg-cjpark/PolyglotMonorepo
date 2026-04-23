@@ -8,15 +8,14 @@ import { test, expect } from '@playwright/test';
  * 실제 DOM 을 렌더시켜 구조·속성·클래스·style 을 검증한다.
  *
  * 매핑되는 스토리(index.json 기준):
- *   - components-table--default             → 기본 렌더 / `getRowKey` 회귀
- *   - components-table--with-custom-render  → `render` 콜백이 실제 ReactNode 로 치환
- *   - components-table--alignment           → align / width 속성 → className / style 반영
- *   - components-table--empty               → rows=[] + emptyMessage → 한 줄 colspan 렌더
+ *   - components-table--default                → 기본 렌더 / `getRowKey` 회귀
+ *   - components-table--with-custom-render     → `render` 콜백이 실제 ReactNode 로 치환
+ *   - components-table--alignment              → align / width 속성 → className / style 반영
+ *   - components-table--empty                  → rows=[] + 커스텀 emptyMessage → colspan 렌더
+ *   - components-table--empty-default-message  → emptyMessage 미지정 → 기본값 '데이터가 없습니다'
+ *   - components-table--empty-no-columns       → columns=[] 폴백 → colSpan={columns.length || 1} 의 1
  *
- * 커버 못한 케이스 (별도 스토리 부재로 런타임 실행 불가):
- *   - emptyMessage 기본값 ("데이터가 없습니다") — Empty 스토리는 커스텀 문구를 지정함.
- *   - columns=[] + rows=[] 조합 시 `colSpan={columns.length || 1}` 이 1 로 폴백.
- *   두 케이스는 "후속 정비 권고" 로 리포트에 명시.
+ * 모든 분기(기본값 / 폴백 포함) 를 스토리-기반 런타임으로 커버.
  */
 
 // iframe 루트 = Storybook 이 마운트하는 `#storybook-root` 아래의 `.ui-table__wrapper > table`.
@@ -163,5 +162,66 @@ test.describe('Table — 빈 상태 (Empty story)', () => {
     await expect(emptyCell).toHaveAttribute('colspan', '3');
     await expect(emptyCell).toHaveClass(/ui-table__cell--empty/);
     await expect(emptyCell).toHaveText('등록된 사용자가 없습니다');
+  });
+});
+
+test.describe('Table — 빈 상태 기본 메시지 (EmptyDefaultMessage story)', () => {
+  test('emptyMessage 미지정 시 Table.tsx 기본값 "데이터가 없습니다" 가 렌더된다', async ({
+    page,
+  }) => {
+    // EmptyDefaultMessage story 는 rows=[] 만 주고 emptyMessage 를 args 에서 누락.
+    // → Table 컴포넌트의 default parameter ('데이터가 없습니다') 분기가 동작해야 함.
+    await page.goto('/iframe.html?id=components-table--empty-default-message&viewMode=story');
+    const table = page.locator(TABLE);
+
+    // thead 는 기존 Empty story 와 동일하게 3 컬럼 유지.
+    const ths = table.locator('thead > tr > th');
+    await expect(ths).toHaveCount(3);
+    await expect(ths.nth(0)).toHaveText('ID');
+    await expect(ths.nth(1)).toHaveText('이름');
+    await expect(ths.nth(2)).toHaveText('이메일');
+
+    // tbody 는 빈 상태 전용 단일 tr.
+    const bodyRows = table.locator('tbody > tr');
+    await expect(bodyRows).toHaveCount(1);
+    await expect(bodyRows.first()).toHaveClass(/ui-table__row--empty/);
+
+    // 기본값 텍스트 + colspan=3 (columns.length 가 3 이므로 폴백 안 탐).
+    const emptyCell = bodyRows.first().locator('td');
+    await expect(emptyCell).toHaveCount(1);
+    await expect(emptyCell).toHaveAttribute('colspan', '3');
+    await expect(emptyCell).toHaveClass(/ui-table__cell--empty/);
+    await expect(emptyCell).toHaveText('데이터가 없습니다');
+  });
+});
+
+test.describe('Table — 컬럼/행 모두 비어있는 엣지 (EmptyNoColumns story)', () => {
+  test('columns=[] + rows=[] 조합 시 colSpan 이 1 로 폴백되고 단일 셀이 렌더된다', async ({
+    page,
+  }) => {
+    // EmptyNoColumns story 는 columns=[], rows=[], emptyMessage='컬럼 정의가 없습니다'.
+    // → `colSpan={columns.length || 1}` 의 `|| 1` 폴백 분기가 동작해야 함.
+    await page.goto('/iframe.html?id=components-table--empty-no-columns&viewMode=story');
+    const table = page.locator(TABLE);
+
+    // table / thead / tbody 구조는 유지되지만 thead 의 th 는 0 개.
+    await expect(table).toHaveCount(1);
+    await expect(table.locator('thead')).toHaveCount(1);
+    await expect(table.locator('thead > tr > th')).toHaveCount(0);
+
+    // tbody 에는 빈 상태 전용 단일 tr + 단일 td.
+    const bodyRows = table.locator('tbody > tr');
+    await expect(bodyRows).toHaveCount(1);
+    await expect(bodyRows.first()).toHaveClass(/ui-table__row--empty/);
+
+    const emptyCell = bodyRows.first().locator('td');
+    await expect(emptyCell).toHaveCount(1);
+    await expect(emptyCell).toHaveClass(/ui-table__cell--empty/);
+
+    // 핵심 회귀 방지: columns.length=0 → `|| 1` 폴백 → colspan="1".
+    await expect(emptyCell).toHaveAttribute('colspan', '1');
+
+    // 스토리에서 지정한 emptyMessage 가 그대로 표시.
+    await expect(emptyCell).toHaveText('컬럼 정의가 없습니다');
   });
 });
