@@ -3,7 +3,7 @@
 **원본 PRD**: [../prd/todo.md](../prd/todo.md)
 **원본 Brief**: [../stitch-brief/todo.md](../stitch-brief/todo.md)
 **작성일**: 2026-04-23
-**상태**: 선택 대기
+**상태**: 선택 완료 — TodoListPage: Variant A (표 + 세그먼트) / TodoFormPage: Variant A (세로 스택)
 
 **한 눈 비교**: [index.html](./todo-variants/index.html) — 모든 variant 를 한 페이지에서 Light/Dark 토글하며 비교.
 
