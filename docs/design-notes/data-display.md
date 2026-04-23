@@ -116,6 +116,15 @@ hover 전용 토큰을 새로 만들기보다, **기존 토큰 재사용 또는 
 - 교체 확정 후 본 문서의 **2.1 절을 다시 업데이트** — 어떤 토큰/식을 선택했는지 한 줄로 기록 (후속 감사 추적용).
 - 토큰을 신설한 경우 `apply-theme-colors.mjs` 경유 필수, 양 테마 동시 정의, Tailwind alias 도 함께.
 
+#### 실제 적용 (2026-04-23)
+
+옵션 (1) "기존 semantic 토큰 재사용" 경로 채택. `libs/ui/src/components/Table/Table.scss` 의
+`.ui-table__body .ui-table__row:hover` 배경을 `var(--background-bg-innerframe)` 로 교체
+(commit `827c71f`). 헤더 `--background-bg-surface` 와 구분되는 미묘한 innerframe 톤이며,
+Light(`common-light-gray-f5`) / Dark(`neutral-neutral050`) 양쪽에 이미 정의돼 있어
+신규 시멘틱 토큰 생성 없이 해결. `color-mix` / 신규 토큰 신설(옵션 2·3)은 미사용 — 향후
+UX 재검토로 원복/교체 시 위 3개 옵션 서술을 다시 근거로 삼을 것.
+
 ---
 
 ## 3. 선택 매트릭스 (핵심)
@@ -229,3 +238,4 @@ ui-composer → ui-storybook-curator → ui-library-tester → ui-lead
 
 - 2026-04-22: DataGrid (ag-grid-community 래퍼) 제거, Table primitive 로 대체. 대량/정렬/필터 요구가 생기면 재도입 검토.
 - 2026-04-23: §2.1 "Table row hover 의도" 소섹션 추가. `design-consistency-auditor` Warning (3b) — "본문 행 hover 배경이 헤더 배경과 동일" 대응. §8 Out of Scope 의 "페이지 레벨 로딩/에러/빈 상태" 링크를 신규 `global-states.md` 로 갱신.
+- 2026-04-23: §2.1 실제 적용 토큰 기록 — UI팀이 옵션 (1) 기존 `--background-bg-innerframe` 재사용 경로로 `Table.scss` 에 반영 (commit `827c71f`). 신규 토큰 생성 없음.
