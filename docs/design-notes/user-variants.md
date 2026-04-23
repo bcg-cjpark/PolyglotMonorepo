@@ -5,6 +5,8 @@
 **작성일**: 2026-04-23
 **상태**: 선택 대기
 
+**한 눈 비교**: [index.html](./user-variants/index.html) — 모든 variant 를 한 페이지에서 Light/Dark 토글하며 비교.
+
 ---
 
 ## 공통 제약

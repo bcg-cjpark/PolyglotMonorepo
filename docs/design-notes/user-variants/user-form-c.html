@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
 <meta charset="utf-8" />
 <title>시안 — UserFormPage Variant C (모달형)</title>
@@ -14,8 +14,7 @@
   Brief 의 "페이지 헤더 (취소/뒤로가기)" 전제와도 맞지 않음. 위험/전제 배너 필수.
 -->
 <style>
-:root[data-theme="light"],
-:root {
+:root[data-theme="light"] {
   --base-colors-primary-primary800: #4f46e5;
   --base-colors-primary-primary900: #3a30e2;
   --base-colors-primary-primary100: #dedcf9;
@@ -84,6 +83,80 @@
   --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
 }
 
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-secondary-secondary100: #38290f;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red050: #281616;
+  --base-colors-common-bg-surface-default: var(--base-colors-neutral-neutral150, #212325);
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+
+  --input-color-surface: var(--base-colors-neutral-neutral050);
+  --input-color-border-static: var(--base-colors-neutral-neutral200);
+  --input-color-border-focus: var(--base-colors-primary-primary700, #2d22e0);
+  --input-color-border-error: var(--base-colors-red-red500, #962325);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral300);
+  --input-color-text-static: var(--base-colors-neutral-neutral700);
+  --input-color-text-error: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150, #212325);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+
+  --padding-padding-4: 0.25rem;
+  --padding-padding-8: 0.5rem;
+  --padding-padding-12: 0.75rem;
+  --padding-padding-16: 1rem;
+  --padding-padding-24: 1.5rem;
+
+  --radius-default: 0.5rem;
+  --radius-md: 0.625rem;
+
+  --modal-box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.5);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
+/* Light 보강 — neutral150 누락 변수 정의 */
+:root[data-theme="light"] {
+  --base-colors-neutral-neutral150: #ecedee;
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -93,6 +166,27 @@ body {
   margin: 0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.theme-toggle:hover {
+  background-color: var(--background-bg-innerframe);
 }
 
 /* 뒷 배경: 목록 페이지 (blurred 느낌) */
@@ -292,6 +386,8 @@ body {
 </head>
 <body>
 
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
+
   <!-- 상단 고정 위험 배너 (overlay 보다 위에 z-index 배치) -->
   <div class="warn-banner-fixed" role="alert">
     위험/전제: PRD "관련 화면" 은 user-list / user-form 2개 라우트를 명시.
@@ -378,5 +474,15 @@ body {
     </div>
   </div>
 
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
 </body>
 </html>

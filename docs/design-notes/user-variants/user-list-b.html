@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
 <meta charset="utf-8" />
 <title>시안 — UserListPage Variant B (카드 리스트)</title>
@@ -13,8 +13,7 @@
   data-display.md §3 매트릭스의 선택 근거와 어긋남 — 위험/전제 배너 필수.
 -->
 <style>
-:root[data-theme="light"],
-:root {
+:root[data-theme="light"] {
   --base-colors-primary-primary800: #4f46e5;
   --base-colors-primary-primary700: #3a30e2;
   --base-colors-primary-primary900: #3a30e2;
@@ -96,6 +95,89 @@
   --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
 }
 
+:root[data-theme="dark"] {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #2d22e0;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-primary-primary100: #171532;
+  --base-colors-primary-primary050: #151429;
+  --base-colors-primary-primary-deep: #8f89ee;
+  --base-colors-secondary-secondary100: #38290f;
+  --base-colors-secondary-secondary-deep: #f8bb54;
+  --base-colors-neutral-neutral800: #ffffff;
+  --base-colors-neutral-neutral750: #f1f3f5;
+  --base-colors-neutral-neutral700: #ecedee;
+  --base-colors-neutral-neutral600: #dadbdd;
+  --base-colors-neutral-neutral550: #caccce;
+  --base-colors-neutral-neutral500: #babcbe;
+  --base-colors-neutral-neutral400: #8f9299;
+  --base-colors-neutral-neutral300: #696d77;
+  --base-colors-neutral-neutral250: #5a5c5e;
+  --base-colors-neutral-neutral200: #313335;
+  --base-colors-neutral-neutral150: #212325;
+  --base-colors-neutral-neutral100: #1a1c1e;
+  --base-colors-neutral-neutral050: #151719;
+  --base-colors-neutral-neutral000: #131313;
+  --base-colors-red-red900: #ff464a;
+  --base-colors-red-red100: #281616;
+  --base-colors-red-red050: #281616;
+  --base-colors-blue-blue800-deep: #318aff;
+  --base-colors-blue-blue050: #121c28;
+  --base-colors-green-green800: #08b63a;
+  --base-colors-green-green050: #122317;
+  --base-colors-common-bg-surface-default: var(--base-colors-neutral-neutral150);
+  --base-colors-common-light-gray-f5: var(--base-colors-neutral-neutral050);
+  --base-colors-common-light-gray-ea: var(--base-colors-neutral-neutral100);
+
+  --base-size-size-4: 0.25rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-red-background: var(--base-colors-red-red100);
+  --button-red-text: var(--base-colors-red-red700, #cd292c);
+  --button-red-border: var(--base-colors-red-red700, #cd292c);
+  --button-outline-text: var(--base-colors-neutral-neutral600);
+  --button-outline-border: var(--base-colors-neutral-neutral200);
+  --button-outline-background: var(--base-colors-neutral-neutral100);
+  --button-outline-background-hover: var(--base-colors-neutral-neutral100);
+
+  --font-color-default: var(--base-colors-neutral-neutral700);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral500);
+  --font-color-red: var(--base-colors-red-red900);
+  --font-color-white: var(--base-colors-neutral-neutral700);
+
+  --background-bg-default: var(--base-colors-neutral-neutral150);
+  --background-bg-surface: var(--base-colors-neutral-neutral100);
+  --background-bg-innerframe: var(--base-colors-neutral-neutral050);
+  --background-divider: var(--base-colors-neutral-neutral200);
+  --background-bg-dom-ask: var(--base-colors-red-red300, #5f1c1d);
+
+  --padding-padding-4: var(--base-size-size-4);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-24: var(--base-size-size-24);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -105,6 +187,27 @@ body {
   margin: 0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  padding: var(--padding-padding-8) var(--padding-padding-12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.theme-toggle:hover {
+  background-color: var(--background-bg-innerframe);
 }
 
 .page-container {
@@ -243,6 +346,7 @@ body {
 </style>
 </head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Light/Dark 테마 전환">🌓 Light ↔ Dark</button>
   <div class="page-container">
 
     <div class="warn-banner" role="alert">
@@ -332,5 +436,15 @@ body {
     </ul>
 
   </div>
+  <script>
+    (function initTheme() {
+      var q = new URL(location.href).searchParams.get('theme');
+      if (q === 'dark' || q === 'light') document.documentElement.dataset.theme = q;
+    })();
+    function toggleTheme() {
+      var cur = document.documentElement.dataset.theme || 'light';
+      document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+    }
+  </script>
 </body>
 </html>
