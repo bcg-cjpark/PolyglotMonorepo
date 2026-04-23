@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>시안 — UserListPage Variant B (카드 리스트)</title>
+<!--
+  시안: User List — Variant B (카드 리스트, 대안)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD: docs/prd/user.md
+  원본 Brief: docs/stitch-brief/user.md
+
+  주의: PRD/Brief 는 "정형 스키마 CRUD → 표 카테고리" 를 지정. 카드 리스트 채택 시
+  data-display.md §3 매트릭스의 선택 근거와 어긋남 — 위험/전제 배너 필수.
+-->
+<style>
+:root[data-theme="light"],
+:root {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-secondary-secondary100: #fcefd9;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-blue-blue800-deep: #0067ef;
+  --base-colors-blue-blue050: #e8f0fa;
+  --base-colors-green-green800: #00a22f;
+  --base-colors-green-green050: #f1f9f3;
+  --base-colors-common-bg-surface-default: var(--base-colors-neutral-neutral000);
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+
+  --base-size-size-4: 0.25rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-48: 3rem;
+
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-common-bg-surface-default);
+  --button-outline-background-hover: #f7f7f7;
+
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-red: var(--base-colors-red-red900);
+  --font-color-white: var(--base-colors-neutral-neutral000);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-divider: var(--base-colors-neutral-neutral250);
+  --background-bg-dom-ask: var(--base-colors-red-red100, #ffdbdc);
+
+  --padding-padding-4: var(--base-size-size-4);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-24: var(--base-size-size-24);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-container {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+/* 위험/전제 배너 */
+.warn-banner {
+  background-color: var(--base-colors-secondary-secondary100);
+  border: 1px solid var(--alert-warning-icon-color);
+  color: var(--alert-warning-icon-color);
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-sm {
+  padding: var(--padding-padding-4) var(--padding-padding-12);
+  font-size: 0.8125rem;
+}
+
+/* List + 합성 카드 시각 흉내 (data-display.md §3 의 "List + 합성 카드" 범주) */
+.user-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-12);
+}
+.user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+  padding: var(--padding-padding-16);
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+}
+.user-card:hover {
+  background-color: var(--background-bg-innerframe);
+}
+.user-card__left {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-padding-16);
+  min-width: 0;
+}
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background-color: var(--base-colors-primary-primary100);
+  color: var(--base-colors-primary-primary-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  flex-shrink: 0;
+}
+.user-card__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--font-color-default);
+}
+.user-email {
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-card__right {
+  display: flex;
+  align-items: center;
+  gap: var(--padding-padding-16);
+  flex-shrink: 0;
+}
+.user-date {
+  font-size: 0.8125rem;
+  color: var(--font-color-default-muted);
+}
+</style>
+</head>
+<body>
+  <div class="page-container">
+
+    <div class="warn-banner" role="alert">
+      위험/전제: PRD 는 "정형 스키마 CRUD → 표 카테고리" 를 지정
+      (<code>data-display.md §3</code>). 카드 리스트는 고정 스키마 대비 행 높이가 커져
+      스캔성이 떨어짐. 채택하려면 PRD/Brief 에서 "목록" 카테고리로 상향 필요.
+    </div>
+
+    <header class="page-header" role="banner">
+      <h1 class="page-title">사용자</h1>
+      <a class="btn btn-primary" href="#">+ 새 사용자</a>
+    </header>
+
+    <!--
+      본문: List + 페이지 전용 합성 카드 (UserCard — apps/example-web/src/components/UserCard.tsx 에 배치 예정).
+      상태 전환 (구현 단계):
+        - Loading: ListSkeleton 으로 치환.
+        - Error  : 중앙 정렬 에러 텍스트 + "다시 시도" Button.
+        - Empty  : 안내 블록 + "+ 새 사용자" 헤더 버튼으로 유도.
+    -->
+    <ul class="user-list" role="list" aria-label="사용자 목록">
+      <li class="user-card" role="listitem">
+        <div class="user-card__left">
+          <span class="user-avatar" aria-hidden="true">김</span>
+          <div class="user-card__body">
+            <span class="user-name">김민준</span>
+            <span class="user-email">minjun.kim@example.com</span>
+          </div>
+        </div>
+        <div class="user-card__right">
+          <span class="user-date">2026-04-22</span>
+          <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+        </div>
+      </li>
+      <li class="user-card" role="listitem">
+        <div class="user-card__left">
+          <span class="user-avatar" aria-hidden="true">이</span>
+          <div class="user-card__body">
+            <span class="user-name">이서연</span>
+            <span class="user-email">seoyeon.lee@example.com</span>
+          </div>
+        </div>
+        <div class="user-card__right">
+          <span class="user-date">2026-04-22</span>
+          <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+        </div>
+      </li>
+      <li class="user-card" role="listitem">
+        <div class="user-card__left">
+          <span class="user-avatar" aria-hidden="true">박</span>
+          <div class="user-card__body">
+            <span class="user-name">박도윤</span>
+            <span class="user-email">doyun.park@example.com</span>
+          </div>
+        </div>
+        <div class="user-card__right">
+          <span class="user-date">2026-04-21</span>
+          <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+        </div>
+      </li>
+      <li class="user-card" role="listitem">
+        <div class="user-card__left">
+          <span class="user-avatar" aria-hidden="true">최</span>
+          <div class="user-card__body">
+            <span class="user-name">최지우</span>
+            <span class="user-email">jiwoo.choi@example.com</span>
+          </div>
+        </div>
+        <div class="user-card__right">
+          <span class="user-date">2026-04-20</span>
+          <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+        </div>
+      </li>
+      <li class="user-card" role="listitem">
+        <div class="user-card__left">
+          <span class="user-avatar" aria-hidden="true">정</span>
+          <div class="user-card__body">
+            <span class="user-name">정하은</span>
+            <span class="user-email">haeun.jung@example.com</span>
+          </div>
+        </div>
+        <div class="user-card__right">
+          <span class="user-date">2026-04-19</span>
+          <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+        </div>
+      </li>
+    </ul>
+
+  </div>
+</body>
+</html>

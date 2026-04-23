@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>시안 — UserListPage Variant A (표 중심)</title>
+<!--
+  시안: User List — Variant A (표 중심, 권장)
+  용도: 시각 근사 (실제 @monorepo/ui primitive 는 구현 단계에서 사용)
+  원본 PRD: docs/prd/user.md
+  원본 Brief: docs/stitch-brief/user.md
+-->
+<style>
+/* ========================================================================
+   libs/tokens/styles/__tokens-light.css :root 블록 (원본 그대로 복사 — 토큰 강제)
+   ======================================================================== */
+:root[data-theme="light"],
+:root {
+  --base-colors-primary-primary800: #4f46e5;
+  --base-colors-primary-primary700: #3a30e2;
+  --base-colors-primary-primary600: #3b31e2;
+  --base-colors-primary-primary500: #5d55e7;
+  --base-colors-primary-primary400: #7f79ec;
+  --base-colors-primary-primary300: #a19df1;
+  --base-colors-primary-primary200: #bfbcf6;
+  --base-colors-primary-primary100: #dedcf9;
+  --base-colors-primary-primary050: #eeeefc;
+  --base-colors-primary-primary-deep: #251bc3;
+  --base-colors-primary-primary900: #3a30e2;
+  --base-colors-secondary-secondary800: #f59e0b;
+  --base-colors-secondary-secondary700: #dd8e09;
+  --base-colors-secondary-secondary600: #f6a51e;
+  --base-colors-secondary-secondary500: #f7b545;
+  --base-colors-secondary-secondary400: #f9c56c;
+  --base-colors-secondary-secondary300: #fbd493;
+  --base-colors-secondary-secondary200: #fce2b6;
+  --base-colors-secondary-secondary100: #fcefd9;
+  --base-colors-secondary-secondary050: #fef7ec;
+  --base-colors-secondary-secondary-deep: #ac6f07;
+  --base-colors-secondary-secondary900: #dd8e09;
+
+  --base-colors-neutral-neutral800: #131313;
+  --base-colors-neutral-neutral700: #333740;
+  --base-colors-neutral-neutral600: #5a5c5e;
+  --base-colors-neutral-neutral500: #8f9299;
+  --base-colors-neutral-neutral400: #b4b6bb;
+  --base-colors-neutral-neutral300: #caccce;
+  --base-colors-neutral-neutral200: #ecedee;
+  --base-colors-neutral-neutral100: #f5f6f6;
+  --base-colors-neutral-neutral000: #ffffff;
+  --base-colors-neutral-neutral750: #242424;
+  --base-colors-neutral-neutral250: #dadbdd;
+  --base-colors-neutral-neutral150: #ecedee;
+  --base-colors-neutral-neutral550: #717375;
+  --base-colors-neutral-neutral050: #f1f3f5;
+  --base-colors-green-green100: #e6f8eb;
+  --base-colors-green-green200: #c7eed2;
+  --base-colors-green-green300: #a7e5b9;
+  --base-colors-green-green400: #87dc9f;
+  --base-colors-green-green600: #47c96d;
+  --base-colors-green-green700: #28c053;
+  --base-colors-green-green500: #67d286;
+  --base-colors-green-green800: #00a22f;
+  --base-colors-green-green050: #f1f9f3;
+  --base-colors-red-red800: #f63338;
+  --base-colors-red-red700: #ff595c;
+  --base-colors-red-red600: #f56e70;
+  --base-colors-red-red500: #f78284;
+  --base-colors-red-red400: #f89597;
+  --base-colors-red-red300: #f9a8aa;
+  --base-colors-red-red200: #fbbcbd;
+  --base-colors-red-red100: #ffdbdc;
+  --base-colors-red-red050: #fff1f2;
+  --base-colors-red-red900: #ed2d32;
+  --base-colors-blue-blue800-deep: #0067ef;
+  --base-colors-blue-blue700: #539eff;
+  --base-colors-blue-blue600: #6babff;
+  --base-colors-blue-blue500: #83b9ff;
+  --base-colors-blue-blue400: #9cc7ff;
+  --base-colors-blue-blue300: #b4d4ff;
+  --base-colors-blue-blue200: #cce2ff;
+  --base-colors-blue-blue100: #e0edff;
+  --base-colors-blue-blue050: #e8f0fa;
+  --base-colors-blue-blue800: #1775f0;
+  --base-colors-common-bg-surface-dark: #19323f;
+  --base-colors-common-light-gray-ca: #caccce;
+  --base-colors-common-light-gray-f5: #f5f7f9;
+  --base-colors-common-light-gray-ea: #eaecee;
+  --base-colors-purple-purple800: #892fe9;
+  --base-colors-purple-purple700: #984aec;
+  --base-colors-purple-purple600: #a765ee;
+  --base-colors-purple-purple500: #b780f1;
+  --base-colors-purple-purple400: #c69af4;
+  --base-colors-purple-purple300: #d5b5f7;
+  --base-colors-purple-purple200: #e4d0fa;
+  --base-colors-purple-purple100: #f3eafd;
+  --base-colors-purple-purple050: #f9f3ff;
+
+  --base-size-size-14: 0.875rem;
+  --base-size-size-13: 0.812rem;
+  --base-size-size-10: 0.625rem;
+  --base-size-size-8: 0.5rem;
+  --base-size-size-16: 1rem;
+  --base-size-size-6: 0.375rem;
+  --base-size-size-12: 0.75rem;
+  --base-size-size-64: 4rem;
+  --base-size-size-4: 0.25rem;
+  --base-size-size-48: 3rem;
+  --base-size-size-18: 1.125rem;
+  --base-size-size-36: 2.25rem;
+  --base-size-size-24: 1.5rem;
+  --base-size-size-20: 1.25rem;
+  --base-size-size-40: 2.5rem;
+  --base-size-size-0: 0;
+
+  --base-colors-common-bg-surface-default: var(--base-colors-neutral-neutral000);
+  --button-primary-background: var(--base-colors-primary-primary800);
+  --button-primary-text: #ffffff;
+  --button-primary-border: var(--base-colors-primary-primary800);
+  --button-primary-background-hover: var(--base-colors-primary-primary900);
+  --button-red-background: var(--base-colors-red-red050);
+  --button-red-text: var(--base-colors-red-red900);
+  --button-red-border: var(--base-colors-red-red900);
+  --button-outline-text: var(--base-colors-neutral-neutral750);
+  --button-outline-border: var(--base-colors-neutral-neutral550);
+  --button-outline-background: var(--base-colors-common-bg-surface-default);
+  --button-outline-background-hover: #f7f7f7;
+
+  --font-color-primary: var(--base-colors-primary-primary800);
+  --font-color-default: var(--base-colors-neutral-neutral800);
+  --font-color-default-muted: var(--base-colors-neutral-neutral500);
+  --font-color-default-muted-dark: var(--base-colors-neutral-neutral550);
+  --font-color-default-muted-light: var(--base-colors-neutral-neutral400);
+  --font-color-red: var(--base-colors-red-red900);
+  --font-color-white: var(--base-colors-neutral-neutral000);
+  --font-color-blue: var(--base-colors-blue-blue800-deep);
+
+  --input-color-surface: var(--base-colors-neutral-neutral000);
+  --input-color-border-static: var(--base-colors-neutral-neutral250);
+  --input-color-border-focus: var(--base-colors-primary-primary800);
+  --input-color-border-error: var(--base-colors-red-red900);
+  --input-color-text-placeholder: var(--base-colors-neutral-neutral400);
+  --input-color-text-static: var(--base-colors-neutral-neutral800);
+  --input-color-text-error: var(--base-colors-red-red900);
+
+  --background-bg-default: var(--base-colors-neutral-neutral000);
+  --background-bg-surface: var(--base-colors-common-light-gray-ea);
+  --background-bg-innerframe: var(--base-colors-common-light-gray-f5);
+  --background-bg-surface-muted: var(--base-colors-neutral-neutral250);
+  --background-divider: var(--base-colors-neutral-neutral250);
+  --background-bg-dom-ask: var(--base-colors-red-red100);
+  --background-primary-light: var(--base-colors-primary-primary100);
+
+  --chips-status-done-bg: var(--base-colors-green-green050);
+  --chips-status-done-text: var(--base-colors-green-green800);
+  --chips-status-pending-bg: var(--base-colors-primary-primary050);
+  --chips-status-pending-text: var(--base-colors-primary-primary-deep);
+
+  --padding-padding-64: var(--base-size-size-64);
+  --padding-padding-48: var(--base-size-size-48);
+  --padding-padding-36: var(--base-size-size-36);
+  --padding-padding-24: var(--base-size-size-24);
+  --padding-padding-16: var(--base-size-size-16);
+  --padding-padding-12: var(--base-size-size-12);
+  --padding-padding-8: var(--base-size-size-8);
+  --padding-padding-4: var(--base-size-size-4);
+
+  --radius-xs: var(--base-size-size-4);
+  --radius-sm: var(--base-size-size-6);
+  --radius-md: var(--base-size-size-10);
+  --radius-default: var(--base-size-size-8);
+
+  --alert-error-icon-color: var(--base-colors-red-red900);
+  --alert-warning-icon-color: var(--base-colors-secondary-secondary-deep);
+  --alert-info-icon-color: var(--base-colors-blue-blue800-deep);
+  --alert-success-icon-color: var(--base-colors-green-green800);
+}
+
+/* ========================================================================
+   시안용 레이아웃 (primitive 시각 흉내)
+   ======================================================================== */
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Pretendard', 'Pretendard Variable', system-ui, -apple-system, sans-serif;
+  background-color: var(--background-bg-default);
+  color: var(--font-color-default);
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-container {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--padding-padding-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-padding-24);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--padding-padding-16);
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--font-color-default);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--padding-padding-4);
+  padding: var(--padding-padding-8) var(--padding-padding-16);
+  border-radius: var(--radius-default);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background-color: var(--button-primary-background);
+  color: var(--button-primary-text);
+  border-color: var(--button-primary-border);
+}
+.btn-primary:hover {
+  background-color: var(--button-primary-background-hover);
+}
+.btn-ghost {
+  background-color: var(--button-outline-background);
+  color: var(--button-outline-text);
+  border-color: var(--button-outline-border);
+}
+.btn-ghost:hover {
+  background-color: var(--button-outline-background-hover);
+}
+.btn-destructive {
+  background-color: var(--button-red-background);
+  color: var(--button-red-text);
+  border-color: var(--button-red-border);
+}
+.btn-destructive:hover {
+  filter: brightness(0.97);
+}
+.btn-sm {
+  padding: var(--padding-padding-4) var(--padding-padding-12);
+  font-size: 0.8125rem;
+}
+
+/* Table primitive 흉내 */
+.data-table-wrap {
+  background-color: var(--background-bg-default);
+  border: 1px solid var(--background-divider);
+  border-radius: var(--radius-default);
+  overflow: hidden;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.data-table thead th {
+  background-color: var(--background-bg-surface);
+  color: var(--font-color-default);
+  text-align: left;
+  font-weight: 600;
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-bottom: 1px solid var(--background-divider);
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
+}
+.data-table tbody td {
+  padding: var(--padding-padding-12) var(--padding-padding-16);
+  border-bottom: 1px solid var(--background-divider);
+  color: var(--font-color-default);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+/* data-display.md §2.1 의도: hover 는 innerframe 톤 */
+.data-table tbody tr:hover td {
+  background-color: var(--background-bg-innerframe);
+}
+.data-table td.align-right {
+  text-align: right;
+}
+.cell-muted {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+}
+
+.page-footnote {
+  color: var(--font-color-default-muted);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+</style>
+</head>
+<body>
+  <div class="page-container">
+
+    <!-- 페이지 헤더: 제목 + Primary CTA. Loading/Error/Empty 에서도 유지 (global-states.md §2) -->
+    <header class="page-header" role="banner">
+      <h1 class="page-title">사용자</h1>
+      <a class="btn btn-primary" href="#" aria-label="새 사용자 추가">+ 새 사용자</a>
+    </header>
+
+    <!--
+      본문: Table primitive (정형 스키마 CRUD).
+      컬럼: 이름 / 이메일 / 생성일 / 삭제 액션.
+      상태 전환 (구현 단계):
+        - Loading: tbody 자리를 ListSkeleton 으로 치환 (헤더·페이지 헤더는 유지).
+        - Error  : tbody 자리를 에러 안내 + "다시 시도" Button 으로 치환.
+        - Empty  : Table 의 emptyMessage prop 으로 "등록된 사용자가 없습니다." 전달.
+    -->
+    <div class="data-table-wrap" role="region" aria-label="사용자 목록">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 28%;">이름</th>
+            <th style="width: 36%;">이메일</th>
+            <th style="width: 24%;">생성일</th>
+            <th style="width: 12%;" class="align-right">액션</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>김민준</td>
+            <td>minjun.kim@example.com</td>
+            <td class="cell-muted">2026-04-22</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td>이서연</td>
+            <td>seoyeon.lee@example.com</td>
+            <td class="cell-muted">2026-04-22</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td>박도윤</td>
+            <td>doyun.park@example.com</td>
+            <td class="cell-muted">2026-04-21</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td>최지우</td>
+            <td>jiwoo.choi@example.com</td>
+            <td class="cell-muted">2026-04-20</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td>정하은</td>
+            <td>haeun.jung@example.com</td>
+            <td class="cell-muted">2026-04-19</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td>강시우</td>
+            <td>siwoo.kang@example.com</td>
+            <td class="cell-muted">2026-04-18</td>
+            <td class="align-right">
+              <button class="btn btn-destructive btn-sm" type="button">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="page-footnote">
+      총 6명 · createdAt DESC 정렬. 페이지네이션/검색/정렬은 V1 범위 밖.
+    </p>
+  </div>
+</body>
+</html>
