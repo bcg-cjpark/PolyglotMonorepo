@@ -68,11 +68,21 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 ## 표준 파이프라인
 
-**공통 흐름** — `[1] → [2] → [3] → [4/5] → [6] → [7] → [9]`. 단계 [4] 의 백엔드 축과 단계 [7] 통합 e2e 는 **모드에 따라 스킵**.
+**공통 흐름** — `[1] → [2] → [3] → [4/5] → [6] → [7] → [9]`. 단계 [4] 의 백엔드 축과 단계 [7] 통합 e2e 는 **모드에 따라 스킵**. 단계 [2] 는 두 경로 중 **프로젝트별로 하나** 선택.
 
 ```
 [1] 기획 통합       doc-consolidator → stitch-brief-writer → planning-lead (커밋)
-[2] (사용자 수동)   Stitch 로 화면정의서 생성 → docs/screens/*.md 로 투입
+
+[2] 화면정의서 획득 — 두 경로 중 하나:
+    [2a] Stitch 수동 경로 (기본)
+         사용자가 Stitch (또는 대체 UX 툴) 실행 → 결과를 docs/screens/*.md 로 직접 투입
+    [2b] 시안 프로세스 경로 (대안)
+         screen-concepter → docs/design-notes/<feature>-variants.md (카탈로그)
+         → 사용자(또는 메인)가 시안 선택
+         → 메인이 선택된 시안을 docs/screens/*.md 로 승격 (기획팀 소유권의 예외 대행)
+         → design-lead 가 variants.md 커밋, 메인이 screens/*.md 커밋
+         (외부 툴 없이 팀 내부에서 libs/ui 제약 반영된 시안만 쓰고 싶을 때)
+
 [3] 디자인 노트     design-trend-scout → design-lead (커밋)          ← 선택
 [4] 백엔드 ∥ UI    [inhouse 만] backend-developer → backend-lead (커밋)
                    [모든 모드] ui-composer → ui-storybook-curator → ui-library-tester → ui-lead (커밋)
@@ -85,6 +95,14 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 [8] 실패 루프       lead FAIL → 해당 팀원 재호출 (≤ 3회)
 [9] 사후 감사       spec-auditor → planning-lead (커밋)
 ```
+
+### [2b] 시안 프로세스 규약
+
+- **언제 고르나**: 외부 Stitch/Figma AI 를 쓸 수 없거나, 여러 레이아웃 대안을 팀 내부에서만 비교하고 싶을 때.
+- **산출물**: `docs/design-notes/<feature>-variants.md` (디자인팀 소유). 페이지당 시안 2~4개, ASCII 와이어프레임 + `@monorepo/ui` 컴포넌트 매핑 표.
+- **승격**: 사용자가 시안을 선택하면 **메인이 대행** 해 `docs/screens/<page>.md` 를 `docs/screens/README.md` 필수 섹션 포맷으로 생성. 이 예외적 대행이 허용되는 이유 — Stitch 경로의 "사용자 수동 투입" 을 "사용자 선택 + 메인 승격" 으로 대체한 것이라, 의사결정 주체는 여전히 사용자.
+- **primitive 부재**: 시안에 쓰인 `@monorepo/ui` primitive 가 현재 없으면 variants.md 에 "신규 (UI팀 요청)" 로 마킹. 해당 시안이 선택되면 [4] 단계 UI팀 라인이 primitive 신설부터 진행.
+- **PRD 이탈 방지**: 시안이 PRD V1 범위를 넘는 기능(검색/필터/정렬 등) 을 제안하면 screen-concepter 가 "위험/전제" 로 라벨링. 선택 시 PRD 개정 선행.
 
 ## UI 라이브러리 우선 규칙
 
@@ -101,8 +119,8 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 | 경로 | 편집 가능 팀 |
 |---|---|
-| `docs/prd/**`, `docs/screens/**`, `docs/stitch-brief/**`, `docs/audit/**` | 기획팀 |
-| `docs/design-notes/**` | 디자인팀 |
+| `docs/prd/**`, `docs/screens/**`, `docs/stitch-brief/**`, `docs/audit/**` | 기획팀 (단 `docs/screens/**` 는 [2b] 경로일 때 메인이 선택 승격 대행 허용) |
+| `docs/design-notes/**` | 디자인팀 (시안 카탈로그 `*-variants.md` 포함) |
 | `libs/ui/**` | UI팀 |
 | `libs/tokens/styles/__tokens-*.css` | UI팀 (`scripts/apply-theme-colors.mjs` 경유 필수, 의도 결정은 디자인팀) |
 | `libs/tailwind-config/globals.css` (Tailwind `@theme inline` 매핑) | UI팀 |
