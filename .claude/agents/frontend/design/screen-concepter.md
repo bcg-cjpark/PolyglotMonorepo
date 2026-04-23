@@ -129,7 +129,10 @@ Route: `/<path>`
 - `<!DOCTYPE html>` + `<html lang="ko">`.
 - `<head>` 에 `<meta charset="utf-8">` + `<title>` + 인라인 `<style>`.
 - `<style>` 구조:
-  1. `:root { /* libs/tokens/styles/__tokens-light.css 의 :root 블록 전체 복사 */ }`
+  1. `:root { /* libs/tokens/styles/__tokens-light.css 에서 이 시안이 실제 참조하는 변수만 추출해 복사 */ }`
+     - **서브셋 복사 허용**: 전체 599줄 복사는 과도 — `var(--*)` 로 실제 쓰는 변수만 원본에서 취사 복사 (변수명/값 원본 유지, 임의 변형 금지).
+     - **변수 정의 누락 금지**: HTML 본문이 `var(--foo)` 를 참조하면 `:root` 에 반드시 `--foo` 정의 포함. 누락되면 렌더 실패.
+     - 참고: 시안당 100~200줄 내외가 일반적. 400줄 넘어가면 "정말 다 쓰는지" 재검토.
   2. `body` 기본 설정 (`font-family`, `background-color: var(--background-bg-default)`, `color: var(--font-color-default)`, `margin: 0`, `min-height: 100vh`).
   3. 레이아웃 class (page-header, page-body, table-like, form-like 등) — 각 class 는 primitive 의 시각 구조를 흉내내는 CSS. 변수만 사용.
 - `<body>` 는 실제 페이지처럼 헤더 + 본문 구조. 더미 데이터 3~5 행.
