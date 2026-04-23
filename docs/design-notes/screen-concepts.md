@@ -33,7 +33,17 @@
 
 ## 3. 시안 카탈로그 포맷
 
-파일 경로: `docs/design-notes/<feature>-variants.md`
+산출물은 **2 종**:
+
+1. **HTML 시안 파일들** — `docs/design-notes/<feature>-variants/<page>-<variant>.html`
+   - Variant 당 1 HTML. Self-contained (외부 스크립트 없음). 더블클릭으로 브라우저 렌더 가능.
+   - `<style>` 인라인에 `libs/tokens/styles/__tokens-light.css` 의 `:root` 변수 블록 복사.
+   - 레이아웃/색/간격은 오직 CSS 변수로만. 하드코딩 금지.
+   - primitive 의 실제 React 인터랙션은 없음 — **시각 근사**. 매핑 표가 진실 소스.
+   - Light 기본. Dark 가 필요하면 `<page>-<variant>-dark.html` 별도.
+2. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
+   - 각 HTML 에 대한 링크 + 의도 + 컴포넌트 매핑 표 + 선택 가이드.
+
 소유: 디자인팀 (커밋은 `design-lead`).
 
 ```markdown
@@ -47,27 +57,27 @@
 ## 공통 제약
 - @monorepo/ui primitive + libs/tokens CSS 변수만
 - 디자인 노트 global-palette / global-states / data-display 준수
-- Light/Dark 자동 대응
+- Light/Dark 자동 대응 (HTML 은 Light 기본)
 
 ## <Page 이름>
 
 ### Variant A — "<한 단어 컨셉>"
+**시안 HTML**: [<page>-a.html](./<feature>-variants/<page>-a.html)
 **의도**: <1~2문장>
-**와이어프레임**: ASCII 고정폭
 **컴포넌트 매핑**: 역할 / primitive / 기존·신규 / 비고
-**상태 대응**: Loading / Error / Empty
-**위험/전제**: (있다면)
+**상태 대응**: Loading / Error / Empty 본문 대체 방식
+**위험/전제 / 신규 요청**: PRD 범위 / 신규 primitive / 신규 토큰
 
 ### Variant B — "..."
 ### (선택) Variant C — "..."
 
 ## 선택 가이드
-| 시안 | 강점 | 약점 | 신규 primitive |
+| 시안 | 강점 | 약점 | 신규 primitive | 신규 토큰 |
 
 ## 승격 절차 (메인용)
 ```
 
-세부 규약은 `.claude/agents/frontend/design/screen-concepter.md` 의 출력 스펙 참조.
+세부 규약은 `.claude/agents/frontend/design/screen-concepter.md` 의 "출력" / "HTML 작성 규칙" 섹션 참조.
 
 ---
 
@@ -120,13 +130,35 @@
 
 ---
 
-## 7. primitive 부재 처리
+## 7. primitive / 토큰 부재 처리
 
-`screen-concepter` 가 생성한 시안에 `@monorepo/ui` 에 없는 primitive 가 쓰였다면 "신규 (UI팀 요청)" 로 마킹됨. 선택된 시안이 이 플래그를 가지면:
+### 7.1 신규 primitive 요청
 
-1. 메인이 `docs/screens/<page>.md` 를 먼저 승격 (UI 카테고리 용어로 환원된 상태).
+`screen-concepter` 가 생성한 시안에 `@monorepo/ui` 에 없는 primitive 가 쓰였다면 매핑 표에 "신규 (UI팀 요청)" 로 마킹됨. 선택된 시안이 이 플래그를 가지면:
+
+1. 메인이 `docs/screens/<page>.md` 를 먼저 승격 (UI 카테고리 용어로 환원).
 2. [4] 단계 UI팀 라인 (`ui-composer → curator → tester → ui-lead`) 가 신규 primitive 먼저 구현.
 3. 그 다음 [5] 프론트 라인이 해당 primitive 를 사용해 페이지 구현.
+
+### 7.2 신규 색상/semantic 토큰 요청
+
+시안에서 기존 `libs/tokens` 로는 표현이 어려운 새 색/시맨틱 토큰이 필요하면:
+
+1. 시안 `.md` 의 "신규 요청" 에 의도 명시 (예: "status=pending 을 위한 `--status-pending-bg` 토큰이 필요하다. 현재 `--background-bg-innerframe` 으로는 의미 구분 약함").
+2. 디자인팀이 **의도만 결정**. 색상 HEX / 시맨틱 이름을 `docs/design-notes/<feature>.md` 또는 `global-palette.md` 에 기록.
+3. UI팀이 **실행**:
+   - 새 **color scale** 이 필요하면 `scripts/apply-theme-colors.mjs` 경유 (기존 primary/secondary 와 동등 레벨의 전역 팔레트 확장).
+   - 새 **semantic alias** (예: `--status-pending-bg`) 만 필요하면 `libs/tokens/styles/__tokens-light.css` + `__tokens-dark.css` 양쪽에 추가 + `libs/tailwind-config/globals.css` 의 `@theme inline` 에 alias 매핑.
+4. 토큰 확정 후 [5] 프론트 라인이 해당 토큰을 유틸 클래스로 사용.
+
+### 7.3 "기존 조합으로 해결" 우선
+
+신규 토큰을 추가하기 전에 **항상** 기존 semantic 토큰으로 해결 가능한지 검토:
+- 배경 대비: `--background-bg-default` / `--background-bg-surface` / `--background-bg-innerframe` / `--background-bg-surface-muted` 네 단계 존재.
+- 텍스트 강도: `--font-color-default` / `--font-color-default-muted` / `--font-color-default-muted-dark` 존재.
+- 의미 색: `--font-color-danger`, red/blue/green scale 존재.
+
+기존 조합으로 "의미" 까지 설명 가능하면 신규 토큰 요청 금지.
 
 ---
 
