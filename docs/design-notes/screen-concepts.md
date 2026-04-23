@@ -41,9 +41,11 @@
    - 레이아웃/색/간격은 오직 CSS 변수로만. 하드코딩 금지.
    - 우상단 "Light ↔ Dark" 토글 버튼 + URL `?theme=` 쿼리 초기화 (최소 JS 허용).
    - primitive 의 실제 React 인터랙션은 없음 — **시각 근사**. 매핑 표가 진실 소스.
-2. **비교 인덱스 HTML** — `docs/design-notes/<feature>-variants/index.html`
-   - 모든 variant 를 iframe grid 로 한 페이지에서 동시 비교.
-   - 전역 Light/Dark 토글 — iframe src 에 `?theme=` 쿼리를 붙여 재로드 방식으로 동기화 (file:// same-origin 회피).
+2. **비교 인덱스 (3 레이어)** — `docs/design-notes/<feature>-variants/`
+   - **Level 1 `index.html`** — 피처 내 페이지 비교군 목록 (카드). 같은 페이지의 variant 끼리만 의미 있는 비교라 이 레이어로 시작.
+   - **Level 2 `compare-<page>.html`** — 페이지당 variant N 개를 iframe 으로 가로 나열. 전역 Light/Dark 토글 + "← 비교군 목록" 복귀 + 각 cell 에 "전체 화면으로 보기" 링크.
+   - **Level 3 `<page>-<variant>.html`** — 기존 variant 본체.
+   - 전역 토글은 iframe src + "전체 화면" 링크 href 모두 `?theme=` 쿼리로 동기화. 테마 상태가 Level 3 으로 이동 후에도 유지.
 3. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
    - 각 HTML 에 대한 링크 + 의도 + 컴포넌트 매핑 표 + 선택 가이드.
    - 헤더 바로 아래 "한 눈 비교: [index.html]" 링크.

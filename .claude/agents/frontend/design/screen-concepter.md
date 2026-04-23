@@ -68,11 +68,14 @@ Markdown 카탈로그로 생성.
    - **시각 근사 용도**: HTML 은 `@monorepo/ui` primitive 의 **rendered HTML 구조를 흉내** 내는 수준. React 인터랙션/상태 전환은 구현 단계에서. 매핑 표가 "이 시각은 실제로 어느 primitive 인가" 의 진실 소스.
    - **PRD V1 이탈 기능은 파일 내에 "위험/전제" 배너 주석** 으로 명시.
 
-2. **비교 인덱스 HTML** — `docs/design-notes/<feature>-variants/index.html`
-   - 모든 variant HTML 을 **iframe grid** 로 한 페이지에서 동시 비교.
-   - 상단에 전역 "Light ↔ Dark" 토글 — iframe src 에 `?theme=light|dark` 쿼리를 붙여 재로드 방식으로 모든 시안 동기 스위칭 (file:// same-origin 차단 회피).
-   - 2 열 grid, 각 iframe 상단에 "Page / Variant" 레이블.
-   - 역시 self-contained. 외부 리소스 0.
+2. **비교 인덱스 (3 레이어 계층)** — `docs/design-notes/<feature>-variants/`
+   - 같은 페이지의 variant 끼리만 비교해야 의미 있으므로 3 레이어:
+     - **Level 1** `index.html` — 피처 내 "페이지 비교군 목록" 카드 그리드. 각 카드는 Level 2 로 이동.
+     - **Level 2** `compare-<page>.html` — 해당 페이지의 variant N개를 iframe 으로 **동시 비교** (variant 수에 따라 3열/2열). 상단에 "← 비교군 목록" 링크 + 전역 Light/Dark 토글. 각 iframe 상단에 "Variant X — 한 줄 의도" 레이블 + "전체 화면으로 보기" 링크 (`<a target="_top" href="<page>-<variant>.html">`, 현재 테마 querystring 전달).
+     - **Level 3** `<page>-<variant>.html` — 기존 variant 본체 (§1). 상단에 "← 비교로 돌아가기" 링크 선택 배치 (없어도 브라우저 뒤로가기 가능).
+   - 공통: self-contained, 외부 리소스 0.
+   - 전역 토글 → iframe src 에 `?theme=light|dark` 쿼리 붙여 재로드 방식으로 동기화 (file:// same-origin 차단 회피).
+   - 카탈로그 .md 의 "한 눈 비교" 링크는 Level 1 (`index.html`) 을 가리킨다.
 
 3. **카탈로그 마크다운** — `docs/design-notes/<feature>-variants.md`
 
@@ -164,18 +167,52 @@ Route: `/<path>`
 - 접근성: 최소 수준 (`role`, `aria-label` 기본만).
 - 파일 상단에 주석으로 "시안 용도, 실제 렌더는 @monorepo/ui primitive 로 구현됨. 이 HTML 은 시각 근사 목적" 명시.
 
-### 2. 비교 인덱스 HTML (`index.html`)
+### 2. Level 1 `index.html` — 페이지 비교군 목록
 
-- 위 개별 HTML 과 같은 톤의 self-contained 페이지.
-- 상단 sticky 헤더: 기능명 제목 + 전역 "Light ↔ Dark" 토글 버튼.
-- 본문 CSS grid 2 열 (`grid-template-columns: 1fr 1fr; gap: 16px;`).
-- 각 grid cell 은 `<figure>`:
-  - `<figcaption>` 에 "Page / Variant — 한 줄 의도" 레이블
-  - `<iframe src="<page>-<variant>.html" loading="lazy" style="width: 100%; height: 720px; border: 1px solid var(--background-divider); border-radius: 8px;">`
+- 같은 톤의 self-contained 페이지. `<html data-theme="light">` + `:root[data-theme="..."]` 양쪽 인라인 (자체 배경용 최소 변수).
+- 상단 sticky 헤더: "**<feature>** 화면 시안" 제목 + (선택) 전역 Light/Dark 토글 (Level 1 은 iframe 없으므로 자체 테마만 영향).
+- 본문 CSS grid (페이지 수에 따라 1/2/3 열). 각 카드 = 한 페이지의 비교군:
+  ```html
+  <a class="feature-card" href="compare-<page>.html">
+    <h2>UserListPage — 3 variant</h2>
+    <p>목록 화면의 레이아웃 대안. 표 중심 / 카드 리스트 / 표 + 요약.</p>
+  </a>
+  ```
+- `.feature-card` 스타일: `display: block; padding: var(--padding-padding-24); border: 1px solid var(--background-divider); border-radius: 12px; text-decoration: none; color: var(--font-color-default); transition: ...;` + hover 에서 `background-color: var(--background-bg-innerframe)`.
+- 링크 클릭 시 현재 테마 유지하려면 JS 로 `?theme=` 쿼리 append (선택).
+
+### 3. Level 2 `compare-<page>.html` — variant 동시 비교
+
+- 페이지당 파일 1개 (예: UserListPage 3 variant → `compare-list.html`).
+- 상단 sticky 헤더: "← 비교군 목록" (`<a href="index.html">`) + 페이지명 제목 + 전역 "Light ↔ Dark" 토글 버튼.
+- 본문 grid: variant N 개를 가로 나열 (3개면 `grid-template-columns: 1fr 1fr 1fr;`, 2개면 2열).
+- 각 cell 구조:
+  ```html
+  <figure class="variant-cell">
+    <figcaption>
+      <strong>Variant A</strong> — 표 중심 (권장)
+      <a class="open-full" target="_top" href="user-list-a.html">전체 화면으로 보기 →</a>
+    </figcaption>
+    <iframe src="user-list-a.html" loading="lazy"></iframe>
+  </figure>
+  ```
+- iframe 스타일: `width: 100%; height: 720px; border: 1px solid var(--background-divider); border-radius: 8px;`
 - 전역 토글 JS:
   ```js
   var currentTheme = 'light';
-  document.documentElement.dataset.theme = currentTheme;
+  (function initTheme() {
+    var q = new URL(location.href).searchParams.get('theme');
+    if (q === 'dark' || q === 'light') currentTheme = q;
+    document.documentElement.dataset.theme = currentTheme;
+    document.querySelectorAll('iframe').forEach(function(f) {
+      var base = f.getAttribute('src').split('?')[0];
+      f.src = base + '?theme=' + currentTheme;
+    });
+    document.querySelectorAll('a.open-full').forEach(function(a) {
+      var base = a.getAttribute('href').split('?')[0];
+      a.href = base + '?theme=' + currentTheme;
+    });
+  })();
   function toggleAll() {
     currentTheme = currentTheme === 'light' ? 'dark' : 'light';
     document.documentElement.dataset.theme = currentTheme;
@@ -183,14 +220,19 @@ Route: `/<path>`
       var base = f.src.split('?')[0];
       f.src = base + '?theme=' + currentTheme;
     });
+    document.querySelectorAll('a.open-full').forEach(function(a) {
+      var base = a.href.split('?')[0];
+      a.href = base + '?theme=' + currentTheme;
+    });
   }
   ```
-  - iframe 재로드로 each 시안 테마 동기화. file:// 프로토콜 same-origin 차단을 querystring 방식으로 회피.
-- `:root[data-theme="..."]` 블록은 index 자체의 배경/텍스트 색을 위해 간단히 포함 (개별 HTML 과 동일한 서브셋이면 충분).
+  - 전역 토글은 iframe 재로드 + "전체 화면" 링크 href 갱신 둘 다 처리 → 테마 상태가 Level 3 이동 후에도 유지.
+- `:root[data-theme="..."]` 블록은 Level 2 자체 화면 배경용 최소 변수.
 
-### 3. 카탈로그 .md 에 index.html 링크 필수
+### 4. 카탈로그 .md 에 Level 1 링크 필수
 
 - 카탈로그 헤더 바로 아래 "**한 눈 비교**: [index.html](./<feature>-variants/index.html)" 줄 추가.
+- index.html 이 Level 1 이라는 사실 부연 설명은 선택.
 
 ## 작성 절차
 
