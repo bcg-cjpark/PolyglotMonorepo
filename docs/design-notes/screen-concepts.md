@@ -177,7 +177,21 @@
 
 ---
 
-## 9. Out of Scope
+## 9. 알려진 플랫폼 제약
+
+### 9.1 신규 에이전트 세션 로드
+
+`.claude/agents/frontend/design/screen-concepter.md` (또는 그 외 신규 에이전트) 를 처음 추가한 세션에서는 해당 에이전트 이름으로 `Agent` 도구 호출 시 `Agent type '...' not found` 오류. Claude Code 가 세션 시작 시 에이전트 목록을 고정 로드하기 때문.
+
+- **정식 사용**: 세션 재시작 후.
+- **긴급 대행 (세션 내)**: `general-purpose` 에이전트에 해당 `.md` 의 시스템 프롬프트/출력 규약 원문을 인라인으로 주입해 1회성 대행. 커밋 메시지에 **"<agent-name> 인라인 대행"** 명기해서 추적 가능하게.
+- **dogfooding 이력**: User/Todo/Memo 시안 생성 단계에서 `screen-concepter` 를 `general-purpose` 인라인 대행으로 수행 (관련 커밋 144873e / 797d19d / 2e74cc2). 해당 커밋 본문에 "screen-concepter 인라인 대행" 명기.
+
+### 9.2 시안 HTML 정규 토큰 alias 부재
+
+특정 CSS 변수 (`--background-bg-innerframe` 등) 가 `libs/tailwind-config/globals.css` 의 `@theme inline` 에 매핑되지 않아 시안 HTML 에서 arbitrary `hover:bg-[var(--...)]` 형식을 쓰게 되는 경우가 있음. 토큰 참조 자체는 유효하나 Tailwind 유틸 일관성 측면에서 arbitrary 남용은 경계 대상. UI팀에 alias 추가 요청 (후속 과제).
+
+## 10. Out of Scope
 
 - 비주얼 정밀 프로토타입 (Stitch 경로의 영역)
 - 외부 디자인 시스템 레퍼런스 수집 (`design-trend-scout` 의 영역)

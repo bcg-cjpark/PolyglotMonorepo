@@ -167,6 +167,35 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 - 재검수 FAIL → 재호출 반복. **최대 3회**.
 - 초과 시 사용자 보고 + 중단.
 
+## 운영 체크리스트 (dogfooding 발견사항)
+
+### Flyway migration 추가/변경 후 재기동 체크리스트
+
+백엔드팀이 `V<N>__<name>.sql` 을 추가하거나 기존 V 파일을 변경하면:
+
+1. **기존 백엔드 프로세스 종료** — 사용자 터미널에서 Ctrl+C.
+2. **V1 재작성 또는 schema_history checksum 충돌 시**: DB drop + create.
+   ```bash
+   docker exec <mysql-container> mysql -uroot -p<pwd> \
+     -e "DROP DATABASE IF EXISTS <db>; CREATE DATABASE <db> CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+   ```
+   단순 V 증분 (V2, V3 ...) 은 DB drop 불필요 — Flyway 가 자동 적용.
+3. **새 백엔드 기동**: `pnpm nx run example-api:serve`.
+4. **스모크 체크**: 신규 엔드포인트가 기대 스키마로 응답하는지 curl 또는 GET.
+
+이 순서를 건너뛰면 프론트/e2e 가 옛 서버를 보고 "테스트 실패 = 앱 버그" 로 오진하기 쉬움.
+
+### SecurityConfig `permitAll` 병렬 수정 회피
+
+두 피처 백엔드가 병렬로 `SecurityConfig.kt` 에 `.requestMatchers("/feature/**").permitAll()` 을 추가하면 같은 파일을 동시에 편집해 충돌 위험. 패턴:
+
+- 메인이 병렬 호출 **전에** 두 피처의 permitAll 라인을 한 번에 통합 커밋 (`chore(api): /a/** /b/** permitAll 추가`) → 그 후 backend-developer 들이 SecurityConfig 건드리지 말고 도메인/컨트롤러만 작성.
+- 또는 병렬 호출 후 메인이 merge 수동 처리.
+
+### 신규 에이전트 추가 직후 세션 로드 제약
+
+`.claude/agents/` 에 새 에이전트 파일을 추가해도 **현재 실행 중 세션은 그 에이전트를 호출할 수 없음** (세션 시작 시 목록 고정). 정식 사용은 **세션 재시작 후**. 세션 내 긴급 대행은 `general-purpose` 에이전트에 "에이전트 스펙" 을 인라인 프롬프트로 주입하고, 커밋 메시지에 **"<agent-name> 인라인 대행"** 명기.
+
 ## 원칙
 
 - `build` 성공 ≠ `dev` 성공 ≠ **UX 성공**. 세 레이어 중 변경 범위에 해당하는 것 모두 검증.
@@ -176,6 +205,8 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
   2. HTTP 200 만 보고 "버튼 클릭/입력 동작" 미검증
   3. 스펙에 "native 사용" 명시라고 `ui-composer` 호출을 건너뛰고 바로 native (스펙은 UI 종류만, 라이브러리는 구현 단계 결정)
   4. Tailwind `@layer` cascade 모른 채 unlayered SCSS 로 작성 → base preflight 에 덮어써짐
+  5. Flyway 새 migration 추가 후 재기동 누락 → 프론트/e2e 가 옛 API 응답 오해석
+  6. Kotlin Jackson 기본 설정으로 PUT 전체 교체 시 필드 누락이 null/기본값으로 바인딩되어 데이터 유실 (JacksonConfig `FAIL_ON_MISSING_CREATOR_PROPERTIES=true` + `@field:JsonProperty(required=true)` 로 방어)
 
 ## 금지사항
 
