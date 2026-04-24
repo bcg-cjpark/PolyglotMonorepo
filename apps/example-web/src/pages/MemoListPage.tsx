@@ -280,11 +280,15 @@ function MemoListPage() {
         cancelText="취소"
         onClose={closeDialog}
         onCancel={() => {
-          // 삭제 확인 취소 → 상세 모드로 양보 복귀 (screens/memo-dialog.md §2.c).
+          // 삭제 확인 "취소" 버튼 → 상세 모드로 양보 복귀 (screens/memo-dialog.md §2.c).
+          // Modal.tsx 의 handleCancel 은 onCancel 이 throw/reject 하면 handleClose 를
+          // 호출하지 않음(commit e14a388). 이를 이용해 오버레이를 닫지 않고
+          // dialog state 만 "detail" 로 교체한다. 다음 렌더에서 confirmDelete Modal
+          // isOpen=false + detail Modal isOpen=true 로 자연스럽게 전환.
+          // ESC/배경 클릭은 onClose 경로이므로 이 양보 로직과 무관(완전 닫힘 유지).
           if (dialog.kind === "confirmDelete") {
             setDialog({ kind: "detail", memo: dialog.memo });
-          } else {
-            closeDialog();
+            throw new Error("yield-to-detail");
           }
         }}
         onConfirm={handleConfirmDelete}
