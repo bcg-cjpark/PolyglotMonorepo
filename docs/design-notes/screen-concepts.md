@@ -185,7 +185,6 @@
 
 - **정식 사용**: 세션 재시작 후.
 - **긴급 대행 (세션 내)**: `general-purpose` 에이전트에 해당 `.md` 의 시스템 프롬프트/출력 규약 원문을 인라인으로 주입해 1회성 대행. 커밋 메시지에 **"<agent-name> 인라인 대행"** 명기해서 추적 가능하게.
-- **dogfooding 이력**: User/Todo/Memo 시안 생성 단계에서 `screen-concepter` 를 `general-purpose` 인라인 대행으로 수행 (관련 커밋 144873e / 797d19d / 2e74cc2). 해당 커밋 본문에 "screen-concepter 인라인 대행" 명기.
 
 ### 9.2 시안 HTML 정규 토큰 alias 부재
 

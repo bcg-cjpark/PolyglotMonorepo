@@ -18,9 +18,7 @@ class SecurityConfig {
                     .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**", "/health").permitAll()
                     .requestMatchers("/error").permitAll()
                     // 피처별 엔드포인트는 각 피처의 백엔드팀 구현 시점에 여기 추가.
-                    .requestMatchers("/users/**").permitAll() // User 피처 (dogfooding 첫 피처)
-                    .requestMatchers("/todos/**").permitAll() // Todo 피처 (dogfooding 두 번째 피처)
-                    .requestMatchers("/memos/**").permitAll() // Memo 피처 (dogfooding 세 번째 피처)
+                    // 예: .requestMatchers("/users/**").permitAll()
                     .anyRequest().authenticated()
             }
             .build()
