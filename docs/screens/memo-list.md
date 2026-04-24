@@ -63,6 +63,6 @@
 | totalElements | number | 0 | GET 응답 `.totalElements` |
 | isLoading | boolean | true | 쿼리 로딩 |
 | isError | boolean | false | 쿼리 실패 |
-| dialogState | "none" \| { kind: "detail", memo } \| { kind: "edit", memo? } \| { kind: "confirmDelete", memo } | "none" | 카드 클릭 / "+ 새 메모" / 모달 내 버튼 / 닫기 |
+| dialogState | "none" \| { kind: "detail", memo } \| { kind: "create" } \| { kind: "edit", memo } \| { kind: "confirmDelete", memo } | "none" | 카드 클릭 / "+ 새 메모" / 모달 내 버튼 / 닫기 |
 
 `dialogState` 가 none 이 아니면 [memo-dialog.md](./memo-dialog.md) 의 해당 모드 렌더.
