@@ -28,10 +28,6 @@ import { expect, test, type APIRequestContext, type Page } from "@playwright/tes
  *    잘려 들어가며, FormDialog 의 "최대 N자" 로컬 검증 분기는 dead code.
  *    본 스펙은 시나리오 의도 (= 사용자가 한도 너머 입력해도 안전하게 캡됨) 를
  *    "글자 수가 한도에서 멈추고 모달이 정상 동작" 으로 단정한다.
- *
- * T7 은 Modal primitive 제약으로 skip — dogfooding 발견사항. libs/ui Modal 의
- * onCancel 시맨틱이 "양보 경로" (취소 시 닫지 않고 다른 모드로 전환) 를
- * 지원하지 않아 screens/memo-dialog.md §2.c "취소 → 상세 복귀" 표현 불가.
  */
 
 interface CreatedMemoRef {
@@ -383,14 +379,7 @@ test.describe("Memo 피처 e2e — MemoListPage + Dialog", () => {
   // ---------------------------------------------------------------------------
   // T7. 삭제 확인 모드 — 양보 경로 (취소 → 상세 복귀) + 실제 삭제
   // ---------------------------------------------------------------------------
-  // TODO(dogfooding): libs/ui/Modal 의 onCancel 시맨틱이 "양보 경로" (취소 시
-  // 닫기 대신 다른 모드로 전환) 를 지원하지 않음. screens/memo-dialog.md §2.c
-  // "취소 → 상세 모드 복귀" 는 현재 구현으로 표현 불가능. Modal.handleCancel 이
-  // onCancel?.() 호출 후 무조건 handleClose() 를 부르는 구조
-  // (libs/ui/src/components/Modal/Modal.tsx:123-126). Modal primitive 에
-  // preventClose 시그널 또는 onCancel 반환값 기반 옵트인이 추가된 뒤에 unskip.
-  // 발견사항 반영 단계에서 처리 예정.
-  test.skip("T7: 삭제 확인 모드에서 '취소' → 상세 모드 복귀, 다시 '삭제' → DELETE 후 카드 사라짐", async ({
+  test("T7: 삭제 확인 모드에서 '취소' → 상세 모드 복귀, 다시 '삭제' → DELETE 후 카드 사라짐", async ({
     page,
     request,
   }) => {
