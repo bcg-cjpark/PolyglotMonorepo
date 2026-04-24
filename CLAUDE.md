@@ -119,7 +119,7 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 | 경로 | 편집 가능 팀 |
 |---|---|
-| `docs/prd/**`, `docs/screens/**`, `docs/stitch-brief/**`, `docs/audit/**` | 기획팀 (단 `docs/screens/**` 는 [2b] 경로일 때 메인이 선택 승격 대행 허용) |
+| `docs/prd/**`, `docs/screens/**`, `docs/stitch-brief/**`, `docs/audit/**`, `docs/releases/**`, `CHANGELOG.md` | 기획팀 (단 `docs/screens/**` 는 [2b] 경로일 때 메인이 선택 승격 대행 허용) |
 | `docs/design-notes/**` | 디자인팀 (시안 카탈로그 `*-variants.md` 포함) |
 | `libs/ui/**` | UI팀 |
 | `libs/tokens/styles/__tokens-*.css` | UI팀 (`scripts/apply-theme-colors.mjs` 경유 필수, 의도 결정은 디자인팀) |
@@ -152,14 +152,54 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 - **팀장만** `git commit` 실행. main 직접 (기능 브랜치/PR 없음).
 - 메시지는 한국어 Conventional Commits:
-  - `docs(plan)`, `docs(design)`, `docs(audit)`
+  - `docs(plan)`, `docs(design)`, `docs(audit)`, `docs(release)`
   - `feat(ui)`, `feat(web)`, `feat(api)`
   - `test(web)`, `test(integration)`, `test(ui)`
-  - `fix(...)`, `refactor(...)`, `chore(...)`
+  - `fix(...)`, `refactor(...)`, `chore(...)`, `chore(release): bump <X.Y.Z>`
 - 한 팀의 작업 = 한 커밋. 기능 단위로 분할.
 - 팀장 PASS 전에는 커밋 금지.
-- 팀장이 없는 메타 작업 (`.claude/**`, `CLAUDE.md`, 루트 설정 변경) 은 메인이 직접 커밋.
+- 팀장이 없는 메타 작업 (`.claude/**`, `CLAUDE.md`, 루트 설정 변경, 버전 bump) 은 메인이 직접 커밋.
 - Co-Authored-By trailer 항상 포함.
+
+## 릴리즈 규약 (SemVer + Keep a Changelog)
+
+**목표**: 템플릿 사용자가 "이번 업데이트로 뭐가 바뀌었고, 마이그레이션이 필요한지" 를 `CHANGELOG.md` 와 `docs/releases/v<X.Y.Z>.md` 하나로 판단 가능하게.
+
+### 흐름
+
+1. 메인이 "릴리즈해줘" 요청 (또는 의미 있는 변경 누적 후 자체 판단).
+2. `release-curator` 호출 — git log 분석 → SemVer 증분 제안 + `CHANGELOG.md` append + `docs/releases/v<X.Y.Z>.md` 작성.
+3. `planning-lead` 검수 + 커밋 (`docs(release): v<X.Y.Z> 릴리즈 노트`).
+4. **메인이 직접** `package.json` (10개) + `apps/example-api/build.gradle.kts` 버전 bump + 커밋 (`chore(release): bump <X.Y.Z>`).
+5. (선택) 메인이 `git tag v<X.Y.Z>` + `git push --tags`.
+
+### SemVer 판정
+
+| 조건 | 증분 |
+|---|---|
+| 커밋 본문 `BREAKING CHANGE:` 또는 제목 `feat!:` | **major** |
+| 제목 prefix 중 하나라도 `feat(*)` | **minor** |
+| 그 외 (`fix`/`refactor`/`chore`/`test`/`docs`/`perf`/`build`/`style`) | **patch** |
+
+### 템플릿 특성상 major 로 승격되는 변경
+
+아래는 `feat` 이라도 템플릿 사용자에게 breaking 이라 **major**:
+
+- `.claude/agents/**` 의 에이전트 **이름 변경/삭제** (신규 추가는 minor)
+- `CLAUDE.md` 파이프라인 **단계 구조** 변경 (단계 추가/삭제/재순서)
+- `libs/ui` primitive **prop 시그니처 제거/이름 변경** (prop 추가는 minor)
+- `libs/tokens` **시멘틱 토큰 이름 변경/삭제** (추가는 minor)
+- Flyway **V1** 재작성 또는 기존 V 번호 변경
+- `docs/tech-stack/**` 의 **mode/engine 기본값 변경**
+
+자동 판단 애매하면 `release-curator` 는 **minor 로 보수적 제안** 후 근거 리포트. 최종 결정은 메인/사용자.
+
+### 산출물
+
+- `CHANGELOG.md` — Keep a Changelog 1.1.0 포맷. 최신이 위.
+- `docs/releases/v<X.Y.Z>.md` — 릴리즈별 상세 노트 (하이라이트 / 범주별 변경 / breaking 마이그레이션 / 커밋 통계 / 검증 결과).
+
+세부 포맷은 `.claude/agents/planning/release-curator.md` 참조.
 
 ## 실패 루프 규약
 
