@@ -29,8 +29,8 @@ export interface ModalFooterProps {
   fullWidth?: boolean;
   /** 커스텀 푸터 렌더 */
   children?: React.ReactNode;
-  /** 취소 시 */
-  onCancel?: () => void;
+  /** 취소 시 (Promise 반환 시 Modal 이 resolve 될 때까지 대기, reject/throw 시 닫지 않음) */
+  onCancel?: () => void | Promise<void>;
   /** 확인 시 (Promise 반환 시 Modal 이 resolve 될 때까지 대기) */
   onConfirm?: () => void | Promise<void>;
   /** 액션 클릭 시 */

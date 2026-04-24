@@ -91,3 +91,66 @@ test.describe('Modal — async onConfirm reject', () => {
     await expect(page.locator(MODAL)).toBeVisible();
   });
 });
+
+/**
+ * Cancel 측 "양보(yield)" 시나리오 검증 (ui-composer 후속 변경점).
+ *
+ * 변경 포인트 (`libs/ui/src/components/Modal/Modal.tsx`):
+ *  - `handleCancel` 이 `await onCancel?.()` 를 수행하고, 내부에서 throw 되거나
+ *    Promise reject 가 발생하면 `handleClose()` 를 호출하지 않음.
+ *    → 소비자가 "아직 닫지 마세요" 를 표현할 수 있는 탈출구.
+ *
+ * 스토리:
+ *  - `CancelYieldSync` : onCancel 에서 동기 throw → 모달 유지 + "양보 처리됨" 렌더.
+ *  - `CancelYieldAsync`: onCancel 이 지연 후 Promise.reject → 모달 유지.
+ *
+ * cancelText 기본값 = '취소' (meta.args), 스토리에서 override 하지 않는다고 가정.
+ */
+test.describe('Modal — onCancel throw/reject 시 close 보류', () => {
+  test('Cancel sync throw 시 모달이 닫히지 않고 유지되며 onCancel 실행 흔적이 남는다', async ({
+    page,
+  }) => {
+    await page.goto(
+      '/iframe.html?id=components-modal--cancel-yield-sync&viewMode=story'
+    );
+
+    const modal = page.locator(MODAL);
+    await expect(modal).toBeVisible();
+
+    // 기본 cancelText = '취소'
+    const cancelBtn = page.getByRole('button', { name: '취소' });
+    await expect(cancelBtn).toBeVisible();
+    await cancelBtn.click();
+
+    // 동기 throw 이후에도 close 가 트리거되어선 안 됨. 500ms 대기.
+    await page.waitForTimeout(500);
+
+    // 핵심 검증 1: 모달 Panel 이 여전히 DOM 에 1개 존재 + 보임
+    await expect(modal).toHaveCount(1);
+    await expect(modal).toBeVisible();
+
+    // 핵심 검증 2: 스토리가 onCancel 콜백 내부에서 렌더한 "양보 처리됨" 텍스트 노출
+    //               → onCancel 이 실제로 실행됐음을 증명 (클릭 이벤트가 먹혀서 throw 까지 도달)
+    await expect(page.getByText('양보 처리됨')).toBeVisible();
+  });
+
+  test('Cancel async reject 시 지연 후에도 모달이 유지된다', async ({ page }) => {
+    await page.goto(
+      '/iframe.html?id=components-modal--cancel-yield-async&viewMode=story'
+    );
+
+    const modal = page.locator(MODAL);
+    await expect(modal).toBeVisible();
+
+    const cancelBtn = page.getByRole('button', { name: '취소' });
+    await expect(cancelBtn).toBeVisible();
+    await cancelBtn.click();
+
+    // async reject 처리 + 혹시 발생할 잘못된 close 타이밍까지 여유 확보 (≥ 500ms).
+    await page.waitForTimeout(700);
+
+    // 핵심: reject 이후에도 modal panel 잔존.
+    await expect(modal).toHaveCount(1);
+    await expect(modal).toBeVisible();
+  });
+});

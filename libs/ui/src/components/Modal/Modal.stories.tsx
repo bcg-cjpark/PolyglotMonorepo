@@ -345,3 +345,85 @@ export const AsyncConfirmReject: Story = {
     );
   },
 };
+
+/**
+ * 동기 throw 양보 — `onCancel` 이 동기적으로 throw 하면 Modal 은 닫히지 않고
+ * 유지됩니다. 외부가 "취소" 를 다른 모드(예: 미저장 변경사항 확인 모달) 로
+ * 전환하는 양보 경로(yield) 패턴을 시각화합니다.
+ *
+ * dogfooding: memo-dialog §2.c 의 "취소 양보 경로" 를 위한 패턴.
+ */
+export const CancelYieldSync: Story = {
+  args: {
+    title: '확인',
+    cancelText: '취소',
+    confirmText: '확인',
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(true);
+    const [yielded, setYielded] = useState(false);
+    return (
+      <Modal
+        {...args}
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={() => setOpen(false)}
+        onCancel={() => {
+          setYielded(true);
+          throw new Error('yield'); // close 보류
+        }}
+      >
+        <p style={{ margin: 0, color: '#374151' }}>
+          "취소" 를 누르면 throw 되어 모달이 유지됩니다.
+        </p>
+        {yielded && (
+          <p style={{ color: 'var(--font-color-default-muted)', marginTop: 8 }}>
+            양보 처리됨 — 모달이 그대로 유지됨
+          </p>
+        )}
+      </Modal>
+    );
+  },
+};
+
+/**
+ * async reject 양보 — `onCancel` 이 비동기적으로 reject 하면 Modal 은
+ * Promise 가 settle 될 때까지 대기한 뒤에도 닫히지 않고 유지됩니다.
+ * 외부가 네트워크/상태 확인 후 "취소" 를 양보시켜야 하는 경우의 패턴입니다.
+ *
+ * dogfooding: memo-dialog §2.c 의 "취소 양보 경로" 를 위한 패턴.
+ */
+export const CancelYieldAsync: Story = {
+  args: {
+    title: '확인',
+    cancelText: '취소',
+    confirmText: '확인',
+  },
+  render: (args) => {
+    const [open, setOpen] = useState(true);
+    const [yielded, setYielded] = useState(false);
+    return (
+      <Modal
+        {...args}
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={() => setOpen(false)}
+        onCancel={async () => {
+          setYielded(false);
+          await new Promise((r) => setTimeout(r, 300));
+          setYielded(true);
+          throw new Error('yield'); // close 보류
+        }}
+      >
+        <p style={{ margin: 0, color: '#374151' }}>
+          "취소" 를 누르면 0.3초 뒤 async reject 되어 모달이 유지됩니다.
+        </p>
+        {yielded && (
+          <p style={{ color: 'var(--font-color-default-muted)', marginTop: 8 }}>
+            양보 처리됨 — 모달이 그대로 유지됨
+          </p>
+        )}
+      </Modal>
+    );
+  },
+};

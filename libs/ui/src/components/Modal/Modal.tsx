@@ -55,8 +55,8 @@ export interface ModalProps {
   onClose?: () => void;
   /** 뒤로가기 시 */
   onBack?: () => void;
-  /** 취소 시 */
-  onCancel?: () => void;
+  /** 취소 시 (Promise 반환 시 resolve 될 때까지 대기 후 닫힘, reject/throw 시 닫히지 않아 양보 경로 표현 가능) */
+  onCancel?: () => void | Promise<void>;
   /** 확인 시 (Promise 반환 시 resolve 될 때까지 대기 후 닫힘, reject 시 닫히지 않음) */
   onConfirm?: () => void | Promise<void>;
   /** 액션 클릭 시 */
@@ -120,8 +120,13 @@ export const Modal = memo(function Modal({
     }
   }, [closeOnEscape, closeOnOverlayClick, handleClose]);
 
-  const handleCancel = useCallback(() => {
-    onCancel?.();
+  const handleCancel = useCallback(async () => {
+    try {
+      await onCancel?.();
+    } catch {
+      // onCancel 이 throw/reject 하면 모달을 닫지 않아 외부가 다른 모드로 전환(양보 경로)할 수 있도록 함
+      return;
+    }
     handleClose();
   }, [onCancel, handleClose]);
 
