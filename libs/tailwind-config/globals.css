@@ -61,6 +61,7 @@
   --color-default-muted-dark: var(--font-color-default-muted-dark);
   --color-bg-bg-default: var(--background-bg-default);
   --color-bg-bg-outline: var(--background-bg-outline);
+  --color-bg-innerframe: var(--background-bg-innerframe);
 
   /* ── Neutral scale ── */
   --color-neutral-neutral000: var(--base-colors-neutral-neutral000);
