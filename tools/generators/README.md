@@ -1,6 +1,6 @@
 # @monorepo/generators
 
-Nx 커스텀 제너레이터로 `example-api` / `example-web` 을 템플릿 삼아 새 앱을 scaffold 합니다.
+Nx 커스텀 제너레이터로 `api` / `web` 을 템플릿 삼아 새 앱을 scaffold 합니다.
 
 ## 사용법
 
@@ -14,8 +14,8 @@ nx g @monorepo/generators:web-app admin-web
 
 ## 동작
 
-1. `apps/example-api` (또는 `example-web`)의 파일 트리를 복사
-2. 파일 내용의 토큰(`com.example.template`, `example-api` 등)을 입력값으로 치환
+1. `apps/api` (또는 `web`)의 파일 트리를 복사
+2. 파일 내용의 토큰(`com.example.template`, `api` 등)을 입력값으로 치환
 3. 디렉토리 경로의 Java 패키지 경로(`com/example/template`)도 치환
 4. Nx `project.json`을 새 앱 디렉토리에 등록
 

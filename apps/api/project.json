@@ -1,13 +1,13 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "example-api",
+  "name": "api",
   "projectType": "application",
-  "sourceRoot": "apps/example-api",
+  "sourceRoot": "apps/api",
   "targets": {
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "apps/example-api",
+        "cwd": "apps/api",
         "command": "node ../../scripts/run-gradle.mjs :app:bootRun"
       }
     },
@@ -16,7 +16,7 @@
       "cache": true,
       "outputs": ["{projectRoot}/app/build/libs"],
       "options": {
-        "cwd": "apps/example-api",
+        "cwd": "apps/api",
         "command": "node ../../scripts/run-gradle.mjs :app:bootJar"
       }
     },
@@ -24,7 +24,7 @@
       "executor": "nx:run-commands",
       "cache": true,
       "options": {
-        "cwd": "apps/example-api",
+        "cwd": "apps/api",
         "command": "node ../../scripts/run-gradle.mjs test"
       }
     },
@@ -32,7 +32,7 @@
       "executor": "nx:run-commands",
       "cache": true,
       "options": {
-        "cwd": "apps/example-api",
+        "cwd": "apps/api",
         "command": "node ../../scripts/run-gradle.mjs ktlintCheck"
       }
     },
@@ -40,7 +40,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/app/build/openapi.json"],
       "options": {
-        "cwd": "apps/example-api",
+        "cwd": "apps/api",
         "command": "node ../../scripts/run-gradle.mjs :app:generateOpenApiDocs"
       }
     }

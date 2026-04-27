@@ -18,7 +18,7 @@ export default async function webAppGenerator(
     throw new Error(`Directory already exists: ${projectRoot}`);
   }
 
-  copyExampleWeb(tree, "apps/example-web", projectRoot, { name, port });
+  copyExampleWeb(tree, "apps/web", projectRoot, { name, port });
 
   addProjectConfiguration(tree, name, {
     root: projectRoot,
@@ -62,8 +62,8 @@ function replaceContentTokens(
   tokens: { name: string; port: number },
 ): string {
   return content
-    .replace(/"name": "example-web"/g, `"name": "${tokens.name}"`)
+    .replace(/"name": "web"/g, `"name": "${tokens.name}"`)
     .replace(/port: 3000/g, `port: ${tokens.port}`)
-    .replace(/proxy_pass http:\/\/example-api:8080\//g,
-      `proxy_pass http://example-api:8080/`);
+    .replace(/proxy_pass http:\/\/api:8080\//g,
+      `proxy_pass http://api:8080/`);
 }

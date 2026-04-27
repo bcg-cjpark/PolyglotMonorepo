@@ -1,6 +1,6 @@
-# 백엔드 기술 스택 (`apps/example-api`)
+# 백엔드 기술 스택 (`apps/api`)
 
-이 문서는 `apps/example-api` 가 사용하는 백엔드 기술 스택을 **결정 기록(decision record)** 형태로 남긴다.
+이 문서는 `apps/api` 가 사용하는 백엔드 기술 스택을 **결정 기록(decision record)** 형태로 남긴다.
 백엔드팀(`backend-developer`) 이 새 코드를 쓰거나 기존 코드를 고칠 때 이 문서의 규약을 따른다.
 
 관련 규약:
@@ -145,16 +145,16 @@ docker exec -it <container> mysql -uroot -p -e \
 도커 컨테이너가 돌고 있고 `polyglot_example` DB 가 생성된 상태에서, 레포 루트의 `.env.example` 을 `.env` 로 복사해 로컬 값(특히 `DB_PASSWORD`) 만 채우면:
 
 ```bash
-pnpm nx run example-api:serve
+pnpm nx run api:serve
 ```
 
 명령 한 줄로 끝난다.
 
 **환경변수 로드 메커니즘 (실측 확인)**
 - **Nx** 가 태스크 실행 시 레포 루트의 `.env` 를 자동 로드해서 프로세스 환경변수에 주입한다.
-- `pnpm nx run example-api:serve` → `./gradlew :app:bootRun` 을 spawn 하면서 상속, Gradle `JavaExec` 의 기본 동작상 자식 JVM 이 `System.getenv()` 를 그대로 받는다.
+- `pnpm nx run api:serve` → `./gradlew :app:bootRun` 을 spawn 하면서 상속, Gradle `JavaExec` 의 기본 동작상 자식 JVM 이 `System.getenv()` 를 그대로 받는다.
 - 따라서 `.env` 에 있는 `SPRING_PROFILES_ACTIVE`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `API_PORT` 는 별도 쉘 `export` 없이 Spring Boot 까지 도달한다.
-- 커맨드라인에서 `DB_PASSWORD=xxx pnpm nx run example-api:serve` 처럼 붙이면 해당 변수만 `.env` 값을 **override** 한다 (상위 우선).
+- 커맨드라인에서 `DB_PASSWORD=xxx pnpm nx run api:serve` 처럼 붙이면 해당 변수만 `.env` 값을 **override** 한다 (상위 우선).
 
 **흔한 함정: `.env` 가 template 시절 값으로 남아 있을 때**
 - `.env.example` 이 갱신되더라도 이미 만든 `.env` 는 자동으로 바뀌지 않는다. PostgreSQL 시절 값(예: `DB_PORT=5432`, `DB_NAME=app`) 이 남아 있으면 MySQL 기동이 `Communications link failure` 로 떨어진다.

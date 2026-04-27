@@ -7,7 +7,7 @@
     "codegen": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/src/generated.ts"],
-      "dependsOn": ["example-api:generate-openapi"],
+      "dependsOn": ["api:generate-openapi"],
       "options": {
         "cwd": "libs/api-types",
         "command": "pnpm codegen"

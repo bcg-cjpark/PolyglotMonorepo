@@ -34,7 +34,7 @@ UI팀 팀원. **libs/ui 만** 대상으로 런타임 검증.
 libs/ui/tests/<Name>.spec.ts
 ```
 
-(디렉터리 없으면 첫 스펙 작성 시 생성. `apps/example-web/tests/e2e/` 와는 분리.)
+(디렉터리 없으면 첫 스펙 작성 시 생성. `apps/web/tests/e2e/` 와는 분리.)
 
 ## 실행 방법 두 가지
 

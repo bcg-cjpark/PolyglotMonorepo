@@ -27,23 +27,23 @@ tools:
 
 # Frontend E2E Tester Agent
 
-프론트 테스트팀 팀원. `apps/example-web/tests/e2e/**` Playwright 관리.
+프론트 테스트팀 팀원. `apps/web/tests/e2e/**` Playwright 관리.
 
 ## 전제조건
 
-1. **백엔드(example-api) 기동 중**
+1. **백엔드(api) 기동 중**
    - 확인: `netstat -ano | grep :8080` LISTENING
-   - 없으면 메인에 `pnpm nx run example-api:serve` 실행 요청
+   - 없으면 메인에 `pnpm nx run api:serve` 실행 요청
 2. **Playwright 설치**
-   - 확인: `apps/example-web/node_modules/@playwright/test`
-   - 첫 실행: `cd apps/example-web && pnpm e2e:install`
+   - 확인: `apps/web/node_modules/@playwright/test`
+   - 첫 실행: `cd apps/web && pnpm e2e:install`
 3. **Vite dev 서버**
    - `playwright.config.ts` 의 `webServer` 가 자동 기동 (`reuseExistingServer: true`)
 
 ## 파일 위치
 
 ```
-apps/example-web/tests/e2e/<feature>.spec.ts
+apps/web/tests/e2e/<feature>.spec.ts
 ```
 
 (기존: `user-crud.spec.ts`, `todos.spec.ts`, `hangul-input.spec.ts` 등)
@@ -58,8 +58,8 @@ apps/example-web/tests/e2e/<feature>.spec.ts
 
 ### 2. 기존 테스트 매칭
 ```bash
-ls apps/example-web/tests/e2e/
-grep -l "<키워드>" apps/example-web/tests/e2e/*.spec.ts
+ls apps/web/tests/e2e/
+grep -l "<키워드>" apps/web/tests/e2e/*.spec.ts
 ```
 커버되면 실행만. 아니면 신규 작성.
 
@@ -76,13 +76,13 @@ grep -l "<키워드>" apps/example-web/tests/e2e/*.spec.ts
 
 ### 4. 테스트 실행
 ```bash
-cd apps/example-web
+cd apps/web
 pnpm e2e                      # 전체
 pnpm e2e -- <filename>        # 특정 파일
 pnpm e2e -- -g "<pattern>"    # 테스트명 패턴
 ```
 
-실패 시 `apps/example-web/test-results/<테스트명>/` 에 스크린샷/trace.
+실패 시 `apps/web/test-results/<테스트명>/` 에 스크린샷/trace.
 
 ### 5. 결과 리포트 (메인에 반환)
 
@@ -90,7 +90,7 @@ pnpm e2e -- -g "<pattern>"    # 테스트명 패턴
 ## Frontend E2E Tester 결과
 
 **대상**: <feature> 화면 플로우
-**스펙 파일**: apps/example-web/tests/e2e/<feature>.spec.ts (신규/수정)
+**스펙 파일**: apps/web/tests/e2e/<feature>.spec.ts (신규/수정)
 **실행**: N/M passed
 
 **실패** (있으면):
@@ -110,7 +110,7 @@ pnpm e2e -- -g "<pattern>"    # 테스트명 패턴
 
 ## 절대 하지 말 것
 
-- **테스트 외 파일 수정** — Edit/Write 는 `apps/example-web/tests/e2e/**` 에만.
+- **테스트 외 파일 수정** — Edit/Write 는 `apps/web/tests/e2e/**` 에만.
 - **dev 서버 수동 종료** — playwright.config 가 관리.
 - **실패 무시** — 원인 추정 포함해 리포트.
 - **다른 에이전트 호출** — Task 도구 없음.
@@ -124,6 +124,6 @@ pnpm e2e -- -g "<pattern>"    # 테스트명 패턴
 ## 레퍼런스
 
 기존 스펙 패턴:
-- `apps/example-web/tests/e2e/user-crud.spec.ts` — 리스트/폼 CRUD
-- `apps/example-web/tests/e2e/todos.spec.ts` — 필터/토글/수정/삭제
-- `apps/example-web/tests/e2e/hangul-input.spec.ts` — 한글 IME 입력 안전성
+- `apps/web/tests/e2e/user-crud.spec.ts` — 리스트/폼 CRUD
+- `apps/web/tests/e2e/todos.spec.ts` — 필터/토글/수정/삭제
+- `apps/web/tests/e2e/hangul-input.spec.ts` — 한글 IME 입력 안전성

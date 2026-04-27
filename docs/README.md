@@ -38,5 +38,5 @@ docs/
 
 ## 예시
 
-`prd/user-management.md` 와 `screens/user-list.md`, `screens/user-form.md` 는 **이 레포의 `example-api` + `example-web` 이 실제로 구현하고 있는 기능**의 문서.  
+`prd/user-management.md` 와 `screens/user-list.md`, `screens/user-form.md` 는 **이 레포의 `api` + `web` 이 실제로 구현하고 있는 기능**의 문서.  
 포맷 참고용. 실제 프로젝트에서 `example-*` 앱은 삭제하고 새 기능 문서로 대체.

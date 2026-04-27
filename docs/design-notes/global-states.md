@@ -3,7 +3,7 @@
 **원본 PRD**: 해당 없음 (범용 가이드 — `docs/prd/todo.md`, `docs/prd/user-crud.md`, `docs/prd/memo.md` 공통 적용)
 **작성일**: 2026-04-23
 **소비자**:
-- **프론트 개발팀** (`apps/example-web/src/pages/**` 의 Loading/Error/Empty 분기 구현 기준)
+- **프론트 개발팀** (`apps/web/src/pages/**` 의 Loading/Error/Empty 분기 구현 기준)
 - **UI팀** (필요 시 공용 상태 뷰 primitive 추가 판단 기준)
 - **디자인팀** (각 피처 design-notes 에서 상태 분기 규격을 덮어쓸 때 상위 원칙)
 
@@ -151,8 +151,8 @@ Table primitive 를 쓰는 페이지는 `rows.length === 0` 을 페이지가 직
 
 ### 프론트 개발팀 (즉시)
 
-1. `apps/example-web/src/pages/UserListPage.tsx` — 현재 `isLoading` / `isError` 분기가 페이지 전체를 `<p>` 로 대체하는 패턴. 헤더(제목 + "+ New") 를 유지하도록 재구성. 본문만 Loading/Error 뷰로 치환.
-2. `apps/example-web/src/pages/TodoListPage.tsx` — 동일 재구성. 필터 `RadioGroup` 과 "+ New" 버튼이 있는 상단 영역이 헤더로 유지되어야 함.
+1. `apps/web/src/pages/UserListPage.tsx` — 현재 `isLoading` / `isError` 분기가 페이지 전체를 `<p>` 로 대체하는 패턴. 헤더(제목 + "+ New") 를 유지하도록 재구성. 본문만 Loading/Error 뷰로 치환.
+2. `apps/web/src/pages/TodoListPage.tsx` — 동일 재구성. 필터 `RadioGroup` 과 "+ New" 버튼이 있는 상단 영역이 헤더로 유지되어야 함.
 3. Empty 상태는 Table 의 `emptyMessage` 에 위임 — 페이지에서 `rows.length === 0` 분기 제거.
 
 ### UI팀 (후속 검토)

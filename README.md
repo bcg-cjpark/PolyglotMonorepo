@@ -18,7 +18,7 @@ Kotlin + React 폴리글랏 모노레포 템플릿.
 3. **Claude Code 에서 `/bootstrap` 실행** — 한 번만. 다음을 자동 처리합니다:
    - 프로젝트 슬러그 / Kotlin 루트 패키지 입력 받기
    - `com.example.template` → `com.<your-org>.<project>` 일괄 치환
-   - `example-api` / `example-web` 표시 이름 갱신 (디렉토리명은 선택)
+   - `api` / `web` 표시 이름 갱신 (디렉토리명은 선택)
    - 예시 문서(`docs/prd/user-management.md`, `docs/screens/user-*.md`) 제거
    - 테마 색상 재생성 (`scripts/apply-theme-colors.mjs` 경유 — 토큰 직접 편집 금지)
    - README 를 새 프로젝트용으로 교체
@@ -38,8 +38,8 @@ Kotlin + React 폴리글랏 모노레포 템플릿.
 
 ```
 apps/
-  example-api/          Kotlin · Spring Boot 3 · Gradle multi-module (domain ← security ← app)
-  example-web/          React · Vite · TypeScript
+  api/          Kotlin · Spring Boot 3 · Gradle multi-module (domain ← security ← app)
+  web/          React · Vite · TypeScript
 libs/
   api-types/            OpenAPI → TypeScript 자동 생성 타입
 tools/
@@ -65,10 +65,10 @@ cp .env.example .env
 
 ```bash
 # 백엔드 실행 (H2 로컬 프로필)
-pnpm nx run example-api:serve                # → ./gradlew :app:bootRun
+pnpm nx run api:serve                # → ./gradlew :app:bootRun
 
 # 프론트엔드 실행
-pnpm nx run example-web:dev                  # → vite, port 3000
+pnpm nx run web:dev                  # → vite, port 3000
 
 # 전체 빌드
 pnpm nx run-many -t build                    # 또는 pnpm build
@@ -84,7 +84,7 @@ pnpm nx graph                                # 또는 pnpm graph
 
 ```bash
 # 1. 백엔드에서 OpenAPI spec 추출
-pnpm nx run example-api:generate-openapi     # → app/build/openapi.json
+pnpm nx run api:generate-openapi     # → app/build/openapi.json
 
 # 2. TypeScript 타입 생성
 pnpm nx run api-types:codegen                # → libs/api-types/src/generated.ts

@@ -34,23 +34,23 @@ git diff --stat HEAD
 
 ### 2. 검수 범위 (프론트 개발팀 소관만)
 허용:
-- `apps/example-web/src/pages/**`
-- `apps/example-web/src/services/**`
-- `apps/example-web/src/App.tsx` (라우트 등록)
-- `apps/example-web/src/components/**` (페이지 로컬 합성 컴포넌트만)
+- `apps/web/src/pages/**`
+- `apps/web/src/services/**`
+- `apps/web/src/App.tsx` (라우트 등록)
+- `apps/web/src/components/**` (페이지 로컬 합성 컴포넌트만)
 
 금지:
 - `libs/ui/**` (UI팀)
-- `apps/example-web/tests/**` (테스트팀)
-- `apps/example-api/**` (백엔드팀)
+- `apps/web/tests/**` (테스트팀)
+- `apps/api/**` (백엔드팀)
 - `docs/**` (기획팀/디자인팀)
 
 섞이면 FAIL, 메인에 분리 요청.
 
 ### 3. 필수 검증
 ```bash
-pnpm nx run example-web:lint
-pnpm nx run example-web:build
+pnpm nx run web:lint
+pnpm nx run web:build
 ```
 
 - 에러 → FAIL, frontend-developer 재위임
@@ -72,7 +72,7 @@ native 로 쓰였는데 libs/ui 에 대응 primitive 있으면 → FAIL, UI팀 p
 - [ ] libs/ui 우선 규칙 위반 없음 (native 오용 없음)
 - [ ] 라우트 등록 (신규 페이지면 `App.tsx` 에 Route)
 - [ ] 서비스 함수가 백엔드 API 와 1:1 매칭
-- [ ] 페이지 내 페이지 전용 합성 컴포넌트는 `apps/example-web/src/components/` 에만
+- [ ] 페이지 내 페이지 전용 합성 컴포넌트는 `apps/web/src/components/` 에만
 
 ### 7. 결과
 - **Status**: PASS / FAIL / PARTIAL
@@ -95,7 +95,7 @@ feat(web): <feature> 화면 구현
 
 ### 9. 커밋 실행 (PASS 일 때만)
 ```bash
-git add apps/example-web/src
+git add apps/web/src
 git commit -m "$(cat <<'EOF'
 feat(web): <feature> 화면 구현
 
@@ -111,6 +111,6 @@ FAIL/PARTIAL 이면 커밋 금지, 메인에 이슈 반환.
 ## 금지사항
 
 - Edit/Write/Task 사용.
-- `libs/ui/**` / `apps/example-web/tests/**` / `apps/example-api/**` 를 함께 커밋.
+- `libs/ui/**` / `apps/web/tests/**` / `apps/api/**` 를 함께 커밋.
 - 디자인 감사 Critical 있는데 커밋.
 - 빌드/린트 실패 무시.

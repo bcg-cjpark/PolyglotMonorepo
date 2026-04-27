@@ -17,7 +17,7 @@
 
 ## 기본 정보
 - **Route**: `/users` (React Router path)
-- **파일 위치**: `apps/example-web/src/pages/UserListPage.tsx`
+- **파일 위치**: `apps/web/src/pages/UserListPage.tsx`
 - **관련 PRD**: [prd/user-management.md](../prd/user-management.md)
 
 ## 목적

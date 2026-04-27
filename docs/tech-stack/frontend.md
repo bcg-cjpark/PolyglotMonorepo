@@ -1,6 +1,6 @@
-# 프론트 기술 스택 (`apps/example-web`)
+# 프론트 기술 스택 (`apps/web`)
 
-이 문서는 `apps/example-web` 이 사용하는 프론트엔드 기술 스택을 **결정 기록(decision record)** 형태로 남긴다.
+이 문서는 `apps/web` 이 사용하는 프론트엔드 기술 스택을 **결정 기록(decision record)** 형태로 남긴다.
 프론트 개발팀(`frontend-developer`) 이 새 코드를 쓰거나 기존 코드를 고칠 때 이 문서의 규약을 따른다.
 
 관련 규약:
@@ -36,10 +36,10 @@
 
 **규칙**
 - 모든 HTTP 요청은 `useQuery` / `useMutation` 경유. 페이지에서 axios 직접 호출 금지.
-- 서비스 레이어(`apps/example-web/src/services/*.ts`) 는 그대로 유지 — axios 호출만 담당. 쿼리/뮤테이션 훅은 `apps/example-web/src/queries/<domain>.ts` 에 둔다.
+- 서비스 레이어(`apps/web/src/services/*.ts`) 는 그대로 유지 — axios 호출만 담당. 쿼리/뮤테이션 훅은 `apps/web/src/queries/<domain>.ts` 에 둔다.
 - 쿼리 키는 배열 + 파라미터 객체 패턴: `['memos', { page, size }]`, `['todos', { status }]`, `['users']`, `['memo', id]`.
 - 뮤테이션 성공 후 `queryClient.invalidateQueries({ queryKey: ['memos'] })` 로 관련 쿼리 무효화. 수동 `load()` 재호출 패턴 제거.
-- `QueryClientProvider` 는 `apps/example-web/src/main.tsx` 최상위에 한 번. `staleTime` / `gcTime` 기본값은 초기엔 라이브러리 기본 유지, 페이지별 조정 필요 시 `useQuery` 옵션으로.
+- `QueryClientProvider` 는 `apps/web/src/main.tsx` 최상위에 한 번. `staleTime` / `gcTime` 기본값은 초기엔 라이브러리 기본 유지, 페이지별 조정 필요 시 `useQuery` 옵션으로.
 - 낙관적 업데이트(optimistic update) 는 명시적으로 필요한 케이스(체크박스 토글 등) 에서만 사용.
 
 ### 2.2 Zustand (클라이언트 전역 상태)
@@ -55,7 +55,7 @@
 **선택**: Zustand — 최소 표면, 훅 기반, `persist` / `subscribeWithSelector` 미들웨어.
 
 **규칙**
-- 스토어 위치: `apps/example-web/src/stores/<name>Store.ts`. 파일당 `createStore` 하나.
+- 스토어 위치: `apps/web/src/stores/<name>Store.ts`. 파일당 `createStore` 하나.
 - 훅 이름 규약: `useAuthStore`, `useToastStore` 등 `use<Name>Store`.
 - **서버 데이터는 Zustand 에 저장하지 않는다** — 서버 상태는 TanStack Query 캐시가 유일한 소스. (예: 로그인 "사용자 프로필" 객체 자체는 TanStack Query, "현재 로그인된 userId" 같은 식별자나 토큰만 Zustand.)
 - 전역이 아닌 단일 페이지 UI 상태는 페이지 로컬 `useState` / `useReducer` 로. Zustand 는 **둘 이상의 컴포넌트가 공유** 할 때만.
@@ -84,7 +84,7 @@ TypeScript 타입은 **컴파일 타임**만 보장. API 응답과 폼 입력은
 **선택**: Zod.
 
 **규칙**
-- 폼 검증: 스키마를 페이지 파일 상단에 두거나, 재사용 되면 `apps/example-web/src/schemas/<name>.ts`.
+- 폼 검증: 스키마를 페이지 파일 상단에 두거나, 재사용 되면 `apps/web/src/schemas/<name>.ts`.
 - API 응답 런타임 파싱: `@monorepo/api-types` 의 타입과 별개로, **개발 모드(`import.meta.env.DEV`)** 에서만 `schema.parse(data)` 로 검증해 스키마 드리프트 조기 발견. 프로덕션 번들 비용 회피.
 - 장기적으로는 백엔드 OpenAPI 스키마 → `@monorepo/api-types` → Zod 생성까지 자동화 고려. 지금은 수동.
 
@@ -97,7 +97,7 @@ TypeScript 타입은 **컴파일 타임**만 보장. API 응답과 폼 입력은
 **규칙**
 - `new Date()` 계산이나 포맷팅이 두 군데 이상 반복되면 date-fns 유틸로 교체 (DRY 기준).
 - 시간대가 본격적으로 중요해지면 `date-fns-tz` 보조 도입 검토.
-- 포맷 문자열은 페이지 로컬이 아닌 공용 유틸(`apps/example-web/src/utils/date.ts`) 로 모아간다.
+- 포맷 문자열은 페이지 로컬이 아닌 공용 유틸(`apps/web/src/utils/date.ts`) 로 모아간다.
 
 ## 3. 금지 사항
 
@@ -109,7 +109,7 @@ TypeScript 타입은 **컴파일 타임**만 보장. API 응답과 폼 입력은
 
 ## 4. 현재 마이그레이션 상태
 
-이 문서는 **결정 기록**이다. 2026-04-22 기준, 아래 라이브러리는 `apps/example-web/package.json` 에 아직 미설치:
+이 문서는 **결정 기록**이다. 2026-04-22 기준, 아래 라이브러리는 `apps/web/package.json` 에 아직 미설치:
 
 - `@tanstack/react-query`
 - `zustand`

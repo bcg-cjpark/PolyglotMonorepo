@@ -8,7 +8,7 @@
 **정답**: entry CSS(또는 entry TS) 에서 `@monorepo/tailwind-config/globals` 한 줄만 import.
 
 ```ts
-// apps/example-web/src/main.tsx
+// apps/web/src/main.tsx
 import '@monorepo/tailwind-config/globals';
 ```
 

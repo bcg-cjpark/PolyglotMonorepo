@@ -51,7 +51,7 @@ git diff --stat HEAD
 ### 4. 빌드/검증 명령 (필수)
 ```bash
 # 타입체크 + build
-pnpm nx run example-web:build
+pnpm nx run web:build
 
 # Storybook 빌드 (warning 은 허용, 에러는 FAIL)
 pnpm --filter @monorepo/ui build-storybook

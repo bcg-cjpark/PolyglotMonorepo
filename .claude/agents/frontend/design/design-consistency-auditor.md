@@ -32,7 +32,7 @@ tools:
 
 감사 대상 경로 디폴트:
 - `libs/ui/src/**/*.{tsx,scss}`
-- `apps/example-web/src/**/*.{tsx,scss}`
+- `apps/web/src/**/*.{tsx,scss}`
 
 ## 검토 범위 (4 영역)
 

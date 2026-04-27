@@ -150,7 +150,7 @@ DTOs:
 1. ...
 
 ## 화면 명세
-### <PageName> (route: /x, file: apps/example-web/src/pages/...)
+### <PageName> (route: /x, file: apps/web/src/pages/...)
 **UI 종류**: (docs/screens 의 표 그대로)
 **인터랙션**: (번호 리스트)
 **상태**: (표)

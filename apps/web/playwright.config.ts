@@ -6,7 +6,7 @@ import { defineConfig, devices } from "@playwright/test";
  * 기본 동작:
  *  - Vite dev 서버를 자동으로 기동 (`pnpm dev`), 포트 3000
  *  - Chromium 단일 브라우저로 테스트 (속도 우선)
- *  - 백엔드(8080)는 이미 켜져 있어야 함 — e2e 전에 `pnpm nx run example-api:serve` 기동
+ *  - 백엔드(8080)는 이미 켜져 있어야 함 — e2e 전에 `pnpm nx run api:serve` 기동
  *
  * CI나 다른 브라우저 추가 필요 시 projects 배열 확장.
  */

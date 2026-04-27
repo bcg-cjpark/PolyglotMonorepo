@@ -33,29 +33,29 @@ git diff --stat HEAD
 
 ### 2. 검수 범위
 허용:
-- `apps/example-api/**` (domain/app/security/config 포함)
+- `apps/api/**` (domain/app/security/config 포함)
 
 금지:
-- `apps/example-web/**`, `libs/**`, `docs/**`, `.claude/**`
+- `apps/web/**`, `libs/**`, `docs/**`, `.claude/**`
 
 다른 경로 섞이면 FAIL.
 
 ### 3. 필수 검증
 ```bash
-pnpm nx run example-api:lint     # ktlint
-pnpm nx run example-api:build    # 컴파일 + 유닛 테스트
+pnpm nx run api:lint     # ktlint
+pnpm nx run api:build    # 컴파일 + 유닛 테스트
 ```
 
 둘 다 통과 필수. 하나라도 실패면 FAIL, backend-developer 재위임.
 
 ### 4. Flyway 마이그레이션 번호
 ```bash
-ls apps/example-api/domain/src/main/resources/db/migration/
+ls apps/api/domain/src/main/resources/db/migration/
 ```
 - 새 SQL 파일이 가장 큰 기존 버전 + 1 인지 확인
 - 기존 `V<N>__*.sql` (특히 `V1__init.sql`) 변경되지 않았는지 grep
   ```bash
-  git diff HEAD -- apps/example-api/domain/src/main/resources/db/migration/
+  git diff HEAD -- apps/api/domain/src/main/resources/db/migration/
   ```
 - 기존 파일 수정 흔적 있으면 FAIL (Flyway 불변 원칙 위반)
 
@@ -89,7 +89,7 @@ feat(api): <feature> API 구현
 
 ### 8. 커밋 실행 (PASS 일 때만)
 ```bash
-git add apps/example-api
+git add apps/api
 git commit -m "$(cat <<'EOF'
 feat(api): <feature> API 구현
 
@@ -105,6 +105,6 @@ FAIL/PARTIAL 이면 커밋 금지.
 ## 금지사항
 
 - Edit/Write/Task 사용.
-- `apps/example-web/**`, `libs/**`, `docs/**` 를 함께 커밋.
+- `apps/web/**`, `libs/**`, `docs/**` 를 함께 커밋.
 - Flyway `V1__init.sql` 수정 (불변).
 - lint/build 실패 무시.

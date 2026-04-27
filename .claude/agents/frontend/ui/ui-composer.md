@@ -154,7 +154,7 @@ SCSS 는 `@layer components { ... }` 로 감싸기.
 
 ### 5. 빌드 확인
 ```bash
-pnpm nx run example-web:build
+pnpm nx run web:build
 ```
 통과해야 함.
 
@@ -190,7 +190,7 @@ import { <Name> } from '@monorepo/ui';
 ## 절대 하지 말 것
 
 - `Base` 접두사 부여 (구 컨벤션 제거됨)
-- `apps/example-web/` 내부에 컴포넌트 생성
+- `apps/web/` 내부에 컴포넌트 생성
 - `@headlessui/react` 원본 이름으로 export (HUI 별칭 필수 시)
 - `shadcn/ui` 복붙, React Aria / Ark UI / Base UI 도입
 - Headless UI 가 있는데 native 로 구현

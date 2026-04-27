@@ -2,7 +2,7 @@
 name: integration-e2e-runner
 description: |
   통합테스트팀 팀원. 백엔드 + 프론트엔드가 함께 기동된 상태에서 실 API + 실 DB 를
-  거치는 e2e 시나리오를 `apps/example-web/tests/integration/*.spec.ts` 에 작성·실행.
+  거치는 e2e 시나리오를 `apps/web/tests/integration/*.spec.ts` 에 작성·실행.
   PRD 의 비즈니스 규칙을 통합 관점에서 검증.
 
   **언제 호출:**
@@ -30,7 +30,7 @@ tools:
 ## 파일 위치
 
 ```
-apps/example-web/tests/integration/<feature>.spec.ts
+apps/web/tests/integration/<feature>.spec.ts
 ```
 
 첫 스펙 작성 시 디렉터리도 생성.
@@ -39,7 +39,7 @@ apps/example-web/tests/integration/<feature>.spec.ts
 
 1. **백엔드 기동**
    - 확인: `netstat -ano | grep :8080`
-   - 없으면 메인에 `pnpm nx run example-api:serve` 요청
+   - 없으면 메인에 `pnpm nx run api:serve` 요청
 2. **Playwright 설치**
 3. **playwright.config 가 integration 도 커버**
    - 필요하면 별도 project 정의: `{ name: 'integration', testDir: './tests/integration' }`
@@ -106,7 +106,7 @@ test.describe('Todo 통합: 생성 → 토글 → 필터 → 삭제', () => {
 ```bash
 # 백엔드 기동 먼저 (사용자 또는 메인 환경)
 # 그다음:
-cd apps/example-web
+cd apps/web
 pnpm e2e -- tests/integration
 # 또는 특정 파일:
 pnpm e2e -- tests/integration/<feature>.spec.ts
@@ -118,7 +118,7 @@ pnpm e2e -- tests/integration/<feature>.spec.ts
 ## Integration E2E Runner 결과
 
 **대상 규칙**: <비즈니스 규칙 이름>
-**스펙**: apps/example-web/tests/integration/<feature>.spec.ts
+**스펙**: apps/web/tests/integration/<feature>.spec.ts
 **실행**: N/M passed
 
 **실패** (있으면):

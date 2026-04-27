@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "codegen": "openapi-typescript ../../apps/example-api/app/build/openapi.json -o src/generated.ts"
+    "codegen": "openapi-typescript ../../apps/api/app/build/openapi.json -o src/generated.ts"
   },
   "devDependencies": {
     "openapi-typescript": "^7.4.0",

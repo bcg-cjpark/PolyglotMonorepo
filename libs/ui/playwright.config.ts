@@ -8,7 +8,7 @@ import { defineConfig, devices } from '@playwright/test';
  *    각 스토리를 격리 렌더로 띄우고, 실제 DOM/computed style 을 검증.
  *  - `reuseExistingServer: true` → 개발자가 이미 Storybook 을 띄워둔 상태면 재사용.
  *
- * 앱 레벨 e2e (`apps/example-web/tests/e2e`) 와는 완전 분리.
+ * 앱 레벨 e2e (`apps/web/tests/e2e`) 와는 완전 분리.
  *
  * 실행:
  *   pnpm exec playwright test --config=libs/ui/playwright.config.ts

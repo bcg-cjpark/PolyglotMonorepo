@@ -11,7 +11,7 @@ import type { ApiAppSchema } from "./schema";
 
 /**
  * Scaffolds a new Kotlin Spring Boot multi-module API app by cloning
- * apps/example-api and substituting package/name tokens.
+ * apps/api and substituting package/name tokens.
  */
 export default async function apiAppGenerator(
   tree: Tree,
@@ -26,7 +26,7 @@ export default async function apiAppGenerator(
 
   const packagePath = packageName.replace(/\./g, "/");
 
-  copyExampleApi(tree, "apps/example-api", projectRoot, {
+  copyExampleApi(tree, "apps/api", projectRoot, {
     name,
     packageName,
     packagePath,
@@ -133,8 +133,8 @@ function replaceContentTokens(
 ): string {
   return content
     .replace(/com\.example\.template/g, tokens.packageName)
-    .replace(/rootProject\.name = "example-api"/g, `rootProject.name = "${tokens.name}"`)
-    .replace(/spring:\n  application:\n    name: example-api/g,
+    .replace(/rootProject\.name = "api"/g, `rootProject.name = "${tokens.name}"`)
+    .replace(/spring:\n  application:\n    name: api/g,
       `spring:\n  application:\n    name: ${tokens.name}`)
     .replace(/API_PORT:8080/g, `API_PORT:${tokens.port}`);
 }

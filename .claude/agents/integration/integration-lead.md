@@ -32,7 +32,7 @@ git diff --stat HEAD
 ```
 
 ### 2. 검수 범위
-허용: `apps/example-web/tests/integration/**`
+허용: `apps/web/tests/integration/**`
 금지: 그 외 경로
 
 ### 3. 필수 검증
@@ -43,7 +43,7 @@ git diff --stat HEAD
 netstat -ano | grep :8080 || echo "backend not running"
 
 # 통합 e2e 실행
-pnpm nx run example-web:e2e -- tests/integration
+pnpm nx run web:e2e -- tests/integration
 # 또는 별도 script 가 있다면 해당 명령
 ```
 
@@ -73,7 +73,7 @@ test(integration): <feature> 통합 시나리오 추가
 
 ### 7. 커밋 실행 (PASS 일 때만)
 ```bash
-git add apps/example-web/tests/integration
+git add apps/web/tests/integration
 git commit -m "$(cat <<'EOF'
 test(integration): <feature> 통합 시나리오 추가
 

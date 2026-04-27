@@ -6,12 +6,12 @@
     "api-app": {
       "factory": "./src/api-app/generator",
       "schema": "./src/api-app/schema.json",
-      "description": "Scaffold a new Kotlin Spring Boot multi-module API app from example-api"
+      "description": "Scaffold a new Kotlin Spring Boot multi-module API app from api"
     },
     "web-app": {
       "factory": "./src/web-app/generator",
       "schema": "./src/web-app/schema.json",
-      "description": "Scaffold a new React + Vite web app from example-web"
+      "description": "Scaffold a new React + Vite web app from web"
     }
   }
 }

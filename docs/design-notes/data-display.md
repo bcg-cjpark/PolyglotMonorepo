@@ -4,7 +4,7 @@
 **작성일**: 2026-04-22
 **소비자**:
 - **기획팀** (`docs/prd/**`, `docs/screens/**` 작성 시 UI 카테고리 용어 사전)
-- **프론트 개발팀** (`apps/example-web/src/pages/**` 구현 시 primitive 선택 기준)
+- **프론트 개발팀** (`apps/web/src/pages/**` 구현 시 primitive 선택 기준)
 - **UI팀** (새 primitive 요청 수신 시 판단 기준)
 
 ---
@@ -132,7 +132,7 @@ UX 재검토로 원복/교체 시 위 3개 옵션 서술을 다시 근거로 삼
 | 상황 | 권장 primitive | 이유 |
 |---|---|---|
 | 정형 스키마, 중·소량(수십~수백 행), 관리자 CRUD 화면 | **`Table`** | 컬럼 선언형 API + 토큰 기반 스타일. 정렬/필터가 기본 요구가 아닌 현 단계에 딱 맞는 비용. |
-| 소~중량(수십 행), 행마다 제목+본문+메타 혼합, 컨텐츠 중심 | **`List` + 페이지 전용 합성 카드** (예: `apps/example-web/src/components/MemoCard.tsx`) | 행 레이아웃 자유도. `ListItemText` 의 primary/secondary 로 2줄 요약, 합성 카드로 서브 블록 표현. |
+| 소~중량(수십 행), 행마다 제목+본문+메타 혼합, 컨텐츠 중심 | **`List` + 페이지 전용 합성 카드** (예: `apps/web/src/components/MemoCard.tsx`) | 행 레이아웃 자유도. `ListItemText` 의 primary/secondary 로 2줄 요약, 합성 카드로 서브 블록 표현. |
 | 간단한 설정 메뉴/내비 항목 (아이콘+라벨+우측 액션) | **`List` + `ListItem` + `ListItemAvatar` + `ListItemText`** | 추가 합성 카드 없이도 MUI-풍 세로 목록이 곧장 완성. |
 | 모바일 전용 화면, 좌스와이프 삭제가 UX 요구 | **`MobileList` + `MobileListItem`** | 제스처/삭제 배드롭 내장. |
 | 대량 행(수천+), 서버사이드 정렬·필터·페이지네이션 | 현재 primitive 없음 | 6절 "엣지 / 예외" 참조. |
@@ -140,9 +140,9 @@ UX 재검토로 원복/교체 시 위 3개 옵션 서술을 다시 근거로 삼
 
 ### 현재 레포 내 레퍼런스 페이지
 
-- `apps/example-web/src/pages/UserListPage.tsx` — **`Table` 사용**. 이름/이메일/생성일 컬럼 + 삭제 액션 컬럼 (`render` 콜백에 `Button` 주입).
-- `apps/example-web/src/pages/TodoListPage.tsx` — **`Table` 사용**. 체크박스 토글·상태 배지·Edit/Delete 를 모두 `render` 콜백에 합성. 상단 `RadioGroup` 필터는 테이블 밖에서 별도.
-- `apps/example-web/src/pages/MemoListPage.tsx` — **"List + 합성 카드"** 범주. 현재는 `flex flex-col gap-3` + `MemoCard` 조합이지만 의도상 이 범주에 속한다. 향후 정돈 시 `<List gap="12px">` 래핑으로 정렬 가능 (기능 변화 없음).
+- `apps/web/src/pages/UserListPage.tsx` — **`Table` 사용**. 이름/이메일/생성일 컬럼 + 삭제 액션 컬럼 (`render` 콜백에 `Button` 주입).
+- `apps/web/src/pages/TodoListPage.tsx` — **`Table` 사용**. 체크박스 토글·상태 배지·Edit/Delete 를 모두 `render` 콜백에 합성. 상단 `RadioGroup` 필터는 테이블 밖에서 별도.
+- `apps/web/src/pages/MemoListPage.tsx` — **"List + 합성 카드"** 범주. 현재는 `flex flex-col gap-3` + `MemoCard` 조합이지만 의도상 이 범주에 속한다. 향후 정돈 시 `<List gap="12px">` 래핑으로 정렬 가능 (기능 변화 없음).
 
 ---
 
@@ -172,7 +172,7 @@ UX 재검토로 원복/교체 시 위 3개 옵션 서술을 다시 근거로 삼
 
 ### 5.2 "목록" 스펙 + 행 레이아웃이 카드형 → `List` + 합성 카드
 
-- 페이지 전용 합성 카드는 `apps/example-web/src/components/<Entity>Card.tsx` 에 둔다 (예: `MemoCard.tsx`). **`libs/ui` 에 두지 않음** — 페이지 전용 합성이므로.
+- 페이지 전용 합성 카드는 `apps/web/src/components/<Entity>Card.tsx` 에 둔다 (예: `MemoCard.tsx`). **`libs/ui` 에 두지 않음** — 페이지 전용 합성이므로.
 - 합성 카드 내부는 반드시 `@monorepo/ui` primitive (`Button`, `Badge`, `Chip`, `Icon`, `IconButton`) 로만 구성. 하드코딩 `<div class="...">` 로 버튼 흉내 금지.
 
 ### 5.3 "목록" 스펙 + 단일 라인 텍스트 → `List` + `ListItem` + `ListItemText`
@@ -218,7 +218,7 @@ ui-composer → ui-storybook-curator → ui-library-tester → ui-lead
 ## 7. 구현 제약 (요약)
 
 - **native `<table>` 금지** — `Table` primitive 사용 또는 UI팀 에스컬레이션.
-- **앱 코드 내부에 범용 primitive 생성 금지** — `apps/example-web/src/components/` 는 페이지 전용 합성 카드만 (`MemoCard`, `UserListRow` 같은 것). 범용 이름(`Card`, `Table`, `ListRow`) 금지.
+- **앱 코드 내부에 범용 primitive 생성 금지** — `apps/web/src/components/` 는 페이지 전용 합성 카드만 (`MemoCard`, `UserListRow` 같은 것). 범용 이름(`Card`, `Table`, `ListRow`) 금지.
 - **행 내 액션은 `@monorepo/ui` primitive 로** — `Table` 의 `render` 콜백 / `ListItem` children 에 native 버튼·인풋 삽입 금지.
 - **Light/Dark 양쪽 대응** — `Table` 은 토큰 기반 자동 대응이므로 페이지에서 별도 prop 전달 불필요. 합성 카드는 `libs/tokens` / Tailwind 토큰 유틸만 사용.
 - **하드코딩 색/간격 금지** — 모든 시각 값은 `libs/tokens` + Tailwind 토큰 유틸 경유.

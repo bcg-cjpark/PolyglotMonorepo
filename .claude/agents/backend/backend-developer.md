@@ -1,7 +1,7 @@
 ---
 name: backend-developer
 description: |
-  백엔드 개발팀 팀원. `apps/example-api/**` Kotlin(Spring Boot) 코드를 일관된 패턴으로
+  백엔드 개발팀 팀원. `apps/api/**` Kotlin(Spring Boot) 코드를 일관된 패턴으로
   생성. 멀티모듈(domain / app) 경계 준수, User 예제 패턴 복제.
 
   **언제 호출:**
@@ -39,18 +39,18 @@ doc-consolidator 의 구조화 출력을 그대로 받는 것이 이상적.
 ## 레퍼런스 (매번 먼저 읽을 것)
 
 ### Kotlin User 예제
-- `apps/example-api/domain/src/main/kotlin/com/example/template/domain/common/BaseEntity.kt` — 모든 엔티티가 상속. JPA Auditing (createdAt, updatedAt).
-- `apps/example-api/domain/src/main/kotlin/com/example/template/domain/user/User.kt` — Entity
-- `apps/example-api/domain/src/main/kotlin/com/example/template/domain/user/UserRepository.kt` — Repository
-- `apps/example-api/domain/src/main/kotlin/com/example/template/domain/user/UserService.kt` — Service + 인라인 Exception
-- `apps/example-api/app/src/main/kotlin/com/example/template/user/UserController.kt` — Controller
-- `apps/example-api/app/src/main/kotlin/com/example/template/user/UserDto.kt` — Request/Response DTO
-- `apps/example-api/domain/src/main/resources/db/migration/V1__init.sql` — Flyway 패턴
+- `apps/api/domain/src/main/kotlin/com/example/template/domain/common/BaseEntity.kt` — 모든 엔티티가 상속. JPA Auditing (createdAt, updatedAt).
+- `apps/api/domain/src/main/kotlin/com/example/template/domain/user/User.kt` — Entity
+- `apps/api/domain/src/main/kotlin/com/example/template/domain/user/UserRepository.kt` — Repository
+- `apps/api/domain/src/main/kotlin/com/example/template/domain/user/UserService.kt` — Service + 인라인 Exception
+- `apps/api/app/src/main/kotlin/com/example/template/user/UserController.kt` — Controller
+- `apps/api/app/src/main/kotlin/com/example/template/user/UserDto.kt` — Request/Response DTO
+- `apps/api/domain/src/main/resources/db/migration/V1__init.sql` — Flyway 패턴
 
 ## 멀티모듈 레이아웃 (고정)
 
 ```
-apps/example-api/
+apps/api/
 ├── domain/src/main/kotlin/com/example/template/domain/<feature>/
 │   ├── <Entity>.kt              # @Entity, extends BaseEntity
 │   ├── <Entity>Repository.kt    # JpaRepository
@@ -74,7 +74,7 @@ User 예제 Kotlin 파일 전부 Read.
 
 ### 2. Flyway 마이그레이션 번호 결정
 ```bash
-ls apps/example-api/domain/src/main/resources/db/migration/
+ls apps/api/domain/src/main/resources/db/migration/
 ```
 최대 버전 + 1. 파일명: `V<N>__add_<feature>.sql` (설명은 snake_case).
 
@@ -210,7 +210,7 @@ H2(dev) / PostgreSQL(운영) 호환 문법. 기존 V1 을 참고.
 현재 예제는 JWT 설정만 있고 실 적용 안 됨. 새 엔드포인트는 기본적으로 `permitAll()` 에 추가:
 
 ```kotlin
-// apps/example-api/security/src/main/kotlin/.../SecurityConfig.kt
+// apps/api/security/src/main/kotlin/.../SecurityConfig.kt
 .requestMatchers("/<resource>/**").permitAll()
 ```
 
@@ -218,8 +218,8 @@ PRD 에 인증 명시 없으면 `@PreAuthorize` 붙이지 말 것.
 
 ### 10. 빌드/린트 검증 (필수)
 ```bash
-pnpm nx run example-api:lint    # ktlint
-pnpm nx run example-api:build   # 컴파일 + 테스트
+pnpm nx run api:lint    # ktlint
+pnpm nx run api:build   # 컴파일 + 테스트
 ```
 통과 못하면 다음 단계 금지. 원인 수정.
 
@@ -241,8 +241,8 @@ pnpm nx run example-api:build   # 컴파일 + 테스트
 - SecurityConfig: /<resource>/** 허용 (필요 시)
 
 ### 검증
-- example-api:lint  → ✓
-- example-api:build → ✓
+- api:lint  → ✓
+- api:build → ✓
 
 ### 남은 이슈
 - (PRD 에서 미정이었던 항목 / 추가 확인 필요 사항)
@@ -266,7 +266,7 @@ pnpm nx run example-api:build   # 컴파일 + 테스트
 - **전역 예외 핸들러 신규 도입** — 현재 예제에 없음. 필요하면 별도 PRD/논의로.
 - **마이그레이션 V1 수정** — 불변. 변경은 V<N+1> 로.
 - **lint/build 실패 무시**.
-- **프론트 파일 편집** — `apps/example-web/**` 금지.
+- **프론트 파일 편집** — `apps/web/**` 금지.
 - **libs/** 편집 — UI팀/토큰 영역.
 - **문서 편집** — `docs/**` 금지.
 - **다른 에이전트 호출** — Task 도구 없음.

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: example-api
+    name: api
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
 

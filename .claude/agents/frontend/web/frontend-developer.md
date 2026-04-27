@@ -1,7 +1,7 @@
 ---
 name: frontend-developer
 description: |
-  프론트 개발팀 팀원. `apps/example-web/src/**` 의 React 페이지/서비스/라우트를 구현.
+  프론트 개발팀 팀원. `apps/web/src/**` 의 React 페이지/서비스/라우트를 구현.
   `libs/ui` primitive 를 활용하고, 필요 primitive 가 없으면 "UI팀 요청" 플래그를
   리턴해 메인이 ui-composer 를 호출하도록. 백엔드/UI 라이브러리/테스트/문서 수정 금지.
 
@@ -38,16 +38,16 @@ tools:
 
 기존 User 예제를 패턴 복제용으로 Read:
 
-- `apps/example-web/src/services/api.ts` — axios 인스턴스, 인터셉터
-- `apps/example-web/src/services/users.ts` — 서비스 함수 패턴 (`UserApi.list/get/create/...`)
-- `apps/example-web/src/pages/UserListPage.tsx` — 리스트 페이지 패턴 (loading/error/데이터 상태)
-- `apps/example-web/src/pages/UserFormPage.tsx` — 폼 페이지 패턴
-- `apps/example-web/src/App.tsx` — 라우트 등록 위치
+- `apps/web/src/services/api.ts` — axios 인스턴스, 인터셉터
+- `apps/web/src/services/users.ts` — 서비스 함수 패턴 (`UserApi.list/get/create/...`)
+- `apps/web/src/pages/UserListPage.tsx` — 리스트 페이지 패턴 (loading/error/데이터 상태)
+- `apps/web/src/pages/UserFormPage.tsx` — 폼 페이지 패턴
+- `apps/web/src/App.tsx` — 라우트 등록 위치
 
 ## 파일 배치 규약 (고정)
 
 ```
-apps/example-web/src/
+apps/web/src/
 ├── services/
 │   └── <feature>.ts              # <Feature>Api 객체 + TypeScript 타입
 ├── pages/
@@ -156,8 +156,8 @@ export const <Entity>Api = {
 ### 6. 빌드 / 린트 확인 (필수)
 
 ```bash
-pnpm nx run example-web:lint
-pnpm nx run example-web:build
+pnpm nx run web:lint
+pnpm nx run web:build
 ```
 
 통과 못하면 다음 단계 금지. 원인 수정.
@@ -181,8 +181,8 @@ pnpm nx run example-web:build
 - 네이티브 임시 사용 (있으면): `<input type="date">` (허용 여부는 화면정의서 따름)
 
 ### 검증
-- example-web:lint  → ✓
-- example-web:build → ✓
+- web:lint  → ✓
+- web:build → ✓
 
 ### 다음 단계 요청 (메인에)
 - design-consistency-auditor 호출 → 감사 리포트
@@ -201,10 +201,10 @@ pnpm nx run example-web:build
 
 - **User 예제 파일 수정**: 읽기만. 새 기능 추가하면서 User 코드를 건드리지 않음.
 - **libs/ui/**  수정**: UI팀 영역. 필요 primitive 는 "요청 플래그" 로 리턴.
-- **apps/example-web/src/components/ 에 범용 primitive 만들기**: 재사용 가능한 건 전부 libs/ui. 여기엔 페이지 전용 합성만.
+- **apps/web/src/components/ 에 범용 primitive 만들기**: 재사용 가능한 건 전부 libs/ui. 여기엔 페이지 전용 합성만.
 - **전역 상태 관리 라이브러리 도입**: React Query, Zustand, Redux 등 신규 도입 금지 (PRD/아키텍처 논의 없이).
-- **백엔드 파일 편집**: `apps/example-api/**` 금지.
-- **테스트 파일 편집**: `apps/example-web/tests/**` 금지.
+- **백엔드 파일 편집**: `apps/api/**` 금지.
+- **테스트 파일 편집**: `apps/web/tests/**` 금지.
 - **문서 편집**: `docs/**` 금지.
 - **다른 에이전트 호출**: Task 도구 없음.
 - **lint/build 실패 무시**: 실제 실행 결과로 확인.

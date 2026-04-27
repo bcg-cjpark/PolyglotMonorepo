@@ -32,7 +32,7 @@ bin/
 # ========================
 # libs/api-types/src/generated.ts is committed as a placeholder so that
 # fresh clones type-check. It is overwritten by `nx run api-types:codegen`
-# after example-api has produced its openapi.json; the updated version is
+# after api has produced its openapi.json; the updated version is
 # typically left uncommitted locally.
 
 # ========================

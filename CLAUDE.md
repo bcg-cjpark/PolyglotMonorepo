@@ -24,7 +24,7 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 | 모드 | 뜻 | `docs/tech-stack/backend.md` 헤더 예 |
 |---|---|---|
-| `inhouse` | 이 레포의 `apps/example-api` 가 실제 백엔드. 이 템플릿의 기본. | `mode: inhouse` + engine/profile 필드 |
+| `inhouse` | 이 레포의 `apps/api` 가 실제 백엔드. 이 템플릿의 기본. | `mode: inhouse` + engine/profile 필드 |
 | `external` | 백엔드는 외부에 존재. `swagger.json` 또는 서버 URL 제공. | `mode: external` + `baseUrl:` + `swagger:` |
 | `mock` | 백엔드 미정/대기. MSW 로 mock 해서 프론트만 먼저 구현. | `mode: mock` + `contract:` (+ 선택적 `fallbackTo:`) |
 
@@ -42,26 +42,26 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 ### mock 모드 파일/셋업 규약
 
-- MSW handler 위치: `apps/example-web/src/mocks/**` (프론트 개발팀 소유).
-- Service worker 파일: `apps/example-web/public/mockServiceWorker.js` (`npx msw init` 산출물, **수정 금지**).
+- MSW handler 위치: `apps/web/src/mocks/**` (프론트 개발팀 소유).
+- Service worker 파일: `apps/web/public/mockServiceWorker.js` (`npx msw init` 산출물, **수정 금지**).
 - 토글: `.env` 의 `VITE_USE_MOCK=true` 일 때만 `main.tsx` 에서 `worker.start()` 호출 (dev 전용, prod 번들에서 tree-shake).
 - 계약 출처: `docs/prd/<feature>.md` 의 API 섹션 또는 별도 `libs/api-types` 수작업 타입.
-- **MSW 기본 설치 안 함** — 템플릿 원칙 유지. 모드가 `mock` 으로 설정된 프로젝트에서만 `pnpm add -D msw --filter example-web` + `npx msw init apps/example-web/public --save` + `src/mocks/` 스캐폴드를 1회 실행한다. 이 셋업은 메인(프로젝트 전체 팀장) 책임.
+- **MSW 기본 설치 안 함** — 템플릿 원칙 유지. 모드가 `mock` 으로 설정된 프로젝트에서만 `pnpm add -D msw --filter web` + `npx msw init apps/web/public --save` + `src/mocks/` 스캐폴드를 1회 실행한다. 이 셋업은 메인(프로젝트 전체 팀장) 책임.
 
 ### external 모드 규약
 
 - `libs/api-types` 는 외부 `swagger.json` 에서 `openapi-typescript` 로 자동 생성. 수작업 편집 금지.
-- `apps/example-web/.env` 의 `VITE_API_BASE_URL` 에 외부 서버 URL. Vite dev 프록시는 이 변수를 기반으로 구성.
-- `apps/example-api/**` 는 삭제하지 않고 보관 (향후 `inhouse` 로 되돌릴 가능성). 단 빌드 파이프라인에서는 제외.
+- `apps/web/.env` 의 `VITE_API_BASE_URL` 에 외부 서버 URL. Vite dev 프록시는 이 변수를 기반으로 구성.
+- `apps/api/**` 는 삭제하지 않고 보관 (향후 `inhouse` 로 되돌릴 가능성). 단 빌드 파이프라인에서는 제외.
 
 ### 모드 전환 체크리스트 (메인이 수행)
 
 | 전환 | 체크리스트 |
 |---|---|
-| `mock → external` | (1) `docs/tech-stack/backend.md` 헤더 `mode: external` + `baseUrl` + `swagger` 갱신 → (2) `libs/api-types` 를 외부 스펙에서 재생성 → (3) `apps/example-web/src/mocks/**` 삭제 + `pnpm remove msw --filter example-web` → (4) `.env.VITE_USE_MOCK` 제거 → (5) 통합테스트팀 활성, `tests/integration/**` 스펙 작성/복구. |
-| `mock → inhouse` | 위 (1)(3)(4) + `apps/example-api/**` 스캐폴드 확인 + Flyway `V1` 재생성 + 백엔드팀 활성. |
-| `external → inhouse` | `apps/example-api/**` 스캐폴드 + Flyway `V1` + `VITE_API_BASE_URL` 을 프록시(`/api`) 기본값으로 되돌림 + 백엔드팀 활성. |
-| `inhouse → external` | `apps/example-api/**` 는 보존, 빌드만 off + `baseUrl`/`swagger` 갱신 + 백엔드팀 비활성. |
+| `mock → external` | (1) `docs/tech-stack/backend.md` 헤더 `mode: external` + `baseUrl` + `swagger` 갱신 → (2) `libs/api-types` 를 외부 스펙에서 재생성 → (3) `apps/web/src/mocks/**` 삭제 + `pnpm remove msw --filter web` → (4) `.env.VITE_USE_MOCK` 제거 → (5) 통합테스트팀 활성, `tests/integration/**` 스펙 작성/복구. |
+| `mock → inhouse` | 위 (1)(3)(4) + `apps/api/**` 스캐폴드 확인 + Flyway `V1` 재생성 + 백엔드팀 활성. |
+| `external → inhouse` | `apps/api/**` 스캐폴드 + Flyway `V1` + `VITE_API_BASE_URL` 을 프록시(`/api`) 기본값으로 되돌림 + 백엔드팀 활성. |
+| `inhouse → external` | `apps/api/**` 는 보존, 빌드만 off + `baseUrl`/`swagger` 갱신 + 백엔드팀 비활성. |
 | `inhouse → mock` | 비권장 (이미 백엔드가 있는데 mock 으로 되돌리는 것). 단기 회귀 실험 외 사용 금지. |
 
 각 전환은 **메타 작업** 이므로 메인이 직접 커밋 (`chore(config): mode <prev> → <next> 전환` 류).
@@ -113,7 +113,7 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 3. 메인이 `ui-composer → ui-storybook-curator → ui-library-tester → ui-lead` 순 호출.
 4. UI팀 커밋 완료 후 `frontend-developer` 재호출해서 primitive 교체.
 
-**앱 코드 내부에 범용 primitive 금지** — `apps/example-web/src/components/` 에는 해당 페이지에서만 쓰이는 **합성 컴포넌트** (예: `UserListRow`) 만 허용. 그 내부 구성도 `@monorepo/ui` primitive 기반.
+**앱 코드 내부에 범용 primitive 금지** — `apps/web/src/components/` 에는 해당 페이지에서만 쓰이는 **합성 컴포넌트** (예: `UserListRow`) 만 허용. 그 내부 구성도 `@monorepo/ui` primitive 기반.
 
 ## 파일 편집 소유권
 
@@ -124,12 +124,12 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 | `libs/ui/**` | UI팀 |
 | `libs/tokens/styles/__tokens-*.css` | UI팀 (`scripts/apply-theme-colors.mjs` 경유 필수, 의도 결정은 디자인팀) |
 | `libs/tailwind-config/globals.css` (Tailwind `@theme inline` 매핑) | UI팀 |
-| `apps/example-web/src/**` | 프론트 개발팀 |
-| `apps/example-web/src/mocks/**` (mock 모드 전용) | 프론트 개발팀 |
-| `apps/example-web/public/mockServiceWorker.js` | **수정 금지** (`npx msw init` 산출물, 모드 셋업 스크립트로만 생성/삭제) |
-| `apps/example-web/tests/e2e/**` | 프론트 테스트팀 |
-| `apps/example-web/tests/integration/**` | 통합테스트팀 (`inhouse` / `external` 모드에서만 활성) |
-| `apps/example-api/**` | 백엔드팀 (`inhouse` 모드에서만 활성) |
+| `apps/web/src/**` | 프론트 개발팀 |
+| `apps/web/src/mocks/**` (mock 모드 전용) | 프론트 개발팀 |
+| `apps/web/public/mockServiceWorker.js` | **수정 금지** (`npx msw init` 산출물, 모드 셋업 스크립트로만 생성/삭제) |
+| `apps/web/tests/e2e/**` | 프론트 테스트팀 |
+| `apps/web/tests/integration/**` | 통합테스트팀 (`inhouse` / `external` 모드에서만 활성) |
+| `apps/api/**` | 백엔드팀 (`inhouse` 모드에서만 활성) |
 | `libs/ui/tests/**` | UI팀 (ui-library-tester) |
 | `docs/tech-stack/**` | 메인(프로젝트 전체 팀장) — 기술 스택 결정 기록 |
 | `.claude/**`, `CLAUDE.md`, 루트 설정 | 메인(프로젝트 전체 팀장) |
@@ -138,12 +138,12 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 
 | 변경 계층 | 책임 팀 | 필수 검증 |
 |---|---|---|
-| Kotlin, Gradle, Flyway | 백엔드팀 | `pnpm nx run example-api:lint` + `:build`, Flyway 버전 충돌 없음 (V1 불변) |
-| `libs/ui/**` | UI팀 | `pnpm nx run example-web:build` + `pnpm --filter @monorepo/ui build-storybook` + `ui-library-tester` 통과 |
+| Kotlin, Gradle, Flyway | 백엔드팀 | `pnpm nx run api:lint` + `:build`, Flyway 버전 충돌 없음 (V1 불변) |
+| `libs/ui/**` | UI팀 | `pnpm nx run web:build` + `pnpm --filter @monorepo/ui build-storybook` + `ui-library-tester` 통과 |
 | `libs/tokens/**` 색상 | UI팀 (의도는 디자인팀) | `scripts/apply-theme-colors.mjs` 경유 필수 |
-| `apps/example-web/src/**` React | 프론트 개발팀 | `pnpm nx run example-web:lint` + `:build` |
+| `apps/web/src/**` React | 프론트 개발팀 | `pnpm nx run web:lint` + `:build` |
 | 디자인 일관성 | 디자인팀 | `design-consistency-auditor` Critical 0 |
-| 화면 단위 e2e | 프론트 테스트팀 | `pnpm nx run example-web:e2e` 전체 통과 |
+| 화면 단위 e2e | 프론트 테스트팀 | `pnpm nx run web:e2e` 전체 통과 |
 | 통합 e2e | 통합테스트팀 | 실 API + DB 기동 + `tests/integration/**` 통과 |
 | `docs/prd`, `docs/screens`, `docs/stitch-brief`, `docs/audit` | 기획팀 | 필수 섹션 / 링크 무결성 / 금지어(TODO/FIXME) 0 |
 | `docs/design-notes/**` | 디자인팀 | 레퍼런스 출처 명시, 바이너리 이미지 미포함 |
@@ -170,7 +170,7 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 1. 메인이 "릴리즈해줘" 요청 (또는 의미 있는 변경 누적 후 자체 판단).
 2. `release-curator` 호출 — git log 분석 → SemVer 증분 제안 + `CHANGELOG.md` append + `docs/releases/v<X.Y.Z>.md` 작성.
 3. `planning-lead` 검수 + 커밋 (`docs(release): v<X.Y.Z> 릴리즈 노트`).
-4. **메인이 직접** `package.json` (10개) + `apps/example-api/build.gradle.kts` 버전 bump + 커밋 (`chore(release): bump <X.Y.Z>`).
+4. **메인이 직접** `package.json` (10개) + `apps/api/build.gradle.kts` 버전 bump + 커밋 (`chore(release): bump <X.Y.Z>`).
 5. (선택) 메인이 `git tag v<X.Y.Z>` + `git push --tags`.
 
 ### SemVer 판정
@@ -220,7 +220,7 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
      -e "DROP DATABASE IF EXISTS <db>; CREATE DATABASE <db> CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
    ```
    단순 V 증분 (V2, V3 ...) 은 DB drop 불필요 — Flyway 가 자동 적용.
-3. **새 백엔드 기동**: `pnpm nx run example-api:serve`.
+3. **새 백엔드 기동**: `pnpm nx run api:serve`.
 4. **스모크 체크**: 신규 엔드포인트가 기대 스키마로 응답하는지 curl 또는 GET.
 
 이 순서를 건너뛰면 프론트/e2e 가 옛 서버를 보고 "테스트 실패 = 앱 버그" 로 오진하기 쉬움.
@@ -255,6 +255,6 @@ Claude Code 플랫폼이 sub-agent nesting 을 지원하지 않으므로 팀장 
 - 메인이 팀장 검수 없이 커밋.
 - Flyway `V1__init.sql` 수정. 새 버전은 `V<N+1>` 로. (예외: DB 엔진 자체를 교체하는 `docs/tech-stack/backend.md` 결정이 선행된 경우에 한해 V1~V<N> 을 새 엔진 문법으로 재작성 가능. 재작성 이후 시점부터 다시 불변.)
 - 앱 코드 내부에 범용 UI primitive 생성.
-- **모드 불일치 작업** — `docs/tech-stack/backend.md` 의 `mode` 가 `mock` 인데 `apps/example-api/**` 편집, `external` 인데 `swagger.json` 없이 `libs/api-types` 수작업 편집 같은 것. 모드 변경은 위 "모드 전환 체크리스트" 를 선행하고 반영.
+- **모드 불일치 작업** — `docs/tech-stack/backend.md` 의 `mode` 가 `mock` 인데 `apps/api/**` 편집, `external` 인데 `swagger.json` 없이 `libs/api-types` 수작업 편집 같은 것. 모드 변경은 위 "모드 전환 체크리스트" 를 선행하고 반영.
 - **`external` / `mock` 모드에서 `tests/integration/**` 를 실행**. 스펙 파일은 남겨둘 수 있지만 CI/로컬 실행 대상 아님.
 - **`mock` 모드에서 프로덕션 번들에 MSW 포함**. `worker.start()` 는 반드시 `import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true'` 같은 dev-only 조건부로.

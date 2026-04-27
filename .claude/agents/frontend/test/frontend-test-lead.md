@@ -33,12 +33,12 @@ git diff --stat HEAD
 ```
 
 ### 2. 검수 범위
-허용: `apps/example-web/tests/e2e/**`
+허용: `apps/web/tests/e2e/**`
 금지: 그 외 경로 (섞이면 FAIL)
 
 ### 3. 필수 검증
 ```bash
-pnpm nx run example-web:e2e
+pnpm nx run web:e2e
 ```
 - 통과 테스트 수 + 실패 내역 확인.
 - 새 스펙이 실제로 실행되었는지 (skipped 아닌지) 확인.
@@ -66,7 +66,7 @@ test(web): <feature> e2e 시나리오 추가
 
 ### 7. 커밋 실행 (PASS 일 때만)
 ```bash
-git add apps/example-web/tests/e2e
+git add apps/web/tests/e2e
 git commit -m "$(cat <<'EOF'
 test(web): <feature> e2e 시나리오 추가
 
